@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script>
+    {
+        /* 
+            1.await后面接一个会return new promise的函数并执行它
+            2.await只能放在async函数里 
+        */
+        /* 摇骰子 */
+        // function dice(param) {
+        //     return new Promise((resolve, reject) => {
+        //         let sino = parseInt(Math.random() * 6 + 1)
+        //         if (sino > 3) {
+        //             if (param === '大') {
+        //                 setTimeout(() => {
+        //                     console.log(`点数为${sino},押大`);
+        //                     resolve(sino)
+        //                 }, 2000)
+        //             } else {
+        //                 console.log(`点数为${sino},押小`);
+        //                 reject(sino)
+        //             }
+        //         } else {
+        //             if (param === '大') {
+        //                 console.log(`点数为${sino},押大`);
+        //                 reject(sino)
+        //             } else {
+        //                 setTimeout(() => {
+        //                     console.log(`点数为${sino},押小`);
+        //                     resolve(sino)
+        //                 }, 2000)
+        //             }
+        //         }
+        //     })
+        // }
+
+        // async function test() {
+        //     try {
+        //         let n = await dice('大')
+        //         console.log('赢了,点数：' + n)
+        //     } catch (e) {
+        //         console.log('输了,点数：' + e);
+        //     }
+        // }
+        // test()
+
+        /*  promise.all里面跟一个数组，数组的每一项是一个返回promise的函数调用，
+            then的第一个参数是所有的promise都成功后调用，拿到所有promise的结果是一个数组；
+            第二个参数拿到的是第一个失败的值
+        */
+        // Promise.all(
+        //     [dice('大'), dice('小')]
+        // ).then((x) => {
+        //     console.log(x)
+        // }, (y) => {
+        //     console.log(y)
+        // })
+    }
+
+    {
+        function dice(param) {
+            return new Promise((resolve, reject) => {
+                let sino = parseInt(Math.random() * 6 + 1)
+                if (sino > 3) {
+                    if (param === '大') {
+                        setTimeout(() => {
+                            console.log(`点数为${sino},押大`);
+                            resolve(sino)
+                        }, 2000)
+                    } else {
+                        console.log(`点数为${sino},押小`);
+                        reject(sino)
+                    }
+                } else {
+                    if (param === '大') {
+                        console.log(`点数为${sino},押大`);
+                        reject(sino)
+                    } else {
+                        setTimeout(() => {
+                            console.log(`点数为${sino},押小`);
+                            resolve(sino)
+                        }, 2000)
+                    }
+                }
+            })
+        }
+        /* 使用await
+            await是直接获取多个promise的结果的，因为Promise.all()返回的也是一个promise
+            所以如果要使用await拿到多个promise的值，可以直接await Promise.all()
+        */
+        async function test() {
+            try {
+                let n = await Promise.all([dice('大'), dice('小')])
+                console.log(n)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        // test()
+    }
+
+    {
+        function fn() {
+            return new Promise(resolve => {
+                console.log(1)
+                // resolve()
+            })
+        }
+        async function f1() {
+            await fn()
+            console.log(2)
+        }
+        f1()
+        console.log(3)
+        /* 这个代码因为fn是属于同步的，所以先打印出1，然后是3，
+        但是因为没有resolve结果，所以await拿不到值，因此不会打印2;
+        */
+
+        /* 若将上述resolve()代码解开注释，这个代码与前面相比多了个resolve说明promise成功了，
+        所以await能拿到结果，因此就是1 3 2 */
+    }
+</script>
+
+</html>
