@@ -1,0 +1,33 @@
+.container {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+.container p{
+	height: 40px;
+}
+.block {
+    height: 300px;
+}
+html{
+	height: 1200px;
+}
+header {
+    width: 100%;
+    height: 80px;
+    position: fixed;
+	top: 0;
+	background-color: salmon;
+}
+header ul{
+	display: flex;
+}
+header ul li{
+	flex: 1;
+}
+body{
+    background-color: rgba(0,0,0,.5);
+}
+.add_stop{
+    padding-right: 15px !important;
+    overflow: hidden;
+}
