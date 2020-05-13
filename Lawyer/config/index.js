@@ -9,7 +9,7 @@ module.exports = {
 
     // Paths
     assetsSubDirectory: 'static',
-    assetsPublicPath: './',
+    assetsPublicPath: './', // build时 assetsPublicPath字段值由之前的'/'改为'./'；awy
     proxyTable: {},
 
     // Various Dev Server settings
