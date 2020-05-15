@@ -1,5 +1,17 @@
 <template>
   <div class="ebook">
+    <div class="title-wrapper">
+      <div class="left">
+        <span class="icon-arrow-left2 icon"></span>
+      </div>
+      <div class="right">
+        <div class="icon-wrapper">
+          <span class="icon-cart icon"></span>
+          <span class="icon-user icon"></span>
+          <span class="icon-menu icon"></span>
+        </div>
+      </div>
+    </div>
     <div class="read-wrapper">
       <div id="read"></div>
       <div class="mask">
@@ -70,6 +82,36 @@ export default {
       }
       .right {
         flex: 0 0 px2rem(100);
+      }
+    }
+  }
+  .title-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 101;
+    width: 100%;
+    height: px2rem(48);
+    background-color: #fff;
+    display: flex;
+    box-shadow: 0 px2rem(8) px2rem(8) rgba(0, 0, 0, 0.15);
+    .left {
+      flex: 0 0 px2rem(60);
+      @include center;
+    }
+    .right {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      .icon-wrapper {
+        // flex: 0 0 px2rem(80);
+        @include center;
+        .icon{
+          margin: 0 px2rem(3);
+        }
+        .icon-cart{
+          font-size: px2rem(18);
+        }
       }
     }
   }
