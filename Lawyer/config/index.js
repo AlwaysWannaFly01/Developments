@@ -9,11 +9,12 @@ module.exports = {
 
     // Paths
     assetsSubDirectory: 'static',
-    assetsPublicPath: './', // build时 assetsPublicPath字段值由之前的'/'改为'./'；awy
+    assetsPublicPath: '/',
+    // assetsPublicPath: './', // build时 assetsPublicPath字段值由之前的'/'改为'./'；awy
     proxyTable: {},
 
     // Various Dev Server settings
-    host: '192.168.200.104', // can be overwritten by process.env.HOST
+    host: 'localhost', // can be overwritten by process.env.HOST
     port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,
