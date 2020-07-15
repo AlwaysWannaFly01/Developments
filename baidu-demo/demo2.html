@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #box {
+            width: 300px;
+            height: 200px;
+            border: 4px solid blue;
+            margin: 200px auto;
+            overflow: auto;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            var box = document.getElementById("box");
+            var start = document.getElementById("start");
+            var pasue = document.getElementById("pasue");
+
+            start.onclick = function () {
+                // 设置定时器
+
+                // timer = setInterval(function () {
+                //     // 获取当前滚动条的位置
+                //     var old = box.scrollTop;
+                //     // 改变滚动条的位置：给当前滚动条的位置+10
+                //     var news = old + 10;
+                //     // 将新滚动条的位置赋值回去
+                //     box.scrollTop = news;
+                // }, 200)
+
+                var old = box.scrollTop;
+                console.log(old);
+                var news = old + 20;
+                box.scrollTop = news;
+            }
+            pasue.onclick = function () {
+                clearInterval(timer);
+            }
+
+        }
+    </script>
+</head>
+
+<body>
+    <input type="button" value="开始阅读" id="start">
+    <input type="button" value="停止阅读" id="pasue">
+
+    <div id="box">
+        <p>
+            UCan下午茶是UCloud于2017年启动的系列技术沙龙。
+            该沙龙不仅会分享UCloud最新的技术重点，
+            同时也会诚邀业界相关方向的技术大咖一同交流、分享。诚意满满的干货、鲜活生动的案例内容，
+            将使每位参与者不负午后时光，场场“悟”有所值。
+    
+            2018“UCan下午茶”将会继续秉承技术为先、实践为主的宗旨，
+            为大家分享真正的技术干货，同时，相对于2017年，2018 “UCan下午茶”将会增加目前在市场上火热的区块链，
+            人工智能等前沿技术方向的探讨和交流，希望能够使您在2018年收获满满，“悟”有所值！
+            活动主题：从区块链到数字货币安全
+            众所周知，链圈和币圈经常纷争不止。但其实两边都是区块链行业繁荣的重要组成部分。
+            区块链真正解决的，是数字世界的信任问题，然而，在没有彻底解决诸如安全、性能、
+            一致性等一系列问题之前，
+            区块链解决信任问题的梦想只能是空中楼阁。
+            为此，UCloud将举办UCan下午茶活动，本次沙龙除了重点讲解如何解决区块链安全、
+            性能等方面的问题，
+            包括区块链多重签名、虚拟货币的安全、如何打造公有链等。
+            活动主题：游戏出海，那些弯和那些坑
+            随着游戏市场日趋扩大及竞争的日益激烈，虽然如今游戏出海已经过了满地肥肉的时代，
+            成为一场拼资源拼实力的硬仗，但很多游戏厂商仍然对出海趋之若鹜，
+            毕竟，虽然海外市场，特别 是欧美市场竞争非常惨烈，
+            但同时也是一个回报比较高的市场。那么，对于游戏出海来说，
+            应该怎样避免走弯路，应该注意哪些坑呢。本次UCan下午茶将会为您解答这些方面的疑问，
+            重点探讨游戏出海面临的困难、挑战以及应对的方法和手段，
+            同时，也会就一些游戏开发方面的技术问题进行较为深入的交流和讨论。
+        </p>
+        
+    </div>
+</body>
+
+</html>

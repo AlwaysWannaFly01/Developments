@@ -1,0 +1,107 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #box {
+            display: flex;
+            margin: 300px auto;
+        }
+
+        ul {
+            display: flex;
+            flex-direction: column;
+
+        }
+
+        li {
+            height: 60px;
+            border: 1px solid #ddd;
+            list-style: none;
+        }
+
+        .aa {
+            height: 150px;
+            overflow: auto;
+            width: 300px;
+        }
+
+        .bb {
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box">
+        <div class="bb">
+            <p @click="click(1)">详情</p>
+            <p @click="click(2)">评论</p>
+            <p @click="click(3)">新闻</p>
+            <p @click="click(4)">关于</p>
+            <p @click="click(5)">相关</p>
+        </div>
+        <div class="aa" id="uld">
+            <ul ref='uld'>
+                <!-- <ul ref='uld' @scroll="handleScroll"> -->
+                <li>详情详情详情详情详情详情</li>
+                <li>评论评论评论评论评论</li>
+                <li>新闻新闻新闻新闻新闻</li>
+                <li>关于关于关于关于关于</li>
+                <li>相关相关相关相关相关</li>
+            </ul>
+        </div>
+
+    </div>
+</body>
+
+<script>
+    new Vue({
+        el: '#box',
+        data: {
+            tabList: [{
+                id: 1,
+                name: '详情'
+            }, {
+                id: 2,
+                name: '评论'
+            }, {
+                id: 3,
+                name: '新闻'
+            }, {
+                id: 4,
+                name: '关于'
+            }, {
+                id: 5,
+                name: '相关'
+            }]
+        },
+        // created() {
+        //     window.addEventListener('scroll', this.handleScroll, true);
+        // },
+        methods: {
+            click(p) {
+                console.log(p);
+                // console.log(this.$refs.uld.scrollTop)
+                // this.$refs.uld.scrollTop = 120
+                var uld = document.getElementById("uld");
+                // var old = uld.scrollTop;
+                // console.log(old);
+                // var news = old + 20;
+                uld.scrollTop = (p - 1) * 60;
+            },
+            // handleScroll(e) {
+            //     console.log(e);
+            // }
+        }
+    });
+</script>
+
+</html>
