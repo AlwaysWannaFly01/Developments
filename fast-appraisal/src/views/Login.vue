@@ -1,5 +1,7 @@
 <template>
   <div>
+	  what the fuck
+	  <van-button type="primary" size="small">登录</van-button>
   </div>
 </template>
 
