@@ -24,15 +24,14 @@ export default {
 @import "../../assets/styles/global";
 .panel{
 	width: 100%;
-	height: px2rem(104);
+	height: 104px;
 	box-sizing: border-box;
 	padding: px2rem(10) px2rem(14);
 	display: flex;
 	flex-direction: column;
 	background-image: url("../../assets/images/list-bg.png");
-	background-size: 100%;
-	//position: fixed;
-	//margin:px2rem(14) px2rem(10);
+	background-size: cover;
+	border-radius: px2rem(5);
 	.menu{
 		width: px2rem(17);
 	}
