@@ -3,77 +3,73 @@
 		<div class="fixed-panel">
 			<User></User>
 		</div>
-
-		<div class="list-container">
+		<div class="fixed-search">
 			<van-search
 				v-model="value"
 				placeholder="请输入地址"
 				class="search"
 				:clearable="false"
 			>
-				<!--				<template #action>-->
-				<!--					<img src="../assets/images/search.png" @click="onSearch">-->
-				<!--				</template>-->
 			</van-search>
-			<ul>
-				<li>
-					<div>
-						<h3>北京市</h3>
-						<p>详细地址:详细地址详细地址详细地址详细地址</p>
-					</div>
-					<aside>
-						查看
-					</aside>
-				</li>
-				<li>
-					<div>
-						<h3>北京市</h3>
-						<p>详细地址:详细地址详细地址详细地址详细地址</p>
-					</div>
-					<aside>
-						查看
-					</aside>
-				</li>
-				<li>
-					<div>
-						<h3>北京市</h3>
-						<p>详细地址:详细地址详细地址详细地址详细地址</p>
-					</div>
-					<aside>
-						查看
-					</aside>
-				</li>
-				<li>
-					<div>
-						<h3>北京市</h3>
-						<p>详细地址:详细地址详细地址详细地址详细地址</p>
-					</div>
-					<aside>
-						查看
-					</aside>
-				</li>
-				<li>
-					<div>
-						<h3>北京市</h3>
-						<p>详细地址:详细地址详细地址详细地址详细地址</p>
-					</div>
-					<aside>
-						查看
-					</aside>
-				</li>
-				<li>
-					<div>
-						<h3>北京市</h3>
-						<p>详细地址:详细地址详细地址详细地址详细地址</p>
-					</div>
-					<aside>
-						查看
-					</aside>
-				</li>
-
-
-			</ul>
 		</div>
+		<ul class="list-container">
+			<li>
+				<div>
+					<h3>北京市</h3>
+					<p>详细地址:详细地址详细地址详细地址详细地址</p>
+				</div>
+				<aside>
+					查看
+				</aside>
+			</li>
+			<li>
+				<div>
+					<h3>北京市</h3>
+					<p>详细地址:详细地址详细地址详细地址详细地址</p>
+				</div>
+				<aside>
+					查看
+				</aside>
+			</li>
+			<li>
+				<div>
+					<h3>北京市</h3>
+					<p>详细地址:详细地址详细地址详细地址详细地址</p>
+				</div>
+				<aside>
+					查看
+				</aside>
+			</li>
+			<li>
+				<div>
+					<h3>北京市</h3>
+					<p>详细地址:详细地址详细地址详细地址详细地址</p>
+				</div>
+				<aside>
+					查看
+				</aside>
+			</li>
+			<li>
+				<div>
+					<h3>北京市</h3>
+					<p>详细地址:详细地址详细地址详细地址详细地址</p>
+				</div>
+				<aside>
+					查看
+				</aside>
+			</li>
+			<li>
+				<div>
+					<h3>北京市</h3>
+					<p>详细地址:详细地址详细地址详细地址详细地址</p>
+				</div>
+				<aside>
+					查看
+				</aside>
+			</li>
+
+
+		</ul>
 	</div>
 </template>
 <script>
@@ -101,96 +97,86 @@ export default {
 </script>
 <style lang="scss">
 @import "../assets/styles/global.scss";
-
+//body{
+//	display: flex;
+//	flex-direction: column;
+//	height: 100vh;
+//}
 .page-list {
 	position: relative;
-	//padding: px2rem(14) px2rem(10);
-	min-width: 100vw;
-	min-height: 100vh;
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
 	box-sizing: border-box;
 	background-color: #ebeef5;
-	.fixed-panel{
-		position: fixed;
-		width: 100%;
-		box-sizing: border-box;
-		left: 0;
-		top: 0;
-		padding: px2rem(14) px2rem(10);
-		z-index: 9;
+
+	.fixed-panel {
+		margin: px2rem(14) px2rem(10) px2rem(0);
 	}
-	.list-container {
-		width: 100%;
-		box-sizing: border-box;
-		background-color: #fff;
-		border-radius: px2rem(5);
-		padding: px2rem(20) px2rem(10);
-		//margin-top: px2rem(10);
-		position: absolute;
-		top: px2rem(124);
-		left: 0;
-		z-index: 1;
+
+	.fixed-search {
+		margin: px2rem(10) px2rem(10) px2rem(0);
+
 		.search {
-			padding: 0;
-			height: px2rem(33);
+			border-radius: px2rem(5) px2rem(5) 0 0;
 
 			.van-search__content {
-				border-radius: px2rem(16);
-				background-color: #f2f4f3;
-
 				.van-cell {
 					flex-flow: row-reverse;
 				}
 			}
-
-			img {
-				width: px2rem(15);
-			}
 		}
+	}
 
-		ul {
-			width: 100%;
+	.list-container {
+		flex: 1;
+		height: 100%;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		margin: 0 px2rem(10);
+		box-sizing: border-box;
+		padding: px2rem(10) px2rem(10) 0;
+		background-color: #fff;
+
+		li {
+			margin-bottom: px2rem(15);
 			display: flex;
-			flex-direction: column;
-			margin-top: px2rem(20);
+			height: px2rem(78);
+			align-items: center;
+			border-radius: px2rem(10);
+			background-color: #f2f4f3;
 
-			li {
-				margin-bottom: px2rem(15);
+			div {
+				flex: 1;
+				height: 100%;
+				padding: px2rem(10) px2rem(10);
+				box-sizing: border-box;
 				display: flex;
-				height: px2rem(78);
-				align-items: center;
-				border-radius: px2rem(10);
-				background-color: #f2f4f3;
+				flex-direction: column;
+				justify-content: space-around;
 
-				div {
-					flex: 1;
-					height: 100%;
-					padding: px2rem(10) px2rem(10);
-					box-sizing: border-box;
-					display: flex;
-					flex-direction: column;
-					justify-content: space-around;
-
-					h3 {
-						font-size: 16px;
-						font-weight: 700;
-					}
-
-					p {
-						font-size: 14px;
-						color: #666;
-					}
+				h3 {
+					font-size: 16px;
+					font-weight: 700;
 				}
 
-				aside {
+				p {
 					font-size: 14px;
-					width: px2rem(60);
-					height: 100%;
-					line-height: px2rem(78);
-					text-align: center;
-					background-color: #19b1f0;
-					color: #fff;
-					border-radius: 0 px2rem(10) px2rem(10) 0;
+					color: #666;
 				}
+			}
+
+			aside {
+				font-size: 14px;
+				width: px2rem(60);
+				height: 100%;
+				line-height: px2rem(78);
+				text-align: center;
+				background-color: #19b1f0;
+				color: #fff;
+				border-radius: 0 px2rem(10) px2rem(10) 0;
 			}
 		}
 	}
