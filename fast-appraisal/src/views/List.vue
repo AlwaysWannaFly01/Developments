@@ -1,5 +1,5 @@
 <template>
-	<div class="page-list" :style="height">
+	<div class="page-list" :style="{height: height + 'px'}">
 		<div class="top" ref="topblock">
 			<div class="fixed-panel">
 				<User></User>
@@ -25,6 +25,7 @@
 import User from "@/components/user/user";
 import Vue from "vue";
 import {Search, List, Cell} from "vant";
+
 Vue.use(Search).use(List).use(Cell);
 
 export default {
@@ -33,9 +34,7 @@ export default {
 		User,
 	},
 	beforeMount() {
-		this.height = {
-			  height: window.innerHeight + "px",
-		};
+		this.height = window.innerHeight;
 		// console.log(window.getComputedStyle(this.$refs.topblock).height)
 		this.listHeight = {
 			"height": (window.innerHeight - 183) + 'px',
@@ -65,7 +64,6 @@ export default {
 			// setTimeout 仅做示例，真实场景中一般为 ajax 请求
 			setTimeout(() => {
 				for (let i = 0; i < 10; i++) {
-					//   this.list.push(this.list.length + 1);
 					this.list.push({
 						name: "北京市" + i,
 						address: "详细地址详细地址详细地址详细地址详细地址详细地址" + i,
@@ -92,10 +90,12 @@ export default {
 	width: 100%;
 	box-sizing: border-box;
 	background-color: #ebeef5;
-	.top{
+
+	.top {
 		height: 183px;
 		overflow: hidden;
 	}
+
 	.fixed-panel {
 		position: fixed;
 		width: px2rem(355);
@@ -103,7 +103,7 @@ export default {
 		transform: translateX(-50%);
 		z-index: 9;
 		height: 104px;
-		padding: 14px 10px 0;
+		padding: 13px 10px 0;
 		background-color: #ebeef5;
 	}
 
@@ -120,7 +120,10 @@ export default {
 
 		.search {
 			border-radius: px2rem(5) px2rem(5) 0 0;
+
 			.van-search__content {
+				border-radius: px2rem(20);
+
 				.van-cell {
 					flex-flow: row-reverse;
 				}
@@ -132,9 +135,10 @@ export default {
 		position: absolute;
 		left: 50%;
 		transform: translateX(-50%);
-		top:182px;
+		top: 182px;
 		z-index: 1;
 		width: px2rem(355);
+
 		.van-list {
 			background-color: #fff;
 			padding: 0 px2rem(10);
@@ -154,6 +158,7 @@ export default {
 			border-radius: px2rem(10);
 			background-color: #f2f4f3;
 			margin-top: px2rem(10);
+
 			div {
 				flex: 1;
 				height: 100%;

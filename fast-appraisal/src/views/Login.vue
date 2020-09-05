@@ -27,9 +27,9 @@
                         placeholder="请输入密码"
                         :rules="[{ required: true,message: '请输入密码'}]"
                     ></van-field>
-                    <div class="forget-block">
-                        <van-button size="mini" class="forget">忘记密码?</van-button>
-                    </div>
+<!--                    <div class="forget-block">-->
+<!--                        <van-button size="mini" class="forget">忘记密码?</van-button>-->
+<!--                    </div>-->
                     <van-field
                         v-model="sms"
                         clearable
@@ -142,7 +142,7 @@ export default {
                     }
                 }
 				.send{
-					padding-top: 2px;
+					//padding-top: 2px;
 				}
             }
         }
