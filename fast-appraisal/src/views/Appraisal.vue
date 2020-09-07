@@ -93,7 +93,7 @@
 		</div>
 
 		<div class="btn-panel">
-			<van-button type="default" class="btn" @click="click">关闭</van-button>
+			<van-button type="default" class="btn">关闭</van-button>
 		</div>
 	</div>
 </template>

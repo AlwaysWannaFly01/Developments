@@ -1,151 +1,191 @@
 <template>
-    <div class="login">
-        <div class="main">
-            <img src="../assets/images/kuang.png" class="kuang" />
-            <img src="../assets/images/logo.png" class="logo" />
-            <img src="../assets/images/logo-word.png" class="logo-word" />
+	<div class="login">
+		<div class="main">
+			<img src="../assets/images/kuang.png" class="kuang"/>
+			<img src="../assets/images/logo.png" class="logo"/>
+			<img src="../assets/images/logo-word.png" class="logo-word"/>
 
-            <div class="form-main">
-                <van-form
-                    @submit="onSubmit"
-                    label-width="10"
-                    validate-first
-                    :show-error-message="false"
-                >
-                    <van-field
-                        v-model="username"
-                        name="用户名"
-                        label="*"
-                        placeholder="请输入用户名"
-                        :rules="[{ required: true,message: '请输入用户名'}]"
-                    />
-                    <van-field
-                        v-model="password"
-                        type="password"
-                        name="密码"
-                        label="*"
-                        placeholder="请输入密码"
-                        :rules="[{ required: true,message: '请输入密码'}]"
-                    ></van-field>
-<!--                    <div class="forget-block">-->
-<!--                        <van-button size="mini" class="forget">忘记密码?</van-button>-->
-<!--                    </div>-->
-                    <van-field
-                        v-model="sms"
-                        clearable
-                        label="*"
-                        placeholder="请输入验证码"
-                        :rules="[{ required: true,message: '请输入验证码'}]"
+			<div class="form-main">
+				<van-form
+					@submit="onSubmit"
+					label-width="10"
+					validate-first
+					:show-error-message="false"
+				>
+					<van-field
+						v-model="username"
+						name="用户名"
+						label="*"
+						placeholder="请输入用户名"
+						:rules="[{ required: true,message: '请输入用户名'}]"
+					/>
+					<van-field
+						v-model="password"
+						type="password"
+						name="密码"
+						label="*"
+						placeholder="请输入密码"
+						:rules="[{ required: true,message: '请输入密码'}]"
+					></van-field>
+					<!--                    <div class="forget-block">-->
+					<!--                        <van-button size="mini" class="forget">忘记密码?</van-button>-->
+					<!--                    </div>-->
+					<van-field
+						v-model="sms"
+						clearable
+						label="*"
+						placeholder="请输入验证码"
+						:rules="[{ required: true,message: '请输入验证码'}]"
 						class="send"
-                    >
-                        <template #button>
-                            <van-button size="mini" type="primary">发送验证码</van-button>
-                        </template>
-                    </van-field>
-                    <div class="btn">
-                        <van-button round block native-type="submit" class="submit-btn">登录</van-button>
-                    </div>
-                </van-form>
-            </div>
-        </div>
-    </div>
+					>
+						<template #button>
+							<van-button size="mini" type="primary">发送验证码</van-button>
+						</template>
+					</van-field>
+					<div class="btn">
+						<img :src="img" >
+						<van-button round block native-type="submit" class="submit-btn">登录</van-button>
+					</div>
+				</van-form>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
 import Vue from "vue";
-import { Button, Form, Field } from "vant";
+import {Button, Form, Field} from "vant";
 
 Vue.use(Button).use(Field).use(Form);
 
 export default {
-    name: "Login",
-    components: {},
-    data() {
-        return {
-            username: "",
-            password: "",
-            sms: "",
-        };
-    },
-    methods: {
-        onSubmit(values) {
-            console.log("submit", values);
-        },
-    },
+	name: "Login",
+	components: {},
+	data() {
+		return {
+			username: "",
+			password: "",
+			sms: "",
+			img:''
+		};
+	},
+	mounted() {
+		this.$axios({
+			method: 'get',
+			url: process.env.API_HOST + '/Account/GetCode',
+			headers: {
+				'Content-Type':
+					'image/jpeg'
+			},
+			data: {
+				t: 'asd'
+			},
+			responseType: 'arraybuffer'
+
+		}).then((response) => {          //这里使用了ES6的语法
+			// console.log(response)       //请求成功返回的数据
+			return 'data:image/png;base64,' + btoa(
+				new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
+			)
+		}).then(data => {
+			console.log(data)
+			// let str = data.replace(/\. +/g, '')
+			// str = str.replace(/[\r\n]/g, '')
+			// console.log(str)
+			this.img = data;
+		})
+	},
+	methods: {
+		onSubmit(values) {
+			console.log("submit", values);
+		},
+	},
 };
 </script>
 
 <style lang="scss">
 @import "../assets/styles/global.scss";
+
 .login {
-    background-image: url("../assets/images/login-bg.jpg");
-    background-size: 100% 100%;
-    width: 100vw;
-    height: 100vh;
-    position: relative;
-    .main {
-        width: 70%;
-        height: px2rem(445);
-        // background-color: darkorange;
-        position: relative;
-        top: 50%;
-        left: 15%;
-        transform: translate(0, -50%);
-        text-align: center;
-        .kuang {
-            width: px2rem(265);
-            margin-top: px2rem(-40);
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        .logo {
-            width: px2rem(53);
-            margin-top: px2rem(-20);
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .logo-word {
-            width: px2rem(66);
-            margin-top: px2rem(60);
-            position: relative;
-            z-index: 2;
-        }
-        .form-main {
-            width: px2rem(236);
-            margin-left: px2rem(15);
+	background-image: url("../assets/images/loginbg.jpg");
+	background-size: 100% 100%;
+	width: 100vw;
+	height: 100vh;
+	position: relative;
+
+	.main {
+		width: 70%;
+		height: px2rem(445);
+		// background-color: darkorange;
+		position: relative;
+		top: 50%;
+		left: 15%;
+		transform: translate(0, -50%);
+		text-align: center;
+
+		.kuang {
+			width: px2rem(265);
+			margin-top: px2rem(-40);
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+
+		.logo {
+			width: px2rem(53);
+			margin-top: px2rem(-20);
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+
+		.logo-word {
+			width: px2rem(66);
+			margin-top: px2rem(60);
+			position: relative;
+			z-index: 2;
+		}
+
+		.form-main {
+			width: px2rem(236);
+			margin-left: px2rem(15);
 			margin-top: px2rem(20);
-            .van-form {
-                .van-cell {
-                    line-height: 28px;
+
+			.van-form {
+				.van-cell {
+					line-height: 28px;
 					padding: 12px 16px;
-                }
-				.forget-block{
+				}
+
+				.forget-block {
 					display: flex;
 					padding: 0 16px;
 					justify-content: flex-end;
-					.forget{
+
+					.forget {
 						border: none;
 						height: 14px;
 						color: #bfbfbf;
 					}
 				}
-                .btn {
-                    margin: px2rem(35) px2rem(32) 0;
-                    .submit-btn {
-                        width: px2rem(170);
-                        height: px2rem(34);
-                        background-color: #3869f2;
-                        color: #fff;
-                    }
-                }
-				.send{
+
+				.btn {
+					margin: px2rem(35) px2rem(32) 0;
+
+					.submit-btn {
+						width: px2rem(170);
+						height: px2rem(34);
+						background-color: #3869f2;
+						color: #fff;
+					}
+				}
+
+				.send {
 					//padding-top: 2px;
 				}
-            }
-        }
-    }
+			}
+		}
+	}
 }
 </style>
