@@ -94,7 +94,7 @@ export default {
 			&.tel,
 			&.price,
 			&.company,
-			&.accessory,
+			&.accessory
 			{
 				.van-cell__left-icon{
 					background-size: 20px 20px;
