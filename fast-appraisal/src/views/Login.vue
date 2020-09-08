@@ -14,7 +14,7 @@
 				>
 					<van-field
 						v-model="username"
-						name="用户名"
+						name="UserName"
 						label="*"
 						placeholder="请输入用户名"
 						:rules="[{ required: true,message: '请输入用户名'}]"
@@ -22,7 +22,7 @@
 					<van-field
 						v-model="password"
 						type="password"
-						name="密码"
+						name="Password"
 						label="*"
 						placeholder="请输入密码"
 						:rules="[{ required: true,message: '请输入密码'}]"
@@ -31,7 +31,8 @@
 					<!--                        <van-button size="mini" class="forget">忘记密码?</van-button>-->
 					<!--                    </div>-->
 					<van-field
-						v-model="sms"
+						v-model="code"
+						name="Code"
 						clearable
 						label="*"
 						placeholder="请输入验证码"
@@ -39,11 +40,10 @@
 						class="send"
 					>
 						<template #button>
-							<van-button size="mini" type="primary">发送验证码</van-button>
+							<img :src="img" @click="changeCode">
 						</template>
 					</van-field>
 					<div class="btn">
-						<img :src="img" >
 						<van-button round block native-type="submit" class="submit-btn">登录</van-button>
 					</div>
 				</van-form>
@@ -65,39 +65,48 @@ export default {
 		return {
 			username: "",
 			password: "",
-			sms: "",
-			img:''
+			code: "",
+			img: ''
 		};
 	},
+	beforeMount() {
+		// this.init();
+	},
 	mounted() {
-		this.$axios({
-			method: 'get',
-			url: process.env.API_HOST + '/Account/GetCode',
-			headers: {
-				'Content-Type':
-					'image/jpeg'
-			},
-			data: {
-				t: 'asd'
-			},
-			responseType: 'arraybuffer'
-
-		}).then((response) => {          //这里使用了ES6的语法
-			// console.log(response)       //请求成功返回的数据
-			return 'data:image/png;base64,' + btoa(
-				new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
-			)
-		}).then(data => {
-			console.log(data)
-			// let str = data.replace(/\. +/g, '')
-			// str = str.replace(/[\r\n]/g, '')
-			// console.log(str)
-			this.img = data;
-		})
+		this.getCode();
 	},
 	methods: {
+		getCode() {
+			this.$axios({
+				method: 'get',
+				url: process.env.API_HOST + '/Account/GetCode',
+				responseType: 'arraybuffer'
+			}).then((response) => {          //这里使用了ES6的语法
+				// console.log(response)       //请求成功返回的数据
+				return 'data:image/png;base64,' + btoa(
+					new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
+				)
+			}).then(data => {
+				this.img = data;
+			})
+		},
+		changeCode() {
+			this.code = '';
+			this.getCode();
+		},
 		onSubmit(values) {
 			console.log("submit", values);
+			const {UserName, Password, Code} = values;
+			this.$axios.post(
+				process.env.API_HOST + '/Account/Login',
+				{
+					UserName,
+					Password,
+					Code
+				}
+			).then(res => {
+				console.log(res)
+			})
 		},
 	},
 };
@@ -182,7 +191,14 @@ export default {
 				}
 
 				.send {
-					//padding-top: 2px;
+					.van-field__button {
+						height: px2rem(26);
+
+						img {
+							width: px2rem(66);
+							height: px2rem(26);
+						}
+					}
 				}
 			}
 		}
