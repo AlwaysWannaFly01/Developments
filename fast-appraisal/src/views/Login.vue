@@ -15,7 +15,7 @@
 					<van-field
 						v-model="username"
 						name="UserName"
-						label="*"
+						left-icon="circle"
 						placeholder="请输入用户名"
 						:rules="[{ required: true,message: '请输入用户名'}]"
 					/>
@@ -23,18 +23,16 @@
 						v-model="password"
 						type="password"
 						name="Password"
-						label="*"
+						left-icon="circle"
 						placeholder="请输入密码"
 						:rules="[{ required: true,message: '请输入密码'}]"
+						autocomplete
 					></van-field>
-					<!--                    <div class="forget-block">-->
-					<!--                        <van-button size="mini" class="forget">忘记密码?</van-button>-->
-					<!--                    </div>-->
 					<van-field
 						v-model="code"
 						name="Code"
+						left-icon="circle"
 						clearable
-						label="*"
 						placeholder="请输入验证码"
 						:rules="[{ required: true,message: '请输入验证码'}]"
 						class="send"
@@ -136,7 +134,6 @@ export default {
 	.main {
 		width: 70%;
 		height: px2rem(445);
-		// background-color: darkorange;
 		position: relative;
 		top: 50%;
 		left: 15%;
@@ -176,6 +173,19 @@ export default {
 				.van-cell {
 					line-height: 28px;
 					padding: 12px 16px;
+					.van-field__left-icon{
+						line-height: normal;
+						.van-icon::before{
+							content:'';
+							width:6px;
+							height: 6px;
+							background-color: #afafaf;
+							border-radius: 3px;
+						}
+					}
+					&::after{
+						border-bottom: 1px solid #afafaf;
+					}
 				}
 
 				.forget-block {
@@ -209,6 +219,19 @@ export default {
 							width: px2rem(66);
 							height: px2rem(26);
 						}
+					}
+				}
+				.van-field--error{
+					.van-field__control::placeholder{
+						color: #4a0daf !important;
+					}
+					.van-field__left-icon{
+						.van-icon::before{
+							background-color: #4a0daf;
+						}
+					}
+					&::after{
+						border-bottom: 1px solid #4a0daf;
 					}
 				}
 			}

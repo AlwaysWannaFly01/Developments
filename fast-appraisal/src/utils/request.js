@@ -30,7 +30,6 @@ service.interceptors.response.use(
 	error => {
 		console.log('err', {error}) // for debug
 		const {msg} = error.response.data
-
 		return Promise.reject(error)
 	}
 )

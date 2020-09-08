@@ -93,7 +93,7 @@
 		</div>
 
 		<div class="btn-panel">
-			<van-button type="default" class="btn">关闭</van-button>
+			<van-button type="default" class="btn">委托预评</van-button>
 		</div>
 	</div>
 </template>
@@ -119,6 +119,9 @@ Vue.use(Overlay)
 	.use(Dialog)
 	.use(Popup)
 	.use(Uploader);
+
+import {postData} from '@/api';
+
 export default {
 	name: "Appraisal",
 	components: {
@@ -147,7 +150,17 @@ export default {
 	beforeMount() {
 		this.height = window.innerHeight;
 	},
+	mounted() {
+		this.init();
+	},
 	methods: {
+		init() {
+			postData('/Home/BindCaadRegionDropdownListJson', {
+				parentId: 0
+			}).then(response => {
+				console.log(response)
+			})
+		},
 		showPopup(type) {
 			console.log(type)
 			this.show = true;
@@ -411,8 +424,7 @@ export default {
 			max-height: 308px;
 
 			.van-image,
-			.van-uploader__upload
-			{
+			.van-uploader__upload {
 				width: px2rem(80);
 				height: px2rem(80);
 			}
