@@ -44,7 +44,9 @@
 						</template>
 					</van-field>
 					<div class="btn">
-						<van-button round block native-type="submit" class="submit-btn">登录</van-button>
+						<van-button round block native-type="submit" class="submit-btn" :loading="loginLoading"
+									loading-size="18" loading-text="登录">登录
+						</van-button>
 					</div>
 				</van-form>
 			</div>
@@ -54,9 +56,11 @@
 
 <script>
 import Vue from "vue";
-import {Button, Form, Field} from "vant";
+import {Button, Form, Field, Toast} from "vant";
 
-Vue.use(Button).use(Field).use(Form);
+Vue.use(Button).use(Field).use(Form).use(Toast);
+
+import {getCode, postData} from '@/api';
 
 export default {
 	name: "Login",
@@ -66,25 +70,20 @@ export default {
 			username: "",
 			password: "",
 			code: "",
-			img: ''
+			img: '',
+			loginLoading: false
 		};
 	},
 	beforeMount() {
-		// this.init();
 	},
 	mounted() {
 		this.getCode();
 	},
 	methods: {
 		getCode() {
-			this.$axios({
-				method: 'get',
-				url: process.env.API_HOST + '/Account/GetCode',
-				responseType: 'arraybuffer'
-			}).then((response) => {          //这里使用了ES6的语法
-				// console.log(response)       //请求成功返回的数据
+			getCode().then(response => {
 				return 'data:image/png;base64,' + btoa(
-					new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
+					new Uint8Array(response).reduce((data, byte) => data + String.fromCharCode(byte), '')
 				)
 			}).then(data => {
 				this.img = data;
@@ -95,18 +94,30 @@ export default {
 			this.getCode();
 		},
 		onSubmit(values) {
-			console.log("submit", values);
+			// console.log("submit", values);
 			const {UserName, Password, Code} = values;
-			this.$axios.post(
-				process.env.API_HOST + '/Account/Login',
-				{
-					UserName,
-					Password,
-					Code
+			postData('/Account/Login', {
+				UserName,
+				Password,
+				Code
+			}).then(response => {
+				// console.log(response)
+				const {MsgContent, IsSuccess} = response
+				if (IsSuccess === true) {
+					this.loginLoading = true;
+					setTimeout(() => {
+						this.$router.push({
+							path: "/list",
+						});
+					}, 2000)
+				} else {
+					Toast.fail(MsgContent);
 				}
-			).then(res => {
-				console.log(res)
+
+			}).catch(err => {
+				console.log(err)
 			})
+
 		},
 	},
 };
