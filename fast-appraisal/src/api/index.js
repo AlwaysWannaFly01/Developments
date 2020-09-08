@@ -8,6 +8,14 @@ export function getCode() {
 	})
 }
 
+export function getData(url,data){
+	return request({
+		url,
+		method:'get',
+		data
+	})
+}
+
 export function postData(url,data){
 	return request({
 		url,

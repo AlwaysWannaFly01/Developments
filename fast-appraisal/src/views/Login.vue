@@ -105,9 +105,9 @@ export default {
 					this.loginLoading = true;
 					setTimeout(() => {
 						this.$router.push({
-							path: "/list",
+							path: "/appraisal",
 						});
-					}, 2000)
+					}, 1000)
 				} else {
 					Toast.fail(MsgContent);
 				}

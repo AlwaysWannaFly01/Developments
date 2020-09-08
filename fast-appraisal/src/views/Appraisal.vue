@@ -20,7 +20,7 @@
 					<span class="_request">*</span>
 				</template>
 				<div @click="showPopup('city')">
-					<span>{{ selectCity ? selectCity : '请选择' }}</span>
+					<span>{{ selectCity.value ? selectCity.value : '请选择' }}</span>
 					<img src="../assets/images/icon_triangle.png"/>
 				</div>
 			</van-cell>
@@ -34,18 +34,23 @@
 					<img src="../assets/images/icon_triangle.png"/>
 				</div>
 			</van-cell>
-			<van-cell title="领勘人" icon="shop-o" class="person" value-class="_item">
-				<div @click="showPopup('person')">
-					<span>{{ selectPerson ? selectPerson : '请选择' }}</span>
-					<img src="../assets/images/icon_triangle.png"/>
-				</div>
-			</van-cell>
-			<van-cell title="联系电话" icon="shop-o" class="tel" value-class="_item">
-				<div @click="showPopup('tel')">
-					<span>{{ selectTel ? selectTel : '请选择' }}</span>
-					<img src="../assets/images/icon_triangle.png"/>
-				</div>
-			</van-cell>
+			<van-field
+				v-model="person"
+				label="领勘人"
+				placeholder="请输入领勘人"
+				input-align="right"
+				left-icon="smile-o"
+				class="person"
+			></van-field>
+			<van-field
+				v-model="tel"
+				label="联系电话"
+				placeholder="请输入电话"
+				input-align="right"
+				left-icon="smile-o"
+				class="tel"
+				type="tel"
+			></van-field>
 			<van-field
 				v-model="value"
 				label="网签价格"
@@ -61,7 +66,7 @@
 					<span class="_request">*</span>
 				</template>
 				<div @click="showPopup('company')">
-					<span>{{ selectCompany ? selectCompany : '请选择' }}</span>
+					<span>{{ selectCompany.value ? selectCompany.value : '请选择' }}</span>
 					<img src="../assets/images/icon_triangle.png"/>
 				</div>
 			</van-cell>
@@ -93,7 +98,7 @@
 		</div>
 
 		<div class="btn-panel">
-			<van-button type="default" class="btn">委托预评</van-button>
+			<van-button type="default" class="btn" @click="submit">委托预评</van-button>
 		</div>
 	</div>
 </template>
@@ -120,7 +125,8 @@ Vue.use(Overlay)
 	.use(Popup)
 	.use(Uploader);
 
-import {postData} from '@/api';
+import {postData, getData} from '@/api';
+import _ from 'lodash';
 
 export default {
 	name: "Appraisal",
@@ -131,11 +137,11 @@ export default {
 		return {
 			show: false,
 			selectProvince: "",
-			selectCity: '',
+			selectCity: {},
 			selectAppraisalType: "",
-			selectPerson: "",
-			selectCompany: "",
-			selectTel: "",
+			person: '',
+			tel: '',
+			selectCompany: {},
 			value: "",
 			columns: [],
 			uploadShow: false,
@@ -155,14 +161,45 @@ export default {
 	},
 	methods: {
 		init() {
+			/*获取城市*/
 			postData('/Home/BindCaadRegionDropdownListJson', {
 				parentId: 0
-			}).then(response => {
-				console.log(response)
+			}).then(res => {
+				/*测试数据*/
+				res = [{
+					Disabled: false,
+					Group: null,
+					Selected: false,
+					Text: "北京市",
+					Value: "110000"
+				}, {
+					Disabled: false,
+					Group: null,
+					Selected: false,
+					Text: "武汉市",
+					Value: "110001"
+				}]
+				/*测试数据*/
+				this.cityColumn = _.map(res, 'Text');
+				this.cityData = res;
+			}).catch(err => {
+				console.log(err)
 			})
+
+
+			/*获取评估公司*/
+			getData('/Home/GetApprovalCompanyList').then(res => {
+				console.log(res)
+				this.companyColumn = _.map(res, 'CompanyName');
+				this.companyData = res;
+				console.log('this.companyColumn', this.companyColumn)
+				console.log('this.companyData', this.companyData)
+			}).catch(err => {
+				console.log(err)
+			})
+
 		},
 		showPopup(type) {
-			console.log(type)
 			this.show = true;
 			switch (type) {
 				case 'province':
@@ -170,33 +207,31 @@ export default {
 					this.selectedOption = 'province';
 					break;
 				case 'city':
-					this.columns = ['武汉', '宁波', '温州', '绍兴', '湖州', '嘉兴', '金华', '衢州'];
+					this.columns = this.cityColumn;
 					this.selectedOption = 'city';
 					break;
 				case 'appraisalType':
-					this.columns = ['appraisalType1', 'appraisalType12'];
+					this.columns = ['预评', '正式'];
 					this.selectedOption = 'appraisalType';
 					break;
-				case 'person':
-					this.columns = ['person1', 'person2', 'person3'];
-					this.selectedOption = 'person';
-					break;
-				case 'tel':
-					this.columns = ['12312312323', '24434645', '233590', '8888', '354'];
-					this.selectedOption = 'tel';
-					break;
 				case 'company':
-					this.columns = ['阿里', '腾讯', '百度', '字节跳动'];
+					this.columns = this.companyColumn;
 					this.selectedOption = 'company';
 					break;
 				default:
 					break;
-
 			}
 
 		},
 		click() {
 			this.show = true;
+		},
+		onChange(picker, value, index) {
+			Toast(`当前值：${value}, 当前索引：${index}`);
+		},
+		onCancel() {
+			Toast('取消');
+			this.show = false;
 		},
 		onConfirm(value, index) {
 			Toast(`当前值：${value}, 当前索引：${index}`);
@@ -206,31 +241,41 @@ export default {
 					this.selectProvince = value;
 					break;
 				case 'city':
-					this.selectCity = value;
+					this.selectCity = {value, index};
+					this.selectData('city');
 					break;
 				case 'appraisalType':
 					this.selectAppraisalType = value;
 					break;
-				case 'person':
-					this.selectPerson = value;
-					break;
-				case 'tel':
-					this.selectTel = value;
-					break;
 				case 'company':
-					this.selectCompany = value;
+					this.selectCompany = {value, index};
+					this.selectData('company');
 					break;
 				default:
 					break;
 			}
 			this.show = false;
 		},
-		onChange(picker, value, index) {
-			Toast(`当前值：${value}, 当前索引：${index}`);
+		selectData(param) {
+			switch (param) {
+				case 'city':
+					this.selectedCity = this.cityData[this.selectCity.index];
+					break;
+				case 'company':
+					this.selectedCompany = this.companyData[this.selectCompany.index];
+					break;
+
+				default:
+					break;
+
+			}
 		},
-		onCancel() {
-			Toast('取消');
-			this.show = false;
+		submit() {
+			const {selectedCity, selectAppraisalType, selectedCompany} = this;
+			console.log('selectedCity', selectedCity)
+			console.log('selectAppraisalType', selectAppraisalType)
+			console.log('selectedCompany', selectedCompany)
+
 		},
 		showUpload() {
 			this.uploadShow = true
@@ -313,22 +358,33 @@ export default {
 			}
 
 			&.person {
-				.van-cell__left-icon {
-					background-image: url("../assets/images/icon_person.png");
+				//.van-cell__left-icon {
+				//	background-image: url("../assets/images/icon_person.png");
+				//}
+				.van-field__left-icon {
+					.van-icon {
+						background-image: url("../assets/images/icon_price.png");
+
+						&::before {
+							content: "";
+						}
+					}
 				}
 			}
 
 			&.tel {
-				.van-cell__left-icon {
-					background-image: url("../assets/images/icon_tel.png");
+				.van-field__left-icon {
+					.van-icon {
+						background-image: url("../assets/images/icon_tel.png");
+
+						&::before {
+							content: "";
+						}
+					}
 				}
 			}
 
 			&.price {
-				.van-cell__left-icon {
-					background-image: url("../assets/images/icon_price.png");
-				}
-
 				.van-field__left-icon {
 					.van-icon {
 						background-image: url("../assets/images/icon_price.png");

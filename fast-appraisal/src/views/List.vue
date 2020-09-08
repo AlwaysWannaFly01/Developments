@@ -27,6 +27,7 @@ import Vue from "vue";
 import {Search, List, Cell} from "vant";
 
 Vue.use(Search).use(List).use(Cell);
+import {postData, getData} from '@/api';
 
 export default {
 	name: "List",
@@ -41,6 +42,7 @@ export default {
 		};
 	},
 	mounted() {
+		this.init()
 	},
 	data() {
 		return {
@@ -57,6 +59,16 @@ export default {
 		};
 	},
 	methods: {
+		init() {
+			getData('/Home/QuickEstimateBindGrid', {
+				page: 1,
+				size: 10
+			}).then(res => {
+				console.log(res)
+			}).catch(err => {
+				console.log(err)
+			})
+		},
 		onSearch() {
 		},
 		onLoad() {
