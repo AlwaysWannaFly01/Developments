@@ -52,7 +52,7 @@
 				type="tel"
 			></van-field>
 			<van-field
-				v-model="value"
+				v-model="price"
 				label="网签价格"
 				placeholder="请输入价格"
 				input-align="right"
@@ -137,12 +137,15 @@ export default {
 		return {
 			show: false,
 			selectProvince: "",
+			selectedProvince: {},
 			selectCity: {},
+			selectedCity: {},
 			selectAppraisalType: "",
 			person: '',
 			tel: '',
 			selectCompany: {},
-			value: "",
+			selectedCompany: {},
+			price: "",
 			columns: [],
 			uploadShow: false,
 			fileList: [
@@ -165,20 +168,21 @@ export default {
 			postData('/Home/BindCaadRegionDropdownListJson', {
 				parentId: 0
 			}).then(res => {
+				console.log(res)
 				/*测试数据*/
-				res = [{
-					Disabled: false,
-					Group: null,
-					Selected: false,
-					Text: "北京市",
-					Value: "110000"
-				}, {
-					Disabled: false,
-					Group: null,
-					Selected: false,
-					Text: "武汉市",
-					Value: "110001"
-				}]
+				// res = [{
+				// 	Disabled: false,
+				// 	Group: null,
+				// 	Selected: false,
+				// 	Text: "北京市",
+				// 	Value: "110000"
+				// }, {
+				// 	Disabled: false,
+				// 	Group: null,
+				// 	Selected: false,
+				// 	Text: "武汉市",
+				// 	Value: "110001"
+				// }]
 				/*测试数据*/
 				this.cityColumn = _.map(res, 'Text');
 				this.cityData = res;
@@ -258,6 +262,9 @@ export default {
 		},
 		selectData(param) {
 			switch (param) {
+				case 'province':
+					this.selectedProvince = {};
+					break;
 				case 'city':
 					this.selectedCity = this.cityData[this.selectCity.index];
 					break;
@@ -271,11 +278,42 @@ export default {
 			}
 		},
 		submit() {
-			const {selectedCity, selectAppraisalType, selectedCompany} = this;
-			console.log('selectedCity', selectedCity)
-			console.log('selectAppraisalType', selectAppraisalType)
-			console.log('selectedCompany', selectedCompany)
+			const {selectedProvince, selectedCity, selectAppraisalType, person, tel, price, selectedCompany} = this;
+			console.log('selectedProvince: ', selectedProvince)
+			console.log('selectedCity: ', selectedCity)
+			console.log('selectAppraisalType: ', selectAppraisalType)
+			console.log('selectedCompany: ', selectedCompany)
+			console.log('person: ', person)
+			console.log('tel: ', tel)
+			console.log('price: ', price)
 
+
+			const params = {
+				HouseProvinceID: selectedProvince.Value || '',       /*省份Id*/
+				HouseProvinceName: selectedProvince.Text || '',     /*省份名称*/
+				HouseCityID: selectedCity.Value || '',             /*城市Id*/
+				HouseCityName: selectedCity.Text || '',           /*城市名称*/
+				PingGuLeiXing: selectAppraisalType || '',        /*评估类型*/
+				LingKanRen: person || '',     				    /*领勘人*/
+				ContactNumber: tel || '',     				   /*联系电话*/
+				ExpectedEvaluationValue: price || '',     	  /*网签价格*/
+				AppraiseCompanyID: selectedCompany || '',    /*评估公司*/
+				fangben: ''
+			}
+			console.log(params)
+			// postData('/Home/OnSaveEntrust', params).then(res => {
+			// 	console.log(res)
+			// 	if(res.IsSuccess){
+			//
+			// 	}
+			// }).catch(err => {
+			// 	console.log(err)
+			// })
+
+			Toast({
+				type: "success",
+				message: '提交成功'
+			});
 		},
 		showUpload() {
 			this.uploadShow = true

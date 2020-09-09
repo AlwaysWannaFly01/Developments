@@ -27,7 +27,8 @@ import Vue from "vue";
 import {Search, List, Cell} from "vant";
 
 Vue.use(Search).use(List).use(Cell);
-import {postData, getData} from '@/api';
+import {postData, getData, getListData} from '@/api';
+import handleToast from '@/utils/toast';
 
 export default {
 	name: "List",
@@ -48,48 +49,74 @@ export default {
 		return {
 			value: "",
 			height: {},
-			list: [
-				// {
-				//   name: "北京市",
-				//   address: "详细地址详细地址详细地址详细地址详细地址详细地址",
-				// },
-			],
+			list: [],
 			loading: false,
 			finished: false,
+			default: {
+				page: '1',
+				size: '10'
+			}
 		};
 	},
 	methods: {
 		init() {
-			getData('/Home/QuickEstimateBindGrid', {
-				page: 1,
-				size: 10
-			}).then(res => {
-				console.log(res)
-			}).catch(err => {
-				console.log(err)
-			})
+			// getListData({
+			// 	page: this.default.page,
+			// 	size: this.default.size,
+			// }).then(res => {
+			// 	console.log(res)
+			// 	if (res.code === 0) {
+			// 		// handleToast('success', '成功');
+			//
+			// 		this.loading = false; // 加载状态结束
+			// 		this.list = res.data;
+			// 		this.finished = true;
+			// 	}else{
+			// 		handleToast('fail', '失败');
+			// 	}
+			// }).catch(err => {
+			// 	console.log(err)
+			// })
 		},
 		onSearch() {
 		},
 		onLoad() {
 			// 异步更新数据
 			// setTimeout 仅做示例，真实场景中一般为 ajax 请求
-			setTimeout(() => {
-				for (let i = 0; i < 10; i++) {
-					this.list.push({
-						name: "北京市" + i,
-						address: "详细地址详细地址详细地址详细地址详细地址详细地址" + i,
-					});
+			// setTimeout(() => {
+			// 	for (let i = 0; i < 10; i++) {
+			// 		this.list.push({
+			// 			name: "北京市" + i,
+			// 			address: "详细地址详细地址详细地址详细地址详细地址详细地址" + i,
+			// 		});
+			// 	}
+			//
+			// 	// 加载状态结束
+			// 	this.loading = false;
+			//
+			// 	// 数据全部加载完成
+			// 	if (this.list.length >= 40) {
+			// 		this.finished = true;
+			// 	}
+			// }, 2000);
+			getListData({
+				page: this.default.page,
+				size: this.default.size,
+			}).then(res => {
+				console.log(res)
+				if (res.code === 0) {
+					// handleToast('success', '成功');
+					setTimeout(() => {
+						this.loading = false; // 加载状态结束
+						this.list = res.data;
+						this.finished = true;
+					}, 1000)
+				} else {
+					handleToast('fail', '失败');
 				}
-
-				// 加载状态结束
-				this.loading = false;
-
-				// 数据全部加载完成
-				if (this.list.length >= 40) {
-					this.finished = true;
-				}
-			}, 2000);
+			}).catch(err => {
+				console.log(err)
+			})
 		},
 	},
 };

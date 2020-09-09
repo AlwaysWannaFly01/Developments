@@ -42,7 +42,11 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     quiet: true, // necessary for FriendlyErrorsPlugin
     watchOptions: {
       poll: config.dev.poll,
-    }
+    },
+	/*使用花生壳内网穿透只返回304，invalid host header*/
+	/*原因：新版的webpack-dev-server出于安全考虑，默认检查hostname，如果hostname不是配置内的，将中断访问。*/
+	/*解决：webpack.dev.conf.js添加配置 disableHostCheck: true,*/
+	disableHostCheck: true,
   },
   plugins: [
     new webpack.DefinePlugin({
