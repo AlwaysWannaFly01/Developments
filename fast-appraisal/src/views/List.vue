@@ -12,8 +12,8 @@
 			<van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
 				<div v-for="(item,index) in list" :key="index" :title="item.name" class="list-item">
 					<div>
-						<h3>{{ item.name }}</h3>
-						<p>{{ item.address }}</p>
+						<h3>{{ item.CompoundName }}</h3>
+						<p>{{ '详细地址:' + item.RoomAddress }}</p>
 					</div>
 					<aside>查看</aside>
 				</div>

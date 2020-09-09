@@ -10,7 +10,7 @@
 					<span class="_request">*</span>
 				</template>
 				<div @click="showPopup('province')">
-					<span>{{ selectProvince ? selectProvince : '请选择' }}</span>
+					<span>{{ selectProvince.value ? selectProvince.value : '请选择' }}</span>
 					<img src="../assets/images/icon_triangle.png"/>
 				</div>
 			</van-cell>
@@ -36,15 +36,16 @@
 			</van-cell>
 			<van-field
 				v-model="person"
-				label="领勘人"
+				label="领勘人:"
 				placeholder="请输入领勘人"
 				input-align="right"
 				left-icon="smile-o"
 				class="person"
-			></van-field>
+			>
+			</van-field>
 			<van-field
 				v-model="tel"
-				label="联系电话"
+				label="联系电话:"
 				placeholder="请输入电话"
 				input-align="right"
 				left-icon="smile-o"
@@ -53,7 +54,7 @@
 			></van-field>
 			<van-field
 				v-model="price"
-				label="网签价格"
+				label="网签价格:"
 				placeholder="请输入价格"
 				input-align="right"
 				left-icon="smile-o"
@@ -73,10 +74,18 @@
 			<van-cell icon="shop-o" class="accessory" value="请选择" value-class="_item">
 				<template #title>
 					<span class="custom-title">房本附件:</span>
+					<span class="_request">*</span>
 				</template>
-				<div @click="showUpload">
-					<img src="../assets/images/icon.png"/>
-				</div>
+				<!--				<div @click="showUpload">-->
+				<!--					<img v-if="fileSrc" :src="fileSrc">-->
+				<!--					<img v-else src="../assets/images/icon.png"/>-->
+				<!--				</div>-->
+				<van-uploader :after-read="afterRead" v-model="fileList" :max-count="1">
+					<div>
+						<img v-if="fileSrc" :src="fileSrc">
+						<img v-else src="../assets/images/icon.png"/>
+					</div>
+				</van-uploader>
 			</van-cell>
 
 			<van-cell title value value-class="_item" class="_empty"></van-cell>
@@ -89,11 +98,14 @@
 					@confirm="onConfirm"
 					@cancel="onCancel"
 					@change="onChange"
+					:loading="loading"
 				/>
 			</van-popup>
 
 			<van-popup v-model="uploadShow" class="_uploadClass" position="bottom">
-				<van-uploader :after-read="afterRead" v-model="fileList" multiple/>
+				<van-uploader :after-read="afterRead" v-model="fileList" :max-count="1" :before-delete="deleteFile" @delete="ddd">
+					<van-button icon="plus" type="primary">上传文件</van-button>
+				</van-uploader>
 			</van-popup>
 		</div>
 
@@ -114,7 +126,8 @@ import {
 	Toast,
 	Dialog,
 	Popup,
-	Uploader
+	Uploader,
+	Notify
 } from "vant";
 
 Vue.use(Overlay)
@@ -123,10 +136,13 @@ Vue.use(Overlay)
 	.use(Picker)
 	.use(Dialog)
 	.use(Popup)
-	.use(Uploader);
+	.use(Uploader)
+	.use(Notify)
+;
 
 import {postData, getData} from '@/api';
 import _ from 'lodash';
+import HandleToast from '@/utils/toast';
 
 export default {
 	name: "Appraisal",
@@ -136,7 +152,7 @@ export default {
 	data() {
 		return {
 			show: false,
-			selectProvince: "",
+			selectProvince: {},
 			selectedProvince: {},
 			selectCity: {},
 			selectedCity: {},
@@ -148,12 +164,9 @@ export default {
 			price: "",
 			columns: [],
 			uploadShow: false,
-			fileList: [
-				{url: 'https://img.yzcdn.cn/vant/leaf.jpg'},
-				// Uploader 根据文件后缀来判断是否为图片文件
-				// 如果图片 URL 中不包含类型信息，可以添加 isImage 标记来声明
-				{url: 'https://img.yzcdn.cn/vant/tree.jpg', isImage: true},
-			],
+			fileSrc: null,
+			fileList: [],
+			loading: null
 		};
 	},
 	beforeMount() {
@@ -164,7 +177,7 @@ export default {
 	},
 	methods: {
 		init() {
-			/*获取城市*/
+			/*获取省份 : parentId: 0*/
 			postData('/Home/BindCaadRegionDropdownListJson', {
 				parentId: 0
 			}).then(res => {
@@ -176,16 +189,10 @@ export default {
 				// 	Selected: false,
 				// 	Text: "北京市",
 				// 	Value: "110000"
-				// }, {
-				// 	Disabled: false,
-				// 	Group: null,
-				// 	Selected: false,
-				// 	Text: "武汉市",
-				// 	Value: "110001"
 				// }]
 				/*测试数据*/
-				this.cityColumn = _.map(res, 'Text');
-				this.cityData = res;
+				this.provinceColumn = _.map(res, 'Text');
+				this.provinceData = res;
 			}).catch(err => {
 				console.log(err)
 			})
@@ -203,22 +210,47 @@ export default {
 			})
 
 		},
+		async getCity(param) {
+			return await postData('/Home/BindCaadRegionDropdownListJson', {
+				parentId: param
+			})
+		},
 		showPopup(type) {
-			this.show = true;
 			switch (type) {
 				case 'province':
-					this.columns = ['湖北', '浙江', '湖南', '江西', '四川', '河北', '广西', '江苏'];
+					this.show = true;
+					this.columns = this.provinceColumn;
 					this.selectedOption = 'province';
 					break;
 				case 'city':
-					this.columns = this.cityColumn;
-					this.selectedOption = 'city';
+					// console.log(this.selectedProvince)
+					if (!this.selectedProvince.Value || !this.selectedProvince.Text) {
+						this.show = false;
+						Toast('请先选择省份');
+					} else {
+						this.columns = [];
+						this.show = true;
+						this.loading = true;
+						this.getCity(this.selectedProvince.Value).then(res => {
+							// setTimeout(() => {
+							this.cityColumn = _.map(res, 'Text');
+							this.cityData = res;
+							this.columns = this.cityColumn;
+							this.selectedOption = 'city';
+							this.loading = false;
+							// }, 500)
+						}).catch(err => {
+							console.log(err)
+						})
+					}
 					break;
 				case 'appraisalType':
+					this.show = true;
 					this.columns = ['预评', '正式'];
 					this.selectedOption = 'appraisalType';
 					break;
 				case 'company':
+					this.show = true;
 					this.columns = this.companyColumn;
 					this.selectedOption = 'company';
 					break;
@@ -239,17 +271,22 @@ export default {
 		},
 		onConfirm(value, index) {
 			Toast(`当前值：${value}, 当前索引：${index}`);
-			console.log(this.selectedOption)
+			// console.log(this.selectedOption)
 			switch (this.selectedOption) {
 				case "province":
-					this.selectProvince = value;
+					this.selectProvince = {value, index};
+					this.selectData('province');
 					break;
 				case 'city':
 					this.selectCity = {value, index};
 					this.selectData('city');
 					break;
 				case 'appraisalType':
-					this.selectAppraisalType = value;
+					if (value === '预评') {
+						this.selectAppraisalType = '1'
+					} else if (value === '正式') {
+						this.selectAppraisalType = '2'
+					}
 					break;
 				case 'company':
 					this.selectCompany = {value, index};
@@ -263,22 +300,21 @@ export default {
 		selectData(param) {
 			switch (param) {
 				case 'province':
-					this.selectedProvince = {};
+					this.selectedProvince = this.provinceData[this.selectProvince.index];
 					break;
 				case 'city':
 					this.selectedCity = this.cityData[this.selectCity.index];
 					break;
 				case 'company':
 					this.selectedCompany = this.companyData[this.selectCompany.index];
+					console.log(this.selectedCompany);
 					break;
-
 				default:
 					break;
-
 			}
 		},
 		submit() {
-			const {selectedProvince, selectedCity, selectAppraisalType, person, tel, price, selectedCompany} = this;
+			const {selectedProvince, selectedCity, selectAppraisalType, person, tel, price, selectedCompany, file} = this;
 			console.log('selectedProvince: ', selectedProvince)
 			console.log('selectedCity: ', selectedCity)
 			console.log('selectAppraisalType: ', selectAppraisalType)
@@ -286,19 +322,19 @@ export default {
 			console.log('person: ', person)
 			console.log('tel: ', tel)
 			console.log('price: ', price)
-
+			console.log('file: ', file)
 
 			const params = {
 				HouseProvinceID: selectedProvince.Value || '',       /*省份Id*/
 				HouseProvinceName: selectedProvince.Text || '',     /*省份名称*/
 				HouseCityID: selectedCity.Value || '',             /*城市Id*/
 				HouseCityName: selectedCity.Text || '',           /*城市名称*/
-				PingGuLeiXing: selectAppraisalType || '',        /*评估类型*/
+				PingGuLeiXing: selectAppraisalType || '',  /*评估类型*/
 				LingKanRen: person || '',     				    /*领勘人*/
 				ContactNumber: tel || '',     				   /*联系电话*/
 				ExpectedEvaluationValue: price || '',     	  /*网签价格*/
-				AppraiseCompanyID: selectedCompany || '',    /*评估公司*/
-				fangben: ''
+				AppraiseCompanyID: selectedCompany.CusOrganizationID || '',    /*评估公司*/
+				fangben: file
 			}
 			console.log(params)
 			// postData('/Home/OnSaveEntrust', params).then(res => {
@@ -310,19 +346,29 @@ export default {
 			// 	console.log(err)
 			// })
 
-			Toast({
-				type: "success",
-				message: '提交成功'
-			});
+			// Toast({
+			// 	type: "success",
+			// 	message: '提交成功'
+			// });
 		},
-		showUpload() {
-			this.uploadShow = true
-		},
+		// showUpload() {
+		// 	this.uploadShow = true
+		// },
 		afterRead(file) {
 			// 此时可以自行将文件上传至服务器
 			console.log(file);
+			this.file = file.file;
+			this.fileSrc = file.content;
+			console.log(this.file)
 		},
-	},
+		deleteFile(file){
+			console.log(123)
+			console.log(file);
+		},
+		ddd(){
+			console.log(2313)
+		}
+	}
 };
 </script>
 
@@ -450,8 +496,23 @@ export default {
 				}
 
 				._item {
-					div {
+					.van-uploader {
 						height: px2rem(35);
+
+						.van-uploader__preview {
+							margin: 0;
+							.van-image{
+								width: px2rem(35);
+								height: px2rem(35);
+								.van-image__img{
+									margin-left: 0;
+								}
+							}
+							.van-uploader__preview-delete{
+								width: px2rem(14);
+								height: px2rem(14);
+							}
+						}
 
 						img {
 							width: px2rem(35);
@@ -492,6 +553,17 @@ export default {
 		.van-cell {
 			&._empty {
 				padding: 0;
+			}
+		}
+
+		.van-field {
+			.van-cell__title {
+				span {
+					&::after {
+						content: " *";
+						color: red;
+					}
+				}
 			}
 		}
 	}
