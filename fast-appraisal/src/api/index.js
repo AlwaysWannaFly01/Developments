@@ -16,6 +16,21 @@ export function getListData(param) {
 	})
 }
 
+export function getItemData(param) {
+	const {id} = param;
+	return request({
+		url: '/Home/QuickEstimateBindGrid?id='+id,
+		method: 'get'
+	})
+}
+export function getTopicList(param){
+	const {page, limit} = param;
+	return request({
+		url: 'https://cnodejs.org/api/v1/topics?page=' + page + '&limit=' + limit,
+		method: 'get'
+	})
+}
+
 export function getData(url, data) {
 	return request({
 		url,

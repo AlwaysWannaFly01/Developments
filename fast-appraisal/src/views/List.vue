@@ -9,11 +9,17 @@
 			</div>
 		</div>
 		<div class="list-container" :style="listHeight">
-			<van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+			<van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad" offset="50"
+					  :error.sync="error"
+					  error-text="请求失败，点击重新加载">
 				<div v-for="(item,index) in list" :key="index" :title="item.name" class="list-item">
+					<!--					<div>-->
+					<!--						<h3>{{ item.CompoundName }}</h3>-->
+					<!--						<p>{{ '详细地址:' + item.RoomAddress }}</p>-->
+					<!--					</div>-->
 					<div>
-						<h3>{{ item.CompoundName }}</h3>
-						<p>{{ '详细地址:' + item.RoomAddress }}</p>
+						<h3>{{ item.id }}</h3>
+						<p>{{ '详细地址:' + item.title }}</p>
 					</div>
 					<aside>查看</aside>
 				</div>
@@ -27,7 +33,7 @@ import Vue from "vue";
 import {Search, List, Cell} from "vant";
 
 Vue.use(Search).use(List).use(Cell);
-import {postData, getData, getListData} from '@/api';
+import {postData, getData, getListData, getItemData, getTopicList} from '@/api';
 import handleToast from '@/utils/toast';
 
 export default {
@@ -53,71 +59,61 @@ export default {
 			loading: false,
 			finished: false,
 			default: {
-				page: '1',
-				size: '10'
-			}
+				page: 0,
+				size: '10',
+				limit: 10
+			},
+			error: false,
 		};
 	},
 	methods: {
 		init() {
-			// getListData({
-			// 	page: this.default.page,
-			// 	size: this.default.size,
-			// }).then(res => {
-			// 	console.log(res)
-			// 	if (res.code === 0) {
-			// 		// handleToast('success', '成功');
-			//
-			// 		this.loading = false; // 加载状态结束
-			// 		this.list = res.data;
-			// 		this.finished = true;
-			// 	}else{
-			// 		handleToast('fail', '失败');
-			// 	}
-			// }).catch(err => {
-			// 	console.log(err)
-			// })
 		},
 		onSearch() {
 		},
 		onLoad() {
-			// 异步更新数据
-			// setTimeout 仅做示例，真实场景中一般为 ajax 请求
-			// setTimeout(() => {
-			// 	for (let i = 0; i < 10; i++) {
-			// 		this.list.push({
-			// 			name: "北京市" + i,
-			// 			address: "详细地址详细地址详细地址详细地址详细地址详细地址" + i,
-			// 		});
+			// getListData({
+			// 	page: this.default.page,
+			// 	size: this.default.size
+			// }).then(res => {
+			// 	// console.log(res)
+			// 	if (res.code === 0) {
+			// 		// handleToast('成功','success');
+			// 		setTimeout(() => {
+			// 			this.loading = false; // 加载状态结束
+			// 			this.list = res.data;
+			// 		}, 1000)
+			// 	} else {
+			// 		handleToast('失败', 'fail');
 			// 	}
-			//
-			// 	// 加载状态结束
-			// 	this.loading = false;
-			//
-			// 	// 数据全部加载完成
-			// 	if (this.list.length >= 40) {
-			// 		this.finished = true;
-			// 	}
-			// }, 2000);
-			getListData({
-				page: this.default.page,
-				size: this.default.size,
-			}).then(res => {
-				console.log(res)
-				if (res.code === 0) {
-					// handleToast('success', '成功');
-					setTimeout(() => {
-						this.loading = false; // 加载状态结束
-						this.list = res.data;
-						this.finished = true;
-					}, 1000)
-				} else {
-					handleToast('fail', '失败');
-				}
+			// }).catch(err => {
+			// 	console.log(err)
+			// })
+			this.default.page++;
+			console.log(this.default.page)
+			this.getTopicList().then(res => {
+				// console.log(res.data)
+				setTimeout(() => {
+					this.loading = false;
+					this.list = this.list.concat(res.data)
+					console.log(this.list)
+					// this.finished = true;
+				}, 900)
 			}).catch(err => {
+				this.error = true;
+				this.loading = false;
 				console.log(err)
 			})
 		},
+		async getTopicList() {
+			return await getTopicList({
+				page: this.default.page,
+				limit: this.default.limit
+			})
+		},
+		load() {
+			console.log(1233)
+		}
 	},
 };
 </script>
@@ -199,22 +195,30 @@ export default {
 			margin-top: px2rem(10);
 
 			div {
-				flex: 1;
 				height: 100%;
 				padding: px2rem(10) px2rem(10);
 				box-sizing: border-box;
 				display: flex;
 				flex-direction: column;
 				justify-content: space-around;
-
+				width: px2rem(275);
+				box-sizing: border-box;
 				h3 {
 					font-size: 16px;
 					font-weight: 700;
 				}
 
 				p {
+					box-sizing: border-box;
 					font-size: 14px;
 					color: #666;
+					line-height: 15px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					display: -webkit-box;
+					-webkit-line-clamp: 2;
+					line-clamp: 2;
+					-webkit-box-orient: vertical;
 				}
 			}
 

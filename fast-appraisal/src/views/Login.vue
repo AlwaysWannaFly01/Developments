@@ -104,7 +104,7 @@ export default {
 				if (IsSuccess === true) {
 					this.loginLoading = true;
 					setTimeout(() => {
-						this.$router.push({
+						this.$router.replace({
 							path: "/appraisal",
 						});
 					}, 1000)

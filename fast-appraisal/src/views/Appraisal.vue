@@ -76,13 +76,12 @@
 					<span class="custom-title">房本附件:</span>
 					<span class="_request">*</span>
 				</template>
-				<!--				<div @click="showUpload">-->
-				<!--					<img v-if="fileSrc" :src="fileSrc">-->
-				<!--					<img v-else src="../assets/images/icon.png"/>-->
-				<!--				</div>-->
-				<van-uploader :after-read="afterRead" v-model="fileList" :max-count="1">
-					<div>
-						<img v-if="fileSrc" :src="fileSrc">
+				<van-uploader v-model="fileList" :after-read="afterRead" @delete="deleteFile" :max-count="1">
+					<div class="tyr">
+						<img v-if="fileSrc" class="qqq" :src="fileSrc">
+						<!--						<img :src="fileSrc" class="image-to-base64 rotate2" v-else-if="fileSrc&&rotateState==2">-->
+						<!--						<img :src="fileSrc" class="image-to-base64 rotate3" v-else-if="fileSrc&&rotateState==3">-->
+						<!--						<img :src="fileSrc" class="image-to-base64 rotate4" v-else-if="fileSrc&&rotateState==4">-->
 						<img v-else src="../assets/images/icon.png"/>
 					</div>
 				</van-uploader>
@@ -102,11 +101,6 @@
 				/>
 			</van-popup>
 
-			<van-popup v-model="uploadShow" class="_uploadClass" position="bottom">
-				<van-uploader :after-read="afterRead" v-model="fileList" :max-count="1" :before-delete="deleteFile" @delete="ddd">
-					<van-button icon="plus" type="primary">上传文件</van-button>
-				</van-uploader>
-			</van-popup>
 		</div>
 
 		<div class="btn-panel">
@@ -137,12 +131,16 @@ Vue.use(Overlay)
 	.use(Dialog)
 	.use(Popup)
 	.use(Uploader)
-	.use(Notify)
-;
+	.use(Notify);
+import Vconsole from 'vconsole';
+
+// let vConsole = new Vconsole()
+// Vue.use(vConsole)
 
 import {postData, getData} from '@/api';
 import _ from 'lodash';
 import HandleToast from '@/utils/toast';
+import Exif from 'exif-js';
 
 export default {
 	name: "Appraisal",
@@ -163,10 +161,10 @@ export default {
 			selectedCompany: {},
 			price: "",
 			columns: [],
-			uploadShow: false,
 			fileSrc: null,
 			fileList: [],
-			loading: null
+			loading: null,
+			rotateState: 1
 		};
 	},
 	beforeMount() {
@@ -181,16 +179,7 @@ export default {
 			postData('/Home/BindCaadRegionDropdownListJson', {
 				parentId: 0
 			}).then(res => {
-				console.log(res)
-				/*测试数据*/
-				// res = [{
-				// 	Disabled: false,
-				// 	Group: null,
-				// 	Selected: false,
-				// 	Text: "北京市",
-				// 	Value: "110000"
-				// }]
-				/*测试数据*/
+				// console.log(res)
 				this.provinceColumn = _.map(res, 'Text');
 				this.provinceData = res;
 			}).catch(err => {
@@ -200,11 +189,11 @@ export default {
 
 			/*获取评估公司*/
 			getData('/Home/GetApprovalCompanyList').then(res => {
-				console.log(res)
+				// console.log(res)
 				this.companyColumn = _.map(res, 'CompanyName');
 				this.companyData = res;
-				console.log('this.companyColumn', this.companyColumn)
-				console.log('this.companyData', this.companyData)
+				// console.log('this.companyColumn', this.companyColumn)
+				// console.log('this.companyData', this.companyData)
 			}).catch(err => {
 				console.log(err)
 			})
@@ -226,7 +215,7 @@ export default {
 					// console.log(this.selectedProvince)
 					if (!this.selectedProvince.Value || !this.selectedProvince.Text) {
 						this.show = false;
-						Toast('请先选择省份');
+						HandleToast('请先选择省份')
 					} else {
 						this.columns = [];
 						this.show = true;
@@ -307,7 +296,7 @@ export default {
 					break;
 				case 'company':
 					this.selectedCompany = this.companyData[this.selectCompany.index];
-					console.log(this.selectedCompany);
+					// console.log(this.selectedCompany);
 					break;
 				default:
 					break;
@@ -315,59 +304,219 @@ export default {
 		},
 		submit() {
 			const {selectedProvince, selectedCity, selectAppraisalType, person, tel, price, selectedCompany, file} = this;
-			console.log('selectedProvince: ', selectedProvince)
-			console.log('selectedCity: ', selectedCity)
-			console.log('selectAppraisalType: ', selectAppraisalType)
-			console.log('selectedCompany: ', selectedCompany)
-			console.log('person: ', person)
-			console.log('tel: ', tel)
-			console.log('price: ', price)
-			console.log('file: ', file)
-
 			const params = {
 				HouseProvinceID: selectedProvince.Value || '',       /*省份Id*/
 				HouseProvinceName: selectedProvince.Text || '',     /*省份名称*/
 				HouseCityID: selectedCity.Value || '',             /*城市Id*/
 				HouseCityName: selectedCity.Text || '',           /*城市名称*/
-				PingGuLeiXing: selectAppraisalType || '',  /*评估类型*/
+				PingGuLeiXing: selectAppraisalType || '',  		 /*评估类型*/
 				LingKanRen: person || '',     				    /*领勘人*/
 				ContactNumber: tel || '',     				   /*联系电话*/
 				ExpectedEvaluationValue: price || '',     	  /*网签价格*/
 				AppraiseCompanyID: selectedCompany.CusOrganizationID || '',    /*评估公司*/
 				fangben: file
 			}
-			console.log(params)
-			// postData('/Home/OnSaveEntrust', params).then(res => {
-			// 	console.log(res)
-			// 	if(res.IsSuccess){
-			//
-			// 	}
-			// }).catch(err => {
-			// 	console.log(err)
-			// })
+			// console.log(params)
+			if (_.every(params)) {
+				postData('/Home/OnSaveEntrust', params).then(res => {
+					// console.log(res)
+					if (res.IsSuccess) {
+						HandleToast('上传成功', 'success', 800);
+						setTimeout(() => {
+							this.$router.push({
+								path: "/list",
+							});
+						}, 1000)
+					}
+				}).catch(err => {
+					console.log(err)
+				})
+			} else {
+				HandleToast('请将内容填写完整')
+			}
 
-			// Toast({
-			// 	type: "success",
-			// 	message: '提交成功'
-			// });
 		},
-		// showUpload() {
-		// 	this.uploadShow = true
-		// },
 		afterRead(file) {
 			// 此时可以自行将文件上传至服务器
-			console.log(file);
-			this.file = file.file;
+			// console.log(file);
+			this.file = file.file;//文件流
 			this.fileSrc = file.content;
-			console.log(this.file)
+			// console.log(this.fileList)
+			this.imgPreview(this.file);
+
 		},
-		deleteFile(file){
-			console.log(123)
-			console.log(file);
+		imgPreview(file) {
+			// console.log(file)
+			let self = this;
+			let Orientation;
+			//去获取拍照时的信息，解决拍出来的照片旋转问题
+			Exif.getData(file, function () {
+				Orientation = Exif.getTag(this, "Orientation");
+				console.log('Orientation:', Orientation)
+			});
+
+			// if (Orientation == 1) {
+			// 	_this.rotateState = 1;
+			// } else if (Orientation == 3) {
+			// 	_this.rotateState = 2;
+			// } else if (Orientation == 6) {
+			// 	_this.rotateState = 3;
+			// }
+			// 看支持不支持FileReader
+			// if (!file || !window.FileReader) return;
+			// console.log('file1: ', file)
+			// if (/^image/.test(file.type)) {
+			// 	// 创建一个reader
+			// 	let reader = new FileReader();
+			// 	// 将图片2将转成 base64 格式
+			// 	reader.readAsDataURL(file);
+			// 	// 读取成功后的回调
+			// 	reader.onloadend = function () {
+			// 		let result = this.result;
+			// 		let img = new Image();
+			// 		img.src = result;
+			// 		console.log('this.result', this.result);
+			// 		//判断图片是否大于500K,是就直接上传，反之压缩图片
+			// 		if (this.result.length <= 500 * 1024) {
+			// 			// self.headerImage = this.result;
+			// 		} else {
+			// 			img.onload = function () {
+			// 				let data = self.compress(img, Orientation);
+			// 				// self.headerImage = data;
+			// 			};
+			// 		}
+			// 	};
+			// }
 		},
-		ddd(){
-			console.log(2313)
-		}
+		// 压缩图片
+		compress(img, Orientation) {
+			console.log('img', img)
+			console.log('Orientation', Orientation)
+			let canvas = document.createElement("canvas");
+			let ctx = canvas.getContext("2d");
+			//瓦片canvas
+			let tCanvas = document.createElement("canvas");
+			let tctx = tCanvas.getContext("2d");
+			// let initSize = img.src.length;
+			let width = img.width;
+			let height = img.height;
+			//如果图片大于四百万像素，计算压缩比并将大小压至400万以下
+			let ratio;
+			if ((ratio = (width * height) / 4000000) > 1) {
+				// console.log("大于400万像素");
+				ratio = Math.sqrt(ratio);
+				width /= ratio;
+				height /= ratio;
+			} else {
+				ratio = 1;
+			}
+			canvas.width = width;
+			canvas.height = height;
+			//        铺底色
+			ctx.fillStyle = "#fff";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			//如果图片像素大于100万则使用瓦片绘制
+			let count;
+			if ((count = (width * height) / 1000000) > 1) {
+				// console.log("超过100W像素");
+				count = ~~(Math.sqrt(count) + 1); //计算要分成多少块瓦片
+				//            计算每块瓦片的宽和高
+				let nw = ~~(width / count);
+				let nh = ~~(height / count);
+				tCanvas.width = nw;
+				tCanvas.height = nh;
+				for (let i = 0; i < count; i++) {
+					for (let j = 0; j < count; j++) {
+						tctx.drawImage(img, i * nw * ratio, j * nh * ratio, nw * ratio, nh * ratio, 0, 0, nw, nh);
+						ctx.drawImage(tCanvas, i * nw, j * nh, nw, nh);
+					}
+				}
+			} else {
+				ctx.drawImage(img, 0, 0, width, height);
+			}
+			//修复ios上传图片的时候 被旋转的问题
+			if (Orientation != "" && Orientation != 1) {
+				switch (Orientation) {
+					case 6: //需要顺时针（向左）90度旋转
+						this.rotateImg(img, "left", canvas);
+						break;
+					case 8: //需要逆时针（向右）90度旋转
+						this.rotateImg(img, "right", canvas);
+						break;
+					case 3: //需要180度旋转
+						this.rotateImg(img, "right", canvas); //转两次
+						this.rotateImg(img, "right", canvas);
+						break;
+				}
+			}
+			//进行最小压缩
+			let ndata = canvas.toDataURL("image/jpeg", 0.1);
+			tCanvas.width = tCanvas.height = canvas.width = canvas.height = 0;
+			return ndata;
+		},
+		// 旋转图片
+		rotateImg(img, direction, canvas) {
+			//最小与最大旋转方向，图片旋转4次后回到原方向
+			const min_step = 0;
+			const max_step = 3;
+			if (img == null) return;
+			//img的高度和宽度不能在img元素隐藏后获取，否则会出错
+			let height = img.height;
+			let width = img.width;
+			let step = 2;
+			if (step == null) {
+				step = min_step;
+			}
+			if (direction == "right") {
+				step++;
+				//旋转到原位置，即超过最大值
+				step > max_step && (step = min_step);
+			} else {
+				step--;
+				step < min_step && (step = max_step);
+			}
+			//旋转角度以弧度值为参数
+			let degree = (step * 90 * Math.PI) / 180;
+			let ctx = canvas.getContext("2d");
+			switch (step) {
+				case 0:
+					canvas.width = width;
+					canvas.height = height;
+					ctx.drawImage(img, 0, 0);
+					break;
+				case 1:
+					canvas.width = height;
+					canvas.height = width;
+					ctx.rotate(degree);
+					ctx.drawImage(img, 0, -height);
+					break;
+				case 2:
+					canvas.width = width;
+					canvas.height = height;
+					ctx.rotate(degree);
+					ctx.drawImage(img, -width, -height);
+					break;
+				case 3:
+					canvas.width = height;
+					canvas.height = width;
+					ctx.rotate(degree);
+					ctx.drawImage(img, -width, 0);
+					break;
+			}
+		},
+
+		async deleteFile(file) {
+			return new Promise((resolve, reject) => {
+				// console.log("删除文件的回调,delete");
+				// console.log(file)
+				// console.log(this.fileList)
+				if (this.fileList.length < 1) {
+					// console.log(this.fileSrc)
+					this.fileSrc = '';
+				}
+				resolve();
+			});
+		},
 	}
 };
 </script>
@@ -442,12 +591,9 @@ export default {
 			}
 
 			&.person {
-				//.van-cell__left-icon {
-				//	background-image: url("../assets/images/icon_person.png");
-				//}
 				.van-field__left-icon {
 					.van-icon {
-						background-image: url("../assets/images/icon_price.png");
+						background-image: url("../assets/images/icon_person.png");
 
 						&::before {
 							content: "";
@@ -501,14 +647,17 @@ export default {
 
 						.van-uploader__preview {
 							margin: 0;
-							.van-image{
+
+							.van-image {
 								width: px2rem(35);
 								height: px2rem(35);
-								.van-image__img{
+
+								.van-image__img {
 									margin-left: 0;
 								}
 							}
-							.van-uploader__preview-delete{
+
+							.van-uploader__preview-delete {
 								width: px2rem(14);
 								height: px2rem(14);
 							}
@@ -566,6 +715,23 @@ export default {
 				}
 			}
 		}
+
+		.rotate1 {
+			transform: rotate(0deg);
+		}
+
+		.rotate2 {
+			transform: rotate(180deg);
+		}
+
+		.rotate3 {
+			transform: rotate(90deg);
+		}
+
+		.rotate4 {
+			transform: rotate(270deg);
+		}
+
 	}
 
 	.btn-panel {
@@ -582,20 +748,6 @@ export default {
 			color: #fff;
 			border: none;
 		}
-	}
-
-	._uploadClass {
-		.van-uploader {
-			padding: px2rem(8);
-			max-height: 308px;
-
-			.van-image,
-			.van-uploader__upload {
-				width: px2rem(80);
-				height: px2rem(80);
-			}
-		}
-
 	}
 }
 </style>

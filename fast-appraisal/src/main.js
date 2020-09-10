@@ -6,6 +6,7 @@ import router from './router'
 import '../src/assets/styles/global.scss'
 import axios from 'axios'
 
+
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios;
 
