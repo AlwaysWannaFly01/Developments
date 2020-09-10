@@ -5,7 +5,22 @@
 				<User></User>
 			</div>
 			<div class="fixed-search">
-				<van-search v-model="value" placeholder="请输入地址" class="search" :clearable="false"></van-search>
+				<!--				<form action="/">-->
+				<!--					<van-search v-model="value" @search="onSearch" placeholder="请输入地址" class="search"-->
+				<!--								:clearable="true" right-icon="star-o"></van-search>-->
+				<!--				</form>-->
+
+				<van-search
+					v-model="value"
+					show-action
+					placeholder="请输入地址"
+					@search="onSearch"
+					class="search"
+				>
+					<template #action>
+						<img src="../assets/images/icon_search.png" @click="clickSearch">
+					</template>
+				</van-search>
 			</div>
 		</div>
 		<div class="list-container" :style="listHeight">
@@ -69,8 +84,6 @@ export default {
 	methods: {
 		init() {
 		},
-		onSearch() {
-		},
 		onLoad() {
 			// getListData({
 			// 	page: this.default.page,
@@ -111,8 +124,63 @@ export default {
 				limit: this.default.limit
 			})
 		},
-		load() {
-			console.log(1233)
+		async onSearch(val) {
+			console.log(val)
+			if (val) {
+				let fake = '5ee1ee83b703280f0bcb922a';
+				let result = await this.searchBy(fake)
+				if (result.success) {
+					this.loading = false;
+					this.list.push(result.data)
+					this.finished = true;
+				}
+			} else {
+				this.list = [];
+				this.finished = false;
+				this.onLoad()
+			}
+		},
+		async clickSearch() {
+			if (this.value) {
+				let fake = '5433d5e4e737cbe96dcef312';
+				let result = await this.searchBy(fake)
+				// console.log(result)
+				if (result.success) {
+					this.loading = false;
+					this.list.push(result.data)
+					this.finished = true;
+				}
+			} else {
+				this.list = [];
+				this.finished = false;
+				this.onLoad()
+			}
+		},
+		async searchBy(param) {
+			this.list = [];
+			this.loading = true;
+			this.finished = false;
+			let a = await this.refresh();//清空 page, size 等属性
+			console.log(a)
+			return new Promise((resolve, reject) =>
+				getData('https://cnodejs.org/api/v1/topic/' + param).then(res => {
+					resolve(res)
+				}).catch(err => {
+					reject(err)
+				})
+			)
+		},
+		async refresh() {
+			return new Promise((resolve, reject) => {
+				resolve(
+					this.default = {
+						page: 0,
+						size: 10,
+						limit: 10
+					}
+				)
+			})
+
 		}
 	},
 };
@@ -152,15 +220,46 @@ export default {
 		height: 54px;
 		padding: 10px 10px 0px;
 		background-color: #ebeef5;
-
+		//background-color: #fff;
 		.search {
 			border-radius: px2rem(5) px2rem(5) 0 0;
+			//padding-right: 16px;
+			padding: 10px 12px;
+			background-color: #fff;
 
 			.van-search__content {
-				border-radius: px2rem(20);
+				border-radius: px2rem(20) 0 0 px2rem(20);
 
 				.van-cell {
-					flex-flow: row-reverse;
+					//flex-flow: row-reverse;
+					height: 34px;
+
+					.van-field__left-icon {
+						.van-icon-search {
+							display: none;
+						}
+					}
+				}
+
+				.van-field__body {
+					.van-icon-clear {
+					}
+				}
+			}
+
+			.van-search__action {
+				height: 34px;
+				line-height: 34px;
+				background-color: #f7f8fa;
+				padding: 0;
+				width: 40px;
+				text-align: center;
+				border-radius: 0 px2rem(20) px2rem(20) 0;
+
+				img {
+					width: 16px;
+					height: 16px;
+					vertical-align: middle;
 				}
 			}
 		}
@@ -203,6 +302,7 @@ export default {
 				justify-content: space-around;
 				width: px2rem(275);
 				box-sizing: border-box;
+
 				h3 {
 					font-size: 16px;
 					font-weight: 700;
