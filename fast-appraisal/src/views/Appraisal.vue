@@ -30,7 +30,7 @@
 					<span class="_require">*</span>
 				</template>
 				<div @click="showPopup('appraisalType')">
-					<span>{{ selectAppraisalType ? selectAppraisalType : '请选择' }}</span>
+					<span>{{ selectAppraisalTypeValue ? selectAppraisalTypeValue : '请选择' }}</span>
 					<img src="../assets/images/icon_triangle.png"/>
 				</div>
 			</van-cell>
@@ -87,7 +87,7 @@
 				</van-uploader>
 			</van-cell>
 
-			<van-cell title value value-class="_item" class="_empty"></van-cell>
+			<van-divider/>
 
 			<van-popup v-model="show" position="bottom">
 				<van-picker
@@ -121,7 +121,8 @@ import {
 	Dialog,
 	Popup,
 	Uploader,
-	Notify
+	Notify,
+	Divider
 } from "vant";
 
 Vue.use(Overlay)
@@ -131,13 +132,14 @@ Vue.use(Overlay)
 	.use(Dialog)
 	.use(Popup)
 	.use(Uploader)
-	.use(Notify);
+	.use(Notify)
+	.use(Divider);
 import Vconsole from 'vconsole';
 
 // let vConsole = new Vconsole()
 // Vue.use(vConsole)
 
-import {postData, getData, Request} from '@/api';
+import {Request} from '@/api';
 import _ from 'lodash';
 import HandleToast from '@/utils/toast';
 import Exif from 'exif-js';
@@ -155,6 +157,7 @@ export default {
 			selectCity: {},
 			selectedCity: {},
 			selectAppraisalType: "",
+			selectAppraisalTypeValue: '',
 			person: '',
 			tel: '',
 			selectCompany: {},
@@ -176,9 +179,7 @@ export default {
 	methods: {
 		init() {
 			/*获取省份 : parentId: 0*/
-			postData('/Home/BindCaadRegionDropdownListJson', {
-				parentId: 0
-			}).then(res => {
+			Request('/Home/BindCaadRegionDropdownListJson', 'post', {parentId: 0}).then(res => {
 				// console.log(res)
 				this.provinceColumn = _.map(res, 'Text');
 				this.provinceData = res;
@@ -186,21 +187,20 @@ export default {
 				console.log(err)
 			})
 
-
 			/*获取评估公司*/
-			getData('/Home/GetApprovalCompanyList').then(res => {
+			Request('/Home/GetApprovalCompanyList', 'get').then(res => {
 				// console.log(res)
 				this.companyColumn = _.map(res, 'CompanyName');
 				this.companyData = res;
-				// console.log('this.companyColumn', this.companyColumn)
-				// console.log('this.companyData', this.companyData)
+				// 	// console.log('this.companyColumn', this.companyColumn)
+				// 	// console.log('this.companyData', this.companyData)
 			}).catch(err => {
 				console.log(err)
 			})
-
 		},
+
 		async getCity(param) {
-			return await postData('/Home/BindCaadRegionDropdownListJson', {
+			return await Request('/Home/BindCaadRegionDropdownListJson', 'post', {
 				parentId: param
 			})
 		},
@@ -272,8 +272,10 @@ export default {
 					break;
 				case 'appraisalType':
 					if (value === '预评') {
-						this.selectAppraisalType = '1'
+						this.selectAppraisalTypeValue = '预评';
+						this.selectAppraisalType = '1';
 					} else if (value === '正式') {
+						this.selectAppraisalTypeValue = '正式';
 						this.selectAppraisalType = '2'
 					}
 					break;
@@ -296,7 +298,7 @@ export default {
 					break;
 				case 'company':
 					this.selectedCompany = this.companyData[this.selectCompany.index];
-					// console.log(this.selectedCompany);
+					console.log(this.selectedCompany);
 					break;
 				default:
 					break;
@@ -318,7 +320,7 @@ export default {
 			}
 			// console.log(params)
 			if (_.every(params)) {
-				postData('/Home/OnSaveEntrust', params).then(res => {
+				Request('/Home/OnSaveEntrust', 'post', params).then(res => {
 					// console.log(res)
 					if (res.IsSuccess) {
 						HandleToast('上传成功', 'success', 800);
@@ -732,6 +734,10 @@ export default {
 			transform: rotate(270deg);
 		}
 
+		.van-divider {
+			margin: 0 16px;
+			border-color: transparent;
+		}
 	}
 
 	.btn-panel {

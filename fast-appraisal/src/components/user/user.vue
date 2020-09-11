@@ -26,6 +26,7 @@ export default {
 	methods: {
 		init() {
 			Request('/Account/GetUserInfo').then(res => {
+				// console.log(res)
 				if (res.IsSuccess) {
 					this.trueName = '用户名: ' + res.Data.TrueName
 				}

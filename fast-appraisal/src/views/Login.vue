@@ -54,12 +54,12 @@
 
 <script>
 import Vue from "vue";
-import {Button, Form, Field, Toast} from "vant";
+import {Button, Form, Field} from "vant";
 
-Vue.use(Button).use(Field).use(Form).use(Toast);
+Vue.use(Button).use(Field).use(Form);
 
-import {getCode, postData} from '@/api';
-
+import {getCode, Request} from '@/api';
+import HandleToast from '@/utils/toast';
 export default {
 	name: "Login",
 	components: {},
@@ -92,15 +92,14 @@ export default {
 			this.getCode();
 		},
 		onSubmit(values) {
-			// console.log("submit", values);
 			const {UserName, Password, Code} = values;
-			postData('/Account/Login', {
+			Request('/Account/Login', 'post', {
 				UserName,
 				Password,
 				Code
-			}).then(response => {
-				// console.log(response)
-				const {MsgContent, IsSuccess} = response
+			}).then(res => {
+				// console.log(res)
+				const {MsgContent, IsSuccess} = res
 				if (IsSuccess === true) {
 					this.loginLoading = true;
 					setTimeout(() => {
@@ -109,13 +108,11 @@ export default {
 						});
 					}, 1000)
 				} else {
-					Toast.fail(MsgContent);
+					HandleToast(MsgContent,'fail')
 				}
-
 			}).catch(err => {
 				console.log(err)
 			})
-
 		},
 	},
 };
@@ -173,17 +170,20 @@ export default {
 				.van-cell {
 					line-height: 28px;
 					padding: 12px 16px;
-					.van-field__left-icon{
+
+					.van-field__left-icon {
 						line-height: normal;
-						.van-icon::before{
-							content:'';
-							width:6px;
+
+						.van-icon::before {
+							content: '';
+							width: 6px;
 							height: 6px;
 							background-color: #afafaf;
 							border-radius: 3px;
 						}
 					}
-					&::after{
+
+					&::after {
 						border-bottom: 1px solid #afafaf;
 					}
 				}
@@ -221,16 +221,19 @@ export default {
 						}
 					}
 				}
-				.van-field--error{
-					.van-field__control::placeholder{
+
+				.van-field--error {
+					.van-field__control::placeholder {
 						color: #4a0daf !important;
 					}
-					.van-field__left-icon{
-						.van-icon::before{
+
+					.van-field__left-icon {
+						.van-icon::before {
 							background-color: #4a0daf;
 						}
 					}
-					&::after{
+
+					&::after {
 						border-bottom: 1px solid #4a0daf;
 					}
 				}

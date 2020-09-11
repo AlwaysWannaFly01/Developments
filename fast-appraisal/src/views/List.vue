@@ -5,11 +5,6 @@
 				<User></User>
 			</div>
 			<div class="fixed-search">
-				<!--				<form action="/">-->
-				<!--					<van-search v-model="value" @search="onSearch" placeholder="请输入地址" class="search"-->
-				<!--								:clearable="true" right-icon="star-o"></van-search>-->
-				<!--				</form>-->
-
 				<van-search
 					v-model="value"
 					show-action
@@ -28,15 +23,15 @@
 					  :error.sync="error"
 					  error-text="请求失败，点击重新加载">
 				<div v-for="(item,index) in list" :key="index" :title="item.name" class="list-item">
-					<!--					<div>-->
-					<!--						<h3>{{ item.CompoundName }}</h3>-->
-					<!--						<p>{{ '详细地址:' + item.RoomAddress }}</p>-->
-					<!--					</div>-->
 					<div>
-						<h3>{{ item.id }}</h3>
-						<p>{{ '详细地址:' + item.title }}</p>
+						<h3>{{ item.ID }}</h3>
+						<p>{{ '详细地址:' + item.HouseCityName }}</p>
 					</div>
-					<aside>查看</aside>
+					<!--					<div>-->
+					<!--						<h3>{{ item.id }}</h3>-->
+					<!--						<p>{{ '详细地址:' + item.title }}</p>-->
+					<!--					</div>-->
+					<aside @click="toHistory(item.ID)">查看</aside>
 				</div>
 			</van-list>
 		</div>
@@ -48,7 +43,7 @@ import Vue from "vue";
 import {Search, List, Cell} from "vant";
 
 Vue.use(Search).use(List).use(Cell);
-import {postData, getData, getListData, getItemData, getTopicList} from '@/api';
+import {getData, getListData, Request} from '@/api';
 import handleToast from '@/utils/toast';
 
 export default {
@@ -63,9 +58,7 @@ export default {
 			"height": (window.innerHeight - 183) + 'px',
 		};
 	},
-	mounted() {
-		this.init()
-	},
+
 	data() {
 		return {
 			value: "",
@@ -82,58 +75,33 @@ export default {
 		};
 	},
 	methods: {
-		init() {
-		},
 		async onLoad() {
-			getListData({
-				page: this.default.page,
-				size: this.default.size
-			}).then(res => {
-				console.log(res)
-				if (res.code === 0) {
-					// handleToast('成功','success');
-					// setTimeout(() => {
-					// 	this.loading = false; // 加载状态结束
-					// 	this.list = res.data;
-					// }, 1000)
-				} else {
-					handleToast('失败', 'fail');
-				}
-			}).catch(err => {
-				console.log(err)
-			})
-
-			let result = await this.getTopicList()
+			let result = await this.getListData();
 			console.log(result)
-			if (result.success) {
+			if (result.data.length > 0) {
 				setTimeout(() => {
 					this.loading = false;
 					this.list = this.list.concat(result.data)
-					console.log(this.list)
 				}, 900)
 			} else {
-				this.error = true;
 				this.loading = false;
+				this.finished = true;
 			}
 		},
-		async getTopicList() {
+		async getListData() {
 			this.default.page++;
-			console.log(this.default.page)
 			return new Promise((resolve, reject) => {
-				getTopicList({
+				getListData({
 					page: this.default.page,
-					limit: this.default.limit
+					size: this.default.size
 				}).then(res => {
-					if (res.success) {
+					if (res) {
 						resolve(res)
-					} else {
-						reject('获取失败')
 					}
 				}).catch(err => {
-					reject('获取失败')
+					console.log(err)
 				})
 			})
-
 		},
 		async onSearch(val) {
 			console.log('点击回车触发了')
@@ -203,6 +171,14 @@ export default {
 					}
 				}, 1500)
 			})
+		},
+		toHistory(param) {
+			if (param) {
+				this.$router.push({
+					name: 'History',
+					params: {id: param}
+				})
+			}
 		}
 	},
 };
