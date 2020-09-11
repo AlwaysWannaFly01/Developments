@@ -75,7 +75,7 @@ export default {
 			finished: false,
 			default: {
 				page: 0,
-				size: '10',
+				size: 10,
 				limit: 10
 			},
 			error: false,
@@ -84,47 +84,59 @@ export default {
 	methods: {
 		init() {
 		},
-		onLoad() {
-			// getListData({
-			// 	page: this.default.page,
-			// 	size: this.default.size
-			// }).then(res => {
-			// 	// console.log(res)
-			// 	if (res.code === 0) {
-			// 		// handleToast('成功','success');
-			// 		setTimeout(() => {
-			// 			this.loading = false; // 加载状态结束
-			// 			this.list = res.data;
-			// 		}, 1000)
-			// 	} else {
-			// 		handleToast('失败', 'fail');
-			// 	}
-			// }).catch(err => {
-			// 	console.log(err)
-			// })
-			this.default.page++;
-			console.log(this.default.page)
-			this.getTopicList().then(res => {
-				// console.log(res.data)
-				setTimeout(() => {
-					this.loading = false;
-					this.list = this.list.concat(res.data)
-					console.log(this.list)
-					// this.finished = true;
-				}, 900)
+		async onLoad() {
+			getListData({
+				page: this.default.page,
+				size: this.default.size
+			}).then(res => {
+				console.log(res)
+				if (res.code === 0) {
+					// handleToast('成功','success');
+					// setTimeout(() => {
+					// 	this.loading = false; // 加载状态结束
+					// 	this.list = res.data;
+					// }, 1000)
+				} else {
+					handleToast('失败', 'fail');
+				}
 			}).catch(err => {
-				this.error = true;
-				this.loading = false;
 				console.log(err)
 			})
+
+			let result = await this.getTopicList()
+			console.log(result)
+			if (result.success) {
+				setTimeout(() => {
+					this.loading = false;
+					this.list = this.list.concat(result.data)
+					console.log(this.list)
+				}, 900)
+			} else {
+				this.error = true;
+				this.loading = false;
+			}
 		},
 		async getTopicList() {
-			return await getTopicList({
-				page: this.default.page,
-				limit: this.default.limit
+			this.default.page++;
+			console.log(this.default.page)
+			return new Promise((resolve, reject) => {
+				getTopicList({
+					page: this.default.page,
+					limit: this.default.limit
+				}).then(res => {
+					if (res.success) {
+						resolve(res)
+					} else {
+						reject('获取失败')
+					}
+				}).catch(err => {
+					reject('获取失败')
+				})
 			})
+
 		},
 		async onSearch(val) {
+			console.log('点击回车触发了')
 			console.log(val)
 			if (val) {
 				let fake = '5ee1ee83b703280f0bcb922a';
@@ -137,10 +149,14 @@ export default {
 			} else {
 				this.list = [];
 				this.finished = false;
-				this.onLoad()
+				let isTrue = await this.refresh();
+				if (isTrue) {
+					this.onLoad()
+				}
 			}
 		},
 		async clickSearch() {
+			console.log('点击搜索按钮触发了')
 			if (this.value) {
 				let fake = '5433d5e4e737cbe96dcef312';
 				let result = await this.searchBy(fake)
@@ -153,34 +169,40 @@ export default {
 			} else {
 				this.list = [];
 				this.finished = false;
-				this.onLoad()
+				let isTrue = await this.refresh();
+				if (isTrue) {
+					this.onLoad()
+				}
 			}
 		},
 		async searchBy(param) {
 			this.list = [];
 			this.loading = true;
 			this.finished = false;
-			let a = await this.refresh();//清空 page, size 等属性
-			console.log(a)
-			return new Promise((resolve, reject) =>
-				getData('https://cnodejs.org/api/v1/topic/' + param).then(res => {
-					resolve(res)
-				}).catch(err => {
-					reject(err)
-				})
-			)
+			let isTrue = await this.refresh();//清空 page, size 等属性
+			if (isTrue) {
+				return new Promise((resolve, reject) =>
+					getData('https://cnodejs.org/api/v1/topic/' + param).then(res => {
+						resolve(res)
+					}).catch(err => {
+						reject(err)
+					})
+				)
+			}
 		},
 		async refresh() {
 			return new Promise((resolve, reject) => {
-				resolve(
-					this.default = {
-						page: 0,
-						size: 10,
-						limit: 10
+				this.default = {
+					page: 0,
+					size: 10,
+					limit: 10
+				}
+				setTimeout(() => {
+					if (this.default.page === 0) {
+						resolve(true)
 					}
-				)
+				}, 1500)
 			})
-
 		}
 	},
 };

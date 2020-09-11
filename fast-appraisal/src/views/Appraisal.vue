@@ -7,7 +7,7 @@
 			<van-cell icon="shop-o" class="province" value-class="_item">
 				<template #title>
 					<span class="custom-title">省份:</span>
-					<span class="_request">*</span>
+					<span class="_require">*</span>
 				</template>
 				<div @click="showPopup('province')">
 					<span>{{ selectProvince.value ? selectProvince.value : '请选择' }}</span>
@@ -17,7 +17,7 @@
 			<van-cell icon="shop-o" class="city" value-class="_item">
 				<template #title>
 					<span class="custom-title">城市:</span>
-					<span class="_request">*</span>
+					<span class="_require">*</span>
 				</template>
 				<div @click="showPopup('city')">
 					<span>{{ selectCity.value ? selectCity.value : '请选择' }}</span>
@@ -27,7 +27,7 @@
 			<van-cell icon="shop-o" class="type" value-class="_item">
 				<template #title>
 					<span class="custom-title">评估类型:</span>
-					<span class="_request">*</span>
+					<span class="_require">*</span>
 				</template>
 				<div @click="showPopup('appraisalType')">
 					<span>{{ selectAppraisalType ? selectAppraisalType : '请选择' }}</span>
@@ -64,7 +64,7 @@
 			<van-cell icon="shop-o" class="company" value-class="_item">
 				<template #title>
 					<span class="custom-title">评估公司:</span>
-					<span class="_request">*</span>
+					<span class="_require">*</span>
 				</template>
 				<div @click="showPopup('company')">
 					<span>{{ selectCompany.value ? selectCompany.value : '请选择' }}</span>
@@ -74,7 +74,7 @@
 			<van-cell icon="shop-o" class="accessory" value="请选择" value-class="_item">
 				<template #title>
 					<span class="custom-title">房本附件:</span>
-					<span class="_request">*</span>
+					<span class="_require">*</span>
 				</template>
 				<van-uploader v-model="fileList" :after-read="afterRead" @delete="deleteFile" :max-count="1">
 					<div class="tyr">
@@ -137,7 +137,7 @@ import Vconsole from 'vconsole';
 // let vConsole = new Vconsole()
 // Vue.use(vConsole)
 
-import {postData, getData} from '@/api';
+import {postData, getData, Request} from '@/api';
 import _ from 'lodash';
 import HandleToast from '@/utils/toast';
 import Exif from 'exif-js';
@@ -686,7 +686,7 @@ export default {
 				}
 			}
 
-			._request {
+			._require {
 				color: red;
 			}
 

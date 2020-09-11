@@ -1,28 +1,45 @@
 <template>
 	<div class="panel">
 		<img src="../../assets/images/menu.png" class="menu">
-		<div class="info">
+		<div class="info" v-show="trueName">
 			<img src="../../assets/images/photo.png">
 			<p>
-				<strong>用户名:李木子</strong>
+				<strong>{{ trueName }}</strong>
 			</p>
 		</div>
 	</div>
 </template>
 <script>
+import {Request} from '@/api';
+
 export default {
 	name: "user",
-	components: {
-
-	},
+	components: {},
 	data() {
-		return {}
+		return {
+			trueName: ''
+		}
+	},
+	beforeMount() {
+		this.init()
+	},
+	methods: {
+		init() {
+			Request('/Account/GetUserInfo').then(res => {
+				if (res.IsSuccess) {
+					this.trueName = '用户名: ' + res.Data.TrueName
+				}
+			}).catch(err => {
+				console.log(err)
+			})
+		}
 	}
 };
 </script>
 <style lang="scss">
 @import "../../assets/styles/global";
-.panel{
+
+.panel {
 	width: 100%;
 	height: 104px;
 	box-sizing: border-box;
@@ -32,16 +49,20 @@ export default {
 	background-image: url("../../assets/images/list-bg.png");
 	background-size: cover;
 	border-radius: px2rem(5);
-	.menu{
+
+	.menu {
 		width: px2rem(17);
 	}
-	.info{
+
+	.info {
 		@include center;
-		img{
+
+		img {
 			width: px2rem(51);
 			margin-right: px2rem(16);
 		}
-		p{
+
+		p {
 			font-size: 16px;
 		}
 	}
