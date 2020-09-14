@@ -24,7 +24,7 @@ export default new Router({
 			component: List
 		},
 		{
-			path: '/history',
+			path: '/history/:id',
 			name: 'History',
 			component: History
 		},

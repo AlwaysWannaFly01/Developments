@@ -51,6 +51,8 @@
 				left-icon="smile-o"
 				class="tel"
 				type="tel"
+				maxlength="11"
+				@blur="handleTelBlur"
 			></van-field>
 			<van-field
 				v-model="price"
@@ -320,23 +322,26 @@ export default {
 			}
 			// console.log(params)
 			if (_.every(params)) {
-				Request('/Home/OnSaveEntrust', 'post', params).then(res => {
-					// console.log(res)
-					if (res.IsSuccess) {
-						HandleToast('上传成功', 'success', 800);
-						setTimeout(() => {
-							this.$router.push({
-								path: "/list",
-							});
-						}, 1000)
-					}
-				}).catch(err => {
-					console.log(err)
-				})
+				if (!this.checkPhone(params.ContactNumber)) {
+					HandleToast('手机号码有误，请重新填写')
+				} else {
+					Request('/Home/OnSaveEntrust', 'post', params).then(res => {
+						// console.log(res)
+						if (res.IsSuccess) {
+							HandleToast('上传成功', 'success', 800);
+							setTimeout(() => {
+								this.$router.push({
+									path: "/list",
+								});
+							}, 1000)
+						}
+					}).catch(err => {
+						console.log(err)
+					})
+				}
 			} else {
 				HandleToast('请将内容填写完整')
 			}
-
 		},
 		afterRead(file) {
 			// 此时可以自行将文件上传至服务器
@@ -519,6 +524,19 @@ export default {
 				resolve();
 			});
 		},
+		handleTelBlur(e) {
+			const {value} = e.target;
+			if (!this.checkPhone(value)) {
+				HandleToast('手机号码有误，请重新填写')
+			}
+
+		},
+		checkPhone(phoneNumber) {
+			if (!(/^1[3456789]\d{9}$/.test(phoneNumber))) {
+				return false;
+			}
+			return true;
+		}
 	}
 };
 </script>
