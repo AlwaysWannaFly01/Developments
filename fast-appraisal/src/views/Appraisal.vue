@@ -320,7 +320,7 @@ export default {
 				AppraiseCompanyID: selectedCompany.CusOrganizationID || '',    /*评估公司*/
 				fangben: file
 			}
-			// console.log(params)
+			console.log(params)
 			if (_.every(params)) {
 				if (!this.checkPhone(params.ContactNumber)) {
 					HandleToast('手机号码有误，请重新填写')

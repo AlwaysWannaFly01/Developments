@@ -1,7 +1,6 @@
 import request from '@/utils/request';
 import _ from 'lodash';
-// import qs from 'qs';
-import {stringify} from 'qs'
+import qs from 'qs';
 
 export function getCode() {
 	return request({
@@ -52,7 +51,8 @@ export function Request(reqMethod, reqType = 'post', params = {}) {
 			let promise;
 			switch (reqType) {
 				case 'post':
-					promise = request({url, method: 'post', data:stringify(params)})
+					// console.log(qs.stringify(params))
+					promise = request({url, method: 'post', data: qs.stringify(params)})
 					break;
 				case 'get':
 					if (_.isEmpty(params)) {
@@ -65,9 +65,10 @@ export function Request(reqMethod, reqType = 'post', params = {}) {
 			}
 			promise.then(response => {
 				// console.log('请求成功');
-				// setTimeout(() => {
-				resolve(response)
-				// }, 500)
+				// console.log(response)
+				setTimeout(() => {
+					resolve(response)
+				}, 500)
 			}).catch(error => {
 				console.log('请求失败');
 				reject(error)

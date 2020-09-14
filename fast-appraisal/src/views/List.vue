@@ -68,8 +68,7 @@ export default {
 			finished: false,
 			default: {
 				page: 0,
-				size: 10,
-				limit: 10
+				size: 10
 			},
 			error: false,
 		};
@@ -105,17 +104,12 @@ export default {
 		},
 		async onSearch(val) {
 			console.log('点击回车触发了')
-			console.log(val)
 			if (val) {
-				let fake = '5ee1ee83b703280f0bcb922a';
-				let result = await this.searchBy(fake)
-				if (result.success) {
-					this.loading = false;
-					this.list.push(result.data)
-					this.finished = true;
-				}
+				// console.log(val)
+				this.searchBy(val)
 			} else {
 				this.list = [];
+				this.loading = true;
 				this.finished = false;
 				let isTrue = await this.refresh();
 				if (isTrue) {
@@ -126,16 +120,10 @@ export default {
 		async clickSearch() {
 			console.log('点击搜索按钮触发了')
 			if (this.value) {
-				let fake = '5433d5e4e737cbe96dcef312';
-				let result = await this.searchBy(fake)
-				// console.log(result)
-				if (result.success) {
-					this.loading = false;
-					this.list.push(result.data)
-					this.finished = true;
-				}
+				this.searchBy(this.value)
 			} else {
 				this.list = [];
+				this.loading = true;
 				this.finished = false;
 				let isTrue = await this.refresh();
 				if (isTrue) {
@@ -149,21 +137,34 @@ export default {
 			this.finished = false;
 			let isTrue = await this.refresh();//清空 page, size 等属性
 			if (isTrue) {
-				return new Promise((resolve, reject) =>
-					getData('https://cnodejs.org/api/v1/topic/' + param).then(res => {
-						resolve(res)
-					}).catch(err => {
-						reject(err)
-					})
-				)
+				Request('/Home/QuickEstimateBindGrid', 'post', {
+					RoomAddress: param,
+					LingKanRen: '',
+					PingGuLeiXing: '',
+					page: 1,
+					size: 10
+				}).then(res => {
+					console.log(res)
+					if (res.data) {
+						if (res.data.length > 0) {
+							this.list = res.data;
+						} else {
+							this.loading = false;
+							this.list = []
+							this.finished = true;
+						}
+					}
+				}).catch(err => {
+					console.log(err)
+				})
+
 			}
 		},
 		async refresh() {
 			return new Promise((resolve, reject) => {
 				this.default = {
 					page: 0,
-					size: 10,
-					limit: 10
+					size: 10
 				}
 				setTimeout(() => {
 					if (this.default.page === 0) {
