@@ -18,27 +18,20 @@ export function getListData(param) {
 	})
 }
 
-// export function getTopicList(param) {
-// 	const {page, limit} = param;
-// 	return request({
-// 		url: 'https://cnodejs.org/api/v1/topics?page=' + page + '&limit=' + limit,
-// 		method: 'get'
-// 	})
-// }
-
-export function getData(url, data) {
-	return request({
-		url,
-		method: 'get',
-		data
-	})
-}
-
-export function postData(url, data) {
-	return request({
-		url,
-		method: 'post',
-		data
+export function postSearchData(params) {
+	const {size, page, param} = params;
+	return new Promise((resolve, reject) => {
+		request({
+			url: '/Home/QuickEstimateBindGrid?page=' + page + '&size=' + size,
+			method: 'post',
+			data: param
+		}).then(res => {
+			setTimeout(() => {
+				resolve(res)
+			}, 600)
+		}).catch(err => {
+			console.log(err)
+		})
 	})
 }
 
@@ -52,7 +45,12 @@ export function Request(reqMethod, reqType = 'post', params = {}) {
 			switch (reqType) {
 				case 'post':
 					// console.log(qs.stringify(params))
-					promise = request({url, method: 'post', data: qs.stringify(params)})
+					promise = request({
+						url,
+						method: 'post',
+						data: params
+					})
+					// promise = request({url, method: 'post', data: qs.stringify(params)})
 					break;
 				case 'get':
 					if (_.isEmpty(params)) {
@@ -60,7 +58,11 @@ export function Request(reqMethod, reqType = 'post', params = {}) {
 					} else {
 						url = url + params.id;
 					}
-					promise = request({url, method: 'get'});
+					promise = request({
+						url,
+						method: 'get',
+						headers: {'content-type': 'application/x-www-form-urlencoded'},
+					});
 					break;
 			}
 			promise.then(response => {

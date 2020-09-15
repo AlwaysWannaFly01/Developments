@@ -25,12 +25,11 @@
 				<div v-for="(item,index) in list" :key="index" :title="item.name" class="list-item">
 					<div>
 						<h3>{{ item.ID }}</h3>
-						<p>{{ '详细地址:' + item.HouseCityName }}</p>
+						<p>{{ '城市:' + item.HouseCityName }}</p>
+						<p v-if="item.RoomAddress">{{ `详细地址: ${item.RoomAddress}` }}</p>
+						<p>{{ `评估类型: ${item.PingGuLeiXing == 1 ? '预评' : '正式'}` }}</p>
+
 					</div>
-					<!--					<div>-->
-					<!--						<h3>{{ item.id }}</h3>-->
-					<!--						<p>{{ '详细地址:' + item.title }}</p>-->
-					<!--					</div>-->
 					<aside @click="toHistory(item.ID)">查看</aside>
 				</div>
 			</van-list>
@@ -43,8 +42,7 @@ import Vue from "vue";
 import {Search, List, Cell} from "vant";
 
 Vue.use(Search).use(List).use(Cell);
-import {getData, getListData, Request} from '@/api';
-import handleToast from '@/utils/toast';
+import {getListData, Request, postSearchData} from '@/api';
 
 export default {
 	name: "List",
@@ -137,28 +135,30 @@ export default {
 			this.finished = false;
 			let isTrue = await this.refresh();//清空 page, size 等属性
 			if (isTrue) {
-				Request('/Home/QuickEstimateBindGrid', 'post', {
+				this.searchData(param)
+			}
+		},
+		searchData(param) {
+			this.default.page ++;
+			postSearchData({
+				param: {
 					RoomAddress: param,
 					LingKanRen: '',
 					PingGuLeiXing: '',
-					page: 1,
-					size: 10
-				}).then(res => {
-					console.log(res)
-					if (res.data) {
-						if (res.data.length > 0) {
-							this.list = res.data;
-						} else {
-							this.loading = false;
-							this.list = []
-							this.finished = true;
-						}
+				},
+				page: this.default.page,
+				size: this.default.size
+			}).then(res => {
+				if (res) {
+					if (res.count > 0) {
+						this.list = res.data;
+					} else {
+						this.list = [];
 					}
-				}).catch(err => {
-					console.log(err)
-				})
+					this.finished = true;
 
-			}
+				}
+			})
 		},
 		async refresh() {
 			return new Promise((resolve, reject) => {
@@ -286,7 +286,7 @@ export default {
 		.list-item {
 			margin-bottom: px2rem(15);
 			display: flex;
-			height: px2rem(78);
+			//height: px2rem(78);
 			align-items: center;
 			border-radius: px2rem(10);
 			background-color: #f2f4f3;
@@ -318,6 +318,7 @@ export default {
 					-webkit-line-clamp: 2;
 					line-clamp: 2;
 					-webkit-box-orient: vertical;
+					margin-top: px2rem(6);
 				}
 			}
 

@@ -32,7 +32,14 @@
 					<!--					<span class="_request">*</span>-->
 				</template>
 			</van-cell>
-			<van-cell title="房本附件:" icon="shop-o" class="accessory" value="请选择" value-class="_item"></van-cell>
+			<van-cell icon="shop-o" class="accessory" value="请选择" value-class="_item uploadedImg">
+				<template #title>
+					<span class="custom-title">房本附件:</span>
+					<!--					<span class="_require">*</span>-->
+				</template>
+				<van-uploader v-model="fileList" disabled max-count="1" :deletable="false">
+				</van-uploader>
+			</van-cell>
 			<van-divider/>
 		</div>
 		<div class="btn-panel">
@@ -43,6 +50,8 @@
 </template>
 
 <script>
+let baseUrl = 'http://localhost:44390/';
+
 import User from "@/components/user/user";
 import Vue from 'vue';
 import {Button, Cell, CellGroup, Tag, Icon, Divider, Loading} from 'vant';
@@ -65,6 +74,8 @@ export default {
 			tel: '',
 			price: '',
 			company: '',
+			fileList: [],
+			fileSrc: ''
 		};
 	},
 	beforeMount() {
@@ -89,8 +100,9 @@ export default {
 						this.person = res.LingKanRen;
 						this.tel = res.ContactNumber;
 						this.price = res.ExpectedEvaluationValue;
-						this.company = res.AppraiseCompanyID;
-
+						this.company = res.AppraiseCompanyName;
+						this.fileList = [{url: baseUrl + res.FangBen}]
+						this.fileSrc = baseUrl + res.FangBen;
 					}
 				}).catch(err => {
 					console.log(err)
@@ -185,6 +197,9 @@ export default {
 			}
 
 			&.accessory {
+				padding: 5px 16px;
+				display: flex;
+				align-items: center;
 				.van-cell__left-icon {
 					background-image: url("../assets/images/icon_accessory.png");
 				}
@@ -193,6 +208,29 @@ export default {
 			._item {
 				text-align: left;
 				color: #999;
+
+				&.uploadedImg {
+					height: px2rem(35);
+					.van-uploader {
+						height: px2rem(35);
+						.van-uploader__preview {
+							margin: 0;
+
+							.van-image {
+								width: px2rem(35);
+								height: px2rem(35);
+
+								.van-image__img {
+									margin-left: 0;
+								}
+							}
+						}
+
+						.van-uploader__wrapper--disabled {
+							opacity: 1;
+						}
+					}
+				}
 			}
 
 			._request {
