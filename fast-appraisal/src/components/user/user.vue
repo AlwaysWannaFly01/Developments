@@ -11,6 +11,7 @@
 </template>
 <script>
 import {Request} from '@/api';
+import HandleToast from '@/utils/toast';
 
 export default {
 	name: "user",
@@ -26,13 +27,26 @@ export default {
 	methods: {
 		init() {
 			Request('/Account/GetUserInfo').then(res => {
-				// console.log(res)
+				console.log(res)
 				if (res.IsSuccess) {
-					this.trueName = '用户名: ' + res.Data.TrueName
+					this.trueName = '用户名: ' + res.Data.TrueName;
+					this.selectItem(res.IsSuccess);
+				} else {
+					this.selectItem(res.IsSuccess);
+					HandleToast('请先登录', 'fail', 800)
+					setTimeout(() => {
+						this.$router.replace({
+							path:'/login'
+						})
+					}, 1000)
+
 				}
 			}).catch(err => {
 				console.log(err)
 			})
+		},
+		selectItem(param) {
+			this.$emit('checkLogin', param);
 		}
 	}
 };

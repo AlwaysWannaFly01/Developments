@@ -1,10 +1,11 @@
 <template>
 	<div class="page-history" :style="{height: height + 'px'}">
 		<div class="history-panel">
-			<User/>
+			<User @checkLogin='loginStatus'/>
 		</div>
-		<van-loading size="24px" vertical v-if="loading" class="center-panel loading">加载中...</van-loading>
-		<div class="center-panel" v-else>
+		<van-empty description="暂无内容" class="center-panel" v-if="!isLogin"/>
+		<van-loading size="24px" vertical v-if="isLogin&&loading" class="center-panel loading">加载中...</van-loading>
+		<div class="center-panel" v-if="isLogin&&!loading">
 			<van-cell icon="shop-o" class="province" :value="province" value-class="_item">
 				<template #title>
 					<span class="custom-title">省份:</span>
@@ -50,7 +51,6 @@
 </template>
 
 <script>
-let baseUrl = 'http://localhost:44390/';
 
 import User from "@/components/user/user";
 import Vue from 'vue';
@@ -75,7 +75,8 @@ export default {
 			price: '',
 			company: '',
 			fileList: [],
-			fileSrc: ''
+			fileSrc: '',
+			isLogin: true
 		};
 	},
 	beforeMount() {
@@ -91,7 +92,7 @@ export default {
 		init() {
 			if (this.id) {
 				Request('/Home/GetEstimateFinance/', 'get', {id: this.id}).then(res => {
-					console.log(res)
+					// console.log(res)
 					if (res) {
 						this.loading = false;
 						this.province = res.HouseProvinceName;
@@ -101,14 +102,17 @@ export default {
 						this.tel = res.ContactNumber;
 						this.price = res.ExpectedEvaluationValue;
 						this.company = res.AppraiseCompanyName;
-						this.fileList = [{url: baseUrl + res.FangBen}]
-						this.fileSrc = baseUrl + res.FangBen;
+						this.fileList = [{url: process.env.BASE_URL + res.FangBen}]
+						this.fileSrc = process.env.BASE_URL + res.FangBen;
 					}
 				}).catch(err => {
 					console.log(err)
 				})
 			}
 		},
+		loginStatus(singer) {
+			this.isLogin = singer;
+		}
 	}
 }
 </script>
@@ -200,6 +204,7 @@ export default {
 				padding: 5px 16px;
 				display: flex;
 				align-items: center;
+
 				.van-cell__left-icon {
 					background-image: url("../assets/images/icon_accessory.png");
 				}
@@ -211,8 +216,10 @@ export default {
 
 				&.uploadedImg {
 					height: px2rem(35);
+
 					.van-uploader {
 						height: px2rem(35);
+
 						.van-uploader__preview {
 							margin: 0;
 

@@ -1,9 +1,10 @@
 <template>
 	<div class="page-appraisal" :style="{height: height + 'px'}">
 		<div class="appraisal-panel">
-			<User/>
+			<User @checkLogin='loginStatus'/>
 		</div>
-		<div class="center-panel">
+		<van-empty description="暂无内容" class="center-panel" v-if="!isLogin"/>
+		<div class="center-panel" v-if="isLogin">
 			<van-cell icon="shop-o" class="province" value-class="_item">
 				<template #title>
 					<span class="custom-title">省份:</span>
@@ -121,7 +122,9 @@ import {
 	Popup,
 	Uploader,
 	Notify,
-	Divider
+	Divider,
+	Loading,
+	Empty
 } from "vant";
 
 Vue.use(Overlay)
@@ -132,7 +135,9 @@ Vue.use(Overlay)
 	.use(Popup)
 	.use(Uploader)
 	.use(Notify)
-	.use(Divider);
+	.use(Divider)
+	.use(Loading)
+	.use(Empty);
 import Vconsole from 'vconsole';
 
 // let vConsole = new Vconsole()
@@ -166,7 +171,7 @@ export default {
 			fileSrc: null,
 			fileList: [],
 			loading: null,
-			rotateState: 1
+			isLogin: true,
 		};
 	},
 	beforeMount() {
@@ -251,14 +256,14 @@ export default {
 			this.show = true;
 		},
 		onChange(picker, value, index) {
-			Toast(`当前值：${value}, 当前索引：${index}`);
+			// Toast(`当前值：${value}, 当前索引：${index}`);
 		},
 		onCancel() {
-			Toast('取消');
+			// Toast('取消');
 			this.show = false;
 		},
 		onConfirm(value, index) {
-			Toast(`当前值：${value}, 当前索引：${index}`);
+			// Toast(`当前值：${value}, 当前索引：${index}`);
 			// console.log(this.selectedOption)
 			switch (this.selectedOption) {
 				case "province":
@@ -333,7 +338,7 @@ export default {
 					formData.append('AppraiseCompanyID', params.AppraiseCompanyID)
 					formData.append('fangben', params.fangben)
 
-					console.log(params)
+					// console.log(params)
 
 					const instance = this.$axios.create({
 						withCredentials: true    /*axios 默认不允许跨域请求,会将file拦截下来,所以后台接收不到数据的,这样修改*/
@@ -344,7 +349,7 @@ export default {
 							"Content-Type": "multipart/form-data"
 						}
 					}).then(res => {
-						console.log(res)
+						// console.log(res)
 						if (res.data.IsSuccess) {
 							HandleToast('上传成功', 'success', 800);
 							setTimeout(() => {
@@ -408,6 +413,9 @@ export default {
 				return false;
 			}
 			return true;
+		},
+		loginStatus(singer) {
+			this.isLogin = singer;
 		}
 	}
 };

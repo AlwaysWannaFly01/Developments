@@ -2,7 +2,7 @@
 	<div class="page-list" :style="{height: height + 'px'}">
 		<div class="top" ref="topblock">
 			<div class="fixed-panel">
-				<User></User>
+				<User @checkLogin='loginStatus'></User>
 			</div>
 			<div class="fixed-search">
 				<van-search
@@ -18,7 +18,8 @@
 				</van-search>
 			</div>
 		</div>
-		<div class="list-container" :style="listHeight">
+		<van-empty description="暂无内容" class="list-container" :style="listHeight" v-if="!isLogin"/>
+		<div class="list-container" :style="listHeight" v-if="isLogin">
 			<van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad" offset="50"
 					  :error.sync="error"
 					  error-text="请求失败，点击重新加载">
@@ -69,12 +70,13 @@ export default {
 				size: 10
 			},
 			error: false,
+			isLogin: true
 		};
 	},
 	methods: {
 		async onLoad() {
 			let result = await this.getListData();
-			console.log(result)
+			// console.log(result)
 			if (result.data.length > 0) {
 				setTimeout(() => {
 					this.loading = false;
@@ -180,6 +182,9 @@ export default {
 					params: {id: param}
 				})
 			}
+		},
+		loginStatus(singer) {
+			this.isLogin = singer;
 		}
 	},
 };
@@ -332,6 +337,12 @@ export default {
 				color: #fff;
 				border-radius: 0 px2rem(10) px2rem(10) 0;
 			}
+		}
+	}
+
+	.van-empty{
+		&.list-container{
+			background-color: #fff;
 		}
 	}
 }
