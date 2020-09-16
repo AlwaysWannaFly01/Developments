@@ -1,5 +1,6 @@
 <template>
 	<div class="page-list" :style="{height: height + 'px'}">
+		<van-nav-bar title="历史报单" right-text="去评估" @click-right="onClickRight"/>
 		<div class="top" ref="topblock">
 			<div class="fixed-panel">
 				<User @checkLogin='loginStatus'></User>
@@ -40,9 +41,9 @@
 <script>
 import User from "@/components/user/user";
 import Vue from "vue";
-import {Search, List, Cell} from "vant";
+import {Search, List, Cell, NavBar} from "vant";
 
-Vue.use(Search).use(List).use(Cell);
+Vue.use(Search).use(List).use(Cell).use(NavBar);
 import {getListData, Request, postSearchData} from '@/api';
 
 export default {
@@ -52,9 +53,8 @@ export default {
 	},
 	beforeMount() {
 		this.height = window.innerHeight;
-		// console.log(window.getComputedStyle(this.$refs.topblock).height)
 		this.listHeight = {
-			"height": (window.innerHeight - 183) + 'px',
+			"height": (window.innerHeight - 183 -46) + 'px',
 		};
 	},
 
@@ -103,7 +103,7 @@ export default {
 			})
 		},
 		async onSearch(val) {
-			console.log('点击回车触发了')
+			// console.log('点击回车触发了')
 			if (val) {
 				// console.log(val)
 				this.searchBy(val)
@@ -118,7 +118,7 @@ export default {
 			}
 		},
 		async clickSearch() {
-			console.log('点击搜索按钮触发了')
+			// console.log('点击搜索按钮触发了')
 			if (this.value) {
 				this.searchBy(this.value)
 			} else {
@@ -185,6 +185,11 @@ export default {
 		},
 		loginStatus(singer) {
 			this.isLogin = singer;
+		},
+		onClickRight(){
+			this.$router.push({
+				path: "/appraisal",
+			})
 		}
 	},
 };
@@ -216,7 +221,8 @@ export default {
 
 	.fixed-search {
 		position: fixed;
-		top: 118px;
+		//top: 118px;
+		top: 164px;
 		width: px2rem(355);
 		left: 50%;
 		transform: translateX(-50%);
@@ -273,7 +279,8 @@ export default {
 		position: absolute;
 		left: 50%;
 		transform: translateX(-50%);
-		top: 182px;
+		//top: 182px;
+		top: 228px;
 		z-index: 1;
 		width: px2rem(355);
 

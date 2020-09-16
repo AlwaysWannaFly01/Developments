@@ -2,13 +2,32 @@
 
 //1rem = fontSize px
 //1px = (1 / fontSize) rem
-$fontSize:37.5;
-@function px2rem($px){
-  @return ($px / $fontSize) + rem;
+$fontSize: 37.5;
+@function px2rem($px) {
+	@return ($px / $fontSize) + rem;
 }
 
 @mixin center() {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.van-nav-bar {
+	background-color: rgb(65, 136, 242);
+
+	.van-nav-bar__left {
+		.van-icon {
+			color: #fff;
+		}
+	}
+
+	.van-nav-bar__title {
+		color: #fff;
+	}
+	.van-nav-bar__right{
+		.van-nav-bar__text{
+			color: #fff;
+		}
+	}
 }

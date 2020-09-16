@@ -1,5 +1,6 @@
 <template>
 	<div class="page-appraisal" :style="{height: height + 'px'}">
+		<van-nav-bar title="在线报单"/>
 		<div class="appraisal-panel">
 			<User @checkLogin='loginStatus'/>
 		</div>
@@ -104,7 +105,9 @@
 		</div>
 
 		<div class="btn-panel">
-			<van-button type="default" class="btn" @click="submit">委托预评</van-button>
+			<van-button type="default" class="btn" @click="submit" :loading="loginLoading"
+						loading-size="18" loading-text="委托预评">委托预评
+			</van-button>
 		</div>
 	</div>
 </template>
@@ -124,7 +127,8 @@ import {
 	Notify,
 	Divider,
 	Loading,
-	Empty
+	Empty,
+	NavBar
 } from "vant";
 
 Vue.use(Overlay)
@@ -137,7 +141,8 @@ Vue.use(Overlay)
 	.use(Notify)
 	.use(Divider)
 	.use(Loading)
-	.use(Empty);
+	.use(Empty)
+	.use(NavBar);
 import Vconsole from 'vconsole';
 
 // let vConsole = new Vconsole()
@@ -172,6 +177,7 @@ export default {
 			fileList: [],
 			loading: null,
 			isLogin: true,
+			loginLoading: false
 		};
 	},
 	beforeMount() {
@@ -349,13 +355,15 @@ export default {
 							"Content-Type": "multipart/form-data"
 						}
 					}).then(res => {
-						// console.log(res)
+						console.log(res)
 						if (res.data.IsSuccess) {
+							this.loginLoading = true;
 							HandleToast('上传成功', 'success', 800);
 							setTimeout(() => {
 								this.$router.push({
-									path: "/list",
-								});
+									name: 'History',
+									params: {id: res.data.Data}
+								})
 							}, 1000)
 						}
 					}).catch(err => {

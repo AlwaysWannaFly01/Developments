@@ -1,5 +1,6 @@
 <template>
 	<div class="page-history" :style="{height: height + 'px'}">
+		<van-nav-bar title="历史报单" left-arrow @click-left="onClickLeft"/>
 		<div class="history-panel">
 			<User @checkLogin='loginStatus'/>
 		</div>
@@ -44,7 +45,7 @@
 			<van-divider/>
 		</div>
 		<div class="btn-panel">
-			<van-button type="default" class="btn">关闭</van-button>
+			<van-button type="default" class="btn" @click="toAppraisal">继续评估</van-button>
 		</div>
 	</div>
 
@@ -54,9 +55,9 @@
 
 import User from "@/components/user/user";
 import Vue from 'vue';
-import {Button, Cell, CellGroup, Tag, Icon, Divider, Loading} from 'vant';
+import {Button, Cell, CellGroup, Tag, Icon, Divider, Loading, NavBar} from 'vant';
 
-Vue.use(Button).use(Cell).use(CellGroup).use(Tag).use(Icon).use(Divider).use(Loading);
+Vue.use(Button).use(Cell).use(CellGroup).use(Tag).use(Icon).use(Divider).use(Loading).use(NavBar);
 import {Request} from '@/api'
 
 export default {
@@ -112,6 +113,16 @@ export default {
 		},
 		loginStatus(singer) {
 			this.isLogin = singer;
+		},
+		toAppraisal() {
+			this.$router.push({
+				path: "/appraisal",
+			})
+		},
+		onClickLeft(){
+			this.$router.push({
+				path: "/list",
+			})
 		}
 	}
 }
