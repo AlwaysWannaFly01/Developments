@@ -55,9 +55,9 @@ export default {
 		.van-icon {
 			&::before {
 				content: '';
-				width: 22px;
-				height: 21px;
-				background-size: 22px auto;
+				width: 24px;
+				height: 23px;
+				background-size: 24px auto;
 			}
 		}
 
