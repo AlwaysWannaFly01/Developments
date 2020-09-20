@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h1>index</h1>
+		<h1>category</h1>
 	</div>
 </template>
 <script>
@@ -8,11 +8,14 @@
 export default {
 	data() {
 		return {
+
 		}
 	},
 	components: {
 	},
-	methods: {}
+	methods: {
+
+	}
 };
 </script>
 <style lang="scss">
