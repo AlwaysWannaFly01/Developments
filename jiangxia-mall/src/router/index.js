@@ -10,7 +10,6 @@ Vue.use(Router)
 
 
 export default new Router({
-	mode: 'history',
 	routes: [
 		{
 			path: '*',
@@ -19,27 +18,42 @@ export default new Router({
 		{
 			path: '/index',
 			name: 'Index',
-			component: Index
+			component: Index,
+			meta:{
+				title: '江夏优选'
+			}
 		},
 		{
 			path: '/category',
 			name: 'Category',
-			component: Category
+			component: Category,
+			meta:{
+				title: '产品分类'
+			}
 		},
 		{
 			path: '/live',
 			name: 'Live',
-			component: Live
+			component: Live,
+			meta:{
+				title: '直播'
+			}
 		},
 		{
 			path: '/shop',
 			name: 'Shop',
-			component: Shop
+			component: Shop,
+			meta:{
+				title: '购物车'
+			}
 		},
 		{
 			path: '/my',
 			name: 'My',
-			component: My
+			component: My,
+			meta:{
+				title: '个人中心'
+			}
 		},
 	]
 })

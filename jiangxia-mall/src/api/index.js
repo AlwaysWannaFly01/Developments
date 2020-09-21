@@ -1,47 +1,50 @@
-import request from '@/utils/request';
-import _ from 'lodash';
-import qs from 'qs';
+import { requestMain, requestJxyx } from "@/utils/request";
+import _ from "lodash";
+import qs from "qs";
 
 /**
  * 请求接口公共方法
  */
-export function Request(reqMethod, reqType = 'post', params = {}) {
+export function Request(type, reqMethod, reqType = "post", params = {}) {
+	let HostType;
+	if (type === "main") {
+		HostType = requestMain;
+	} else if (type === "jxyx") {
+		HostType = requestJxyx;
+	}
+
 	return new Promise((resolve, reject) => {
-			let url = reqMethod;
-			let promise;
-			switch (reqType) {
-				case 'post':
-					// console.log(qs.stringify(params))
-					promise = request({
-						url,
-						method: 'post',
-						data: params
-					})
-					// promise = request({url, method: 'post', data: qs.stringify(params)})
-					break;
-				case 'get':
-					if (_.isEmpty(params)) {
-						url = reqMethod;
-					} else {
-						url = url + params.id;
-					}
-					promise = request({
-						url,
-						method: 'get',
-						headers: {'content-type': 'application/x-www-form-urlencoded'},
-					});
-					break;
-			}
-			promise.then(response => {
-				// console.log('请求成功');
-				// console.log(response)
-				setTimeout(() => {
-					resolve(response)
-				}, 500)
-			}).catch(error => {
-				console.log('请求失败');
-				reject(error)
-			})
+		let url = reqMethod;
+		let promise;
+		switch (reqType) {
+			case "post":
+				promise = HostType({
+					url,
+					method: "post",
+					data: params
+				});
+				break;
+			case "get":
+				if (_.isEmpty(params)) {
+					url = reqMethod;
+				} else {
+					url = url + params.id;
+				}
+				promise = HostType({
+					url,
+					method: "get"
+				});
+				break;
 		}
-	)
+		promise
+			.then(response => {
+				setTimeout(() => {
+					resolve(response);
+				}, 500);
+			})
+			.catch(error => {
+				console.log("请求失败");
+				reject(error);
+			});
+	});
 }

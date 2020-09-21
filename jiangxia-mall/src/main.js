@@ -10,6 +10,15 @@ import axios from 'axios'
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios;
 
+router.beforeEach((to, from, next) => {
+	/* 路由发生变化修改页面title */
+	// console.log(to)
+	if (to.meta.title) {
+		document.title = to.meta.title
+	}
+	next()
+})
+
 /* eslint-disable no-new */
 new Vue({
 	el: '#app',
