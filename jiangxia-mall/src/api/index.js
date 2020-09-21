@@ -14,6 +14,7 @@ export function Request(type, reqMethod, reqType = "post", params = {}) {
 	}
 
 	return new Promise((resolve, reject) => {
+		// console.log(params);
 		let url = reqMethod;
 		let promise;
 		switch (reqType) {
@@ -38,9 +39,9 @@ export function Request(type, reqMethod, reqType = "post", params = {}) {
 		}
 		promise
 			.then(response => {
-				setTimeout(() => {
+				// setTimeout(() => {
 					resolve(response);
-				}, 500);
+				// }, 500);
 			})
 			.catch(error => {
 				console.log("请求失败");

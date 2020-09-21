@@ -22,4 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-<style></style>
+<style lang="scss">
+	#app{
+		padding-bottom: 50px;
+	}
+</style>
