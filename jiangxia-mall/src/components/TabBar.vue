@@ -17,7 +17,7 @@ Vue.use(Tabbar).use(TabbarItem).use(Notify);
 export default {
 	name: "TabBar",
 	beforeMount() {
-		// console.log(this.$router.history.current.path)
+		console.log(this.$router.history.current.path)
 		switch (this.$router.history.current.path) {
 			case "/index":
 				this.active = 0;
@@ -43,7 +43,12 @@ export default {
 	},
 	methods: {
 		onChange(index) {
-			Notify({type: 'primary', message: index});
+			// console.log(index)
+			// Notify({type: 'primary', message: index});
+		},
+		changeByParent(param){
+			// console.log(param)
+			this.active = param
 		}
 	}
 }
