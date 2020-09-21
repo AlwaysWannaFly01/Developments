@@ -5,6 +5,7 @@ import Category from '@/views/category/category'
 import Live from '@/views/live/live'
 import Shop from '@/views/shop/shop'
 import My from '@/views/my/my'
+import Order from '@/views/my/order'
 
 Vue.use(Router)
 
@@ -53,6 +54,14 @@ export default new Router({
 			component: My,
 			meta:{
 				title: '个人中心'
+			}
+		},
+		{
+			path: '/order',
+			name: 'Order',
+			component: Order,
+			meta:{
+				title: '我的订单'
 			}
 		},
 	]

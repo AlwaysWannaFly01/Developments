@@ -1,5 +1,6 @@
 <template>
 	<div class="page-my">
+
 		<div class="personal">
 			<img src="@/assets/images/jx/default_avatar.png">
 			<h2>项目</h2>
@@ -7,7 +8,7 @@
 		<div class="my-order">
 			<h3>我的订单</h3>
 			<div class="block">
-				<div class="item">
+				<div class="item" @click="handleClick()">
 					<img src="../../assets/images/dfk.png">
 					<span>待付款</span>
 				</div>
@@ -50,16 +51,23 @@
 </template>
 <script>
 import Vue from 'vue';
-import { Cell, CellGroup  } from 'vant';
+import { Cell, CellGroup,NavBar  } from 'vant';
 
-Vue.use(Cell).use(CellGroup);
+Vue.use(Cell).use(CellGroup).use(NavBar);
 import TabBar from "../../components/TabBar";
 export default {
 	data() {
 		return {}
 	},
 	components: {TabBar},
-	methods: {}
+	methods: {
+		handleClick(){
+			this.$router.push({
+				name: 'Order',
+				params: {}
+			})
+		}
+	}
 };
 </script>
 <style scoped lang="scss">
