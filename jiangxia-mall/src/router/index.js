@@ -10,6 +10,9 @@ import Culture from "@/views/index/culture";
 import Healthy from "@/views/index/healthy";
 import Science from "@/views/index/science";
 import CompanyDetail from "@/views/index/companyDetail";
+import Racking from "@/views/index/racking";
+import Hot from "@/views/index/hot";
+import Detail from "@/views/index/detail";
 
 Vue.use(Router);
 
@@ -99,6 +102,31 @@ export default new Router({
 				title: "企业详情"
 			}
 		},
+		{
+			path: "/racking",
+			name: "Racking",
+			component: Racking,
+			meta: {
+				title: "最新上架"
+			}
+		},
+		{
+			path: "/hot",
+			name: "Hot",
+			component: Hot,
+			meta: {
+				title: "热销排行"
+			}
+		},
+		{
+			path: "/detail",
+			name: "Detail",
+			component: Detail,
+			meta: {
+				title: "商品详情"
+			}
+		},
+
 
 	]
 });

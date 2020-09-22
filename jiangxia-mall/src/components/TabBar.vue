@@ -17,7 +17,7 @@ Vue.use(Tabbar).use(TabbarItem).use(Notify);
 export default {
 	name: "TabBar",
 	beforeMount() {
-		console.log(this.$router.history.current.path)
+		// console.log(this.$router.history.current.path)
 		switch (this.$router.history.current.path) {
 			case "/index":
 				this.active = 0;

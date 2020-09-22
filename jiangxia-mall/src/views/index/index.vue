@@ -1,7 +1,7 @@
 <template>
     <div class="page-index">
         <img src="../../assets/images/bg/banner.png" class="banner" />
-        <div class="content">
+        <div class="content" @click="toHotPage">
             <img src="../../assets/images/bg/home-zhanwei.png" class="home-zhanwei" />
             <img src="../../assets/images/jx/play.png" class="play" />
         </div>
@@ -24,7 +24,7 @@
                     <van-tag color="rgb(122, 187, 86)">NEW</van-tag>
                     <span class="strong">最新上架</span>
                 </div>
-                <div class="more">
+                <div class="more" @click="toNewPage">
                     <span>查看更多</span>
                     <van-icon name="arrow" />
                 </div>
@@ -32,7 +32,7 @@
             <div class="_swiper">
                 <van-swipe :loop="false" :width="115" :show-indicators="false">
                     <van-swipe-item v-for="(item,index) in newGoodsList" :key="index">
-                        <div>
+                        <div @click="toDetail(item)">
                             <img :src="item.goodsImg" />
                             <van-button
                                 color="linear-gradient(to right, #7abb56, #F4F4F4)"
@@ -149,11 +149,6 @@ export default {
                 }
             });
 
-            // Request("jxyx", "weapp/articles/getarticlecats").then((res) => {
-            // 	console.log(res);
-
-            // });
-
             this.getGoods("new")
                 .then((res) => {
                     if (res.status === 1) {
@@ -201,7 +196,7 @@ export default {
         },
 
         onClick(name, title) {
-            console.log(name, title);
+            // console.log(name, title);
             this.getGoods(title)
                 .then((res) => {
                     if (res.status === 1) {
@@ -250,6 +245,26 @@ export default {
                     });
                     break;
             }
+        },
+        toNewPage() {
+            this.$router.push({
+                name: "Racking",
+            });
+        },
+        toHotPage() {
+            this.$router.push({
+                name: "Hot",
+            });
+        },
+        toDetail(param) {
+            console.log(param);
+
+            this.$router.push({
+                name: "Detail",
+                query: {
+                    id: param.goodsId,
+                },
+            });
         },
     },
 };
@@ -333,8 +348,7 @@ export default {
         font-size: 14px;
         display: flex;
         flex-direction: column;
-        //align-items: center;
-
+        margin-top: px2rem(15);
         .top {
             display: flex;
             justify-content: space-between;
