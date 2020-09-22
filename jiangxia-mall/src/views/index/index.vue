@@ -58,7 +58,7 @@
             <div class="block">
                 <ul>
                     <li v-for="(subItem,subIndex) in switchListData" :key="subIndex">
-                        <img :src="subItem.goodsImg" />
+                        <img :src="subItem.goodsImg" @click="toDetail(subItem)"/>
                         <h4>{{ subItem.goodsName }}</h4>
                         <p>
                             <span class="price">￥{{ subItem.shopPrice }}</span>
@@ -258,7 +258,6 @@ export default {
         },
         toDetail(param) {
             console.log(param);
-
             this.$router.push({
                 name: "Detail",
                 query: {
@@ -272,6 +271,9 @@ export default {
 <style lang="scss">
 @import "@/assets/styles/global.scss";
 
+#app{
+	padding-bottom: 0;
+}
 .page-index {
     position: relative;
 
@@ -485,6 +487,7 @@ export default {
         }
 
         .block {
+			margin-bottom: 50px;
             ul {
                 display: flex;
                 flex-wrap: wrap;

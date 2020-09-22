@@ -30,7 +30,7 @@
         <div class="cell-container">
             <div class="item">
                 <img src="../../assets/images/jx/my-position.png" />
-                <van-cell title="我的地址" />
+                <van-cell title="我的地址" @click="toManageAddress"/>
             </div>
             <div class="item">
                 <img src="../../assets/images/jx/my-msg.png" />
@@ -68,6 +68,11 @@ export default {
                 },
             });
         },
+		toManageAddress(){
+			this.$router.push({
+				name: "ManageAddress",
+			});
+		}
     },
 };
 </script>
@@ -77,8 +82,8 @@ export default {
 .page-my {
     padding: 0 px2rem(10);
     box-sizing: border-box;
-    //background-image: url("../../assets/images/jx/my-bg.png");
-    background-size: px2rem(375);
+    background-image: url("../../assets/images/jx/my-bg.png");
+    background-size: 115%;
     background-repeat: no-repeat;
     .personal {
         width: 100%;

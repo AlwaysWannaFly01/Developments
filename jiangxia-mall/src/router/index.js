@@ -13,6 +13,8 @@ import CompanyDetail from "@/views/index/companyDetail";
 import Racking from "@/views/index/racking";
 import Hot from "@/views/index/hot";
 import Detail from "@/views/index/detail";
+import ManageAddress from "@/views/my/manageAddress";
+import AddAddress from "@/views/my/addAddress";
 
 Vue.use(Router);
 
@@ -126,7 +128,21 @@ export default new Router({
 				title: "商品详情"
 			}
 		},
-
-
+		{
+			path: "/manageAddress",
+			name: "ManageAddress",
+			component: ManageAddress,
+			meta: {
+				title: "地址管理"
+			}
+		},
+		{
+			path: "/addAddress",
+			name: "AddAddress",
+			component: AddAddress,
+			meta: {
+				title: "地址管理"
+			}
+		},
 	]
 });
