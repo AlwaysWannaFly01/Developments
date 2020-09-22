@@ -39,6 +39,7 @@ export function Request(type, reqMethod, reqType = "post", params = {}) {
 		}
 		promise
 			.then(response => {
+				// console.log(response);
 				// setTimeout(() => {
 					resolve(response);
 				// }, 500);

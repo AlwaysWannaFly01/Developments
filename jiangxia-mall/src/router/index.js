@@ -1,68 +1,104 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import Index from '@/views/index/index'
-import Category from '@/views/category/category'
-import Live from '@/views/live/live'
-import Shop from '@/views/shop/shop'
-import My from '@/views/my/my'
-import Order from '@/views/my/order'
+import Vue from "vue";
+import Router from "vue-router";
+import Index from "@/views/index/index";
+import Category from "@/views/category/category";
+import Live from "@/views/live/live";
+import Shop from "@/views/shop/shop";
+import My from "@/views/my/my";
+import Order from "@/views/my/order";
+import Culture from "@/views/index/culture";
+import Healthy from "@/views/index/healthy";
+import Science from "@/views/index/science";
+import CompanyDetail from "@/views/index/companyDetail";
 
-Vue.use(Router)
-
+Vue.use(Router);
 
 export default new Router({
 	routes: [
 		{
-			path: '*',
-			redirect: '/index',
+			path: "*",
+			redirect: "/index"
 		},
 		{
-			path: '/index',
-			name: 'Index',
+			path: "/index",
+			name: "Index",
 			component: Index,
-			meta:{
-				title: '江夏优选'
+			meta: {
+				title: "江夏优选"
 			}
 		},
 		{
-			path: '/category',
-			name: 'Category',
+			path: "/category",
+			name: "Category",
 			component: Category,
-			meta:{
-				title: '产品分类'
+			meta: {
+				title: "产品分类"
 			}
 		},
 		{
-			path: '/live',
-			name: 'Live',
+			path: "/live",
+			name: "Live",
 			component: Live,
-			meta:{
-				title: '直播'
+			meta: {
+				title: "直播"
 			}
 		},
 		{
-			path: '/shop',
-			name: 'Shop',
+			path: "/shop",
+			name: "Shop",
 			component: Shop,
-			meta:{
-				title: '购物车'
+			meta: {
+				title: "购物车"
 			}
 		},
 		{
-			path: '/my',
-			name: 'My',
+			path: "/my",
+			name: "My",
 			component: My,
-			meta:{
-				title: '个人中心'
+			meta: {
+				title: "个人中心"
 			}
 		},
 		{
-			path: '/order',
-			name: 'Order',
+			path: "/order",
+			name: "Order",
 			component: Order,
-			meta:{
-				title: '我的订单'
+			meta: {
+				title: "我的订单"
 			}
 		},
+		{
+			path: "/science",
+			name: "Science",
+			component: Science,
+			meta: {
+				title: "江夏科创"
+			}
+		},
+		{
+			path: "/culture",
+			name: "Culture",
+			component: Culture,
+			meta: {
+				title: "江夏文旅"
+			}
+		},
+		{
+			path: "/healthy",
+			name: "Healthy",
+			component: Healthy,
+			meta: {
+				title: "江夏健康"
+			}
+		},
+		{
+			path: "/companyDetail",
+			name: "CompanyDetail",
+			component: CompanyDetail,
+			meta: {
+				title: "企业详情"
+			}
+		},
+
 	]
-})
+});

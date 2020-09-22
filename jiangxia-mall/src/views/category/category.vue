@@ -9,9 +9,9 @@
 		</van-tabs>
 		<van-search v-model="value" placeholder="点击搜索商品名称" />
 		<div class="img-block">
-			<img src="../../assets/images/bg/cate-zhanwei.png" v-if="active===0">
-			<img src="../../assets/images/bg/cate-zhanwei2.png" v-if="active===1">
-			<img src="../../assets/images/jx/play.png" class="play"/>
+			<img src="../../assets/images/bg/live_farm.png" v-if="active===0">
+			<img src="../../assets/images/bg/live_oper.png" v-if="active===1">
+<!--			<img src="../../assets/images/jx/play.png" class="play"/>-->
 		</div>
 		<div class="main-container">
 			<div v-if="active===1" class="main">
@@ -144,7 +144,7 @@ export default {
 				}
 				span{
 					font-size: 14px;
-					margin: 0 5px;
+					margin: 0 8px;
 				}
 			}
 			.empty{
