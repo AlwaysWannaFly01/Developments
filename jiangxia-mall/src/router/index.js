@@ -15,6 +15,7 @@ import Hot from "@/views/index/hot";
 import Detail from "@/views/index/detail";
 import ManageAddress from "@/views/my/manageAddress";
 import AddAddress from "@/views/my/addAddress";
+import GoodsList from "@/views/category/goodsList";
 
 Vue.use(Router);
 
@@ -142,6 +143,14 @@ export default new Router({
 			component: AddAddress,
 			meta: {
 				title: "地址管理"
+			}
+		},
+		{
+			path: "/goodsList",
+			name: "GoodsList",
+			component: GoodsList,
+			meta: {
+				title: "商品列表"
 			}
 		},
 	]

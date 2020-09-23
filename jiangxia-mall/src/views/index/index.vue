@@ -257,7 +257,7 @@ export default {
             });
         },
         toDetail(param) {
-            console.log(param);
+            // console.log(param);
             this.$router.push({
                 name: "Detail",
                 query: {
