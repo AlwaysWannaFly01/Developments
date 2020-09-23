@@ -78,7 +78,7 @@ export default {
 							this.finished = true;
 						}, 500);
 
-						console.log(this.list);
+						// console.log(this.list);
 					}
 				})
 				.catch((err) => {

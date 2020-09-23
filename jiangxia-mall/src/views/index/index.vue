@@ -480,10 +480,6 @@ export default {
                 }
             }
 
-            .van-tabs__content {
-                .van-tab__pane {
-                }
-            }
         }
 
         .block {
