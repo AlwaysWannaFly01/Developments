@@ -157,8 +157,8 @@ export default {
 	computed: {},
 	methods: {
 		async onClick(name) {
-			console.log(name);
-			console.log(this.active);
+			// console.log(name);
+			// console.log(this.active);
 			if (this.active === 1) {
 				let operGoodsRes = await this.getGoodsList(
 					this.switchList[1].catId
@@ -176,7 +176,22 @@ export default {
 				this.operGoods = operGoodsRes;
 				this.mainLoading = false;
 			} else if (this.active === 0) {
-				// this.init();
+				let menuList = this.switchList[0].childList;
+				this.menuList = menuList;
+				let firstMenu = await this.getGoodsList(
+					menuList[this.activeKey].catId
+				);
+				firstMenu.data.map((item) => {
+					if (_.startsWith(item.goodsImg, "http")) {
+						return;
+					} else {
+						item.goodsImg =
+							"http://youyoujiang.com/" + item.goodsImg;
+					}
+				});
+
+				this.goodsList = firstMenu;
+				this.loading = false;
 			}
 		},
 		async init() {
@@ -214,7 +229,21 @@ export default {
 				// console.log(firstMenu);
 				this.goodsList = firstMenu;
 				this.loading = false;
-			} else {
+			} else if (this.active === 1) {
+				let operGoodsRes = await this.getGoodsList(
+					this.switchList[1].catId
+				);
+
+				operGoodsRes.data.map((item) => {
+					if (_.startsWith(item.goodsImg, "http")) {
+						return;
+					} else {
+						item.goodsImg =
+							"http://youyoujiang.com/" + item.goodsImg;
+					}
+				});
+				this.operGoods = operGoodsRes;
+				this.mainLoading = false;
 			}
 		},
 		getMenuList() {
@@ -454,6 +483,10 @@ export default {
 				.van-sidebar {
 					height: 100%;
 					overflow-y: auto;
+
+					.van-sidebar-item {
+						padding: 15px 12px;
+					}
 
 					.van-sidebar-item--select {
 						&::before {

@@ -153,15 +153,17 @@ export default {
                 .then((res) => {
                     if (res.status === 1) {
                         res.data.map((item) => {
-                            if (_.startsWith(item.catImg, "http")) {
+                            if (_.startsWith(item.goodsImg, "http")) {
                                 return;
                             } else {
-                                item.catImg =
-                                    "http://youyoujiang.com/" + item.catImg;
+                                item.goodsImg =
+                                    "http://youyoujiang.com/" + item.goodsImg;
                             }
                         });
 
                         this.newGoodsList = res.data;
+						console.log(this.newGoodsList)
+
                     }
                 })
                 .catch((err) => {
@@ -180,7 +182,7 @@ export default {
                                     "http://youyoujiang.com/" + item.goodsImg;
                             }
                         });
-                        // console.log(res.data);
+                        console.log(res.data);
                         this.switchListData = res.data;
                     }
                 })
@@ -201,14 +203,16 @@ export default {
                 .then((res) => {
                     if (res.status === 1) {
                         res.data.map((item) => {
-                            if (_.startsWith(item.catImg, "http")) {
+                            if (_.startsWith(item.goodsImg, "http")) {
                                 return;
                             } else {
-                                item.catImg =
-                                    "http://youyoujiang.com/" + item.catImg;
+                                item.goodsImg =
+                                    "http://youyoujiang.com/" + item.goodsImg;
                             }
                         });
                         this.switchListData = res.data;
+						console.log(this.switchListData)
+
                     }
                 })
                 .catch((err) => {

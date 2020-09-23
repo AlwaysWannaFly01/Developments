@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getToken } from "@/utils/auth";
 
+console.log(process.env.API_HOST)
 const instance = axios.create({
 	baseURL: process.env.API_HOST, // url = base url + request url
 	timeout: 5000 // request timeout
