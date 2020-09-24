@@ -38,7 +38,7 @@
             </div>
             <div class="item">
                 <img src="../../assets/images/jx/store_icon.png" />
-                <van-cell title="商家入驻" />
+                <van-cell title="商家入驻" @click="toSellerJoin"/>
             </div>
             <div class="item">
                 <img src="../../assets/images/jx/server_icon.png" />
@@ -71,6 +71,11 @@ export default {
 		toManageAddress(){
 			this.$router.push({
 				name: "ManageAddress",
+			});
+		},
+		toSellerJoin(){
+			this.$router.push({
+				name: "SellerJoin",
 			});
 		}
     },

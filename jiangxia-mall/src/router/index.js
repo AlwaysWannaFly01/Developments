@@ -16,6 +16,7 @@ import Detail from "@/views/index/detail";
 import ManageAddress from "@/views/my/manageAddress";
 import AddAddress from "@/views/my/addAddress";
 import GoodsList from "@/views/category/goodsList";
+import SellerJoin from "@/views/my/sellerJoin";
 
 Vue.use(Router);
 
@@ -151,6 +152,14 @@ export default new Router({
 			component: GoodsList,
 			meta: {
 				title: "商品列表"
+			}
+		},
+		{
+			path: "/sellerJoin",
+			name: "SellerJoin",
+			component: SellerJoin,
+			meta: {
+				title: "商品入驻"
 			}
 		},
 	]

@@ -151,7 +151,7 @@ import Vconsole from 'vconsole';
 import {Request} from '@/api';
 import _ from 'lodash';
 import HandleToast from '@/utils/toast';
-import Exif from 'exif-js';
+// import Exif from 'exif-js';
 
 export default {
 	name: "Appraisal",
