@@ -76,9 +76,6 @@ export default {
 			let AllProvince = await this.getProvinceCityCounty();
 			this.AllProvince = AllProvince;
 			console.log('所有省份:', AllProvince);
-			const a = await this.getProvinceCityCounty2(180);
-			console.log(a)
-
 			this.mapCityData()
 		},
 		async mapCityData() {
@@ -134,57 +131,37 @@ export default {
 			}
 		},
 		async checkCountryData(param) {
-			console.log(param)
+			// console.log(param)
 			let countryData = [];
 
 			// param.map(async (item, index) => {
-			// 	// console.log(item)
-			// 	let countryRes = await this.mapCountryData(item.children);
-			// 	// console.log(countryRes)
+				// console.log(item)
+				// let countryRes = await this.mapCountryData(item.children);
+				// console.log(countryRes)
 			// })
-			param[28].children.map(item=>{
-				console.log(item)
-				this.mapCountryData(item);
+
+			param[28].children.map(async item=>{
+				const res = await this.mapCountryData(item);
+				console.log(res)
 			})
 
 		},
 		async mapCountryData(param) {
 			// console.log(param)
-			// const promise = param.map(async item =>{
-				// console.log(item)
-				const countryRes = await this.getProvinceCityCounty(param.parentId, param.areaId);
-				console.log(countryRes)
-
-				const a = await this.getProvinceCityCounty(13, 180);
-				console.log(a)
+			// const promise = param.map(async item => {
+				const countryRes = await this.getProvinceCityCounty(param.areaId);
+				console.log(countryRes);
 				// return countryRes;
 			// })
 			// const thisCityCountry = await Promise.all(promise);
 			// console.log(thisCityCountry)
 		},
 
-		getProvinceCityCounty(province = 0, city) {
+		getProvinceCityCounty(param = 0) {
 			return new Promise((resolve, reject) => {
 				Request("main", "weapp/users/listQuery", "post", {
-					parentId: province,
-					areaId: city
+					parentId: param,
 				}).then(res => {
-					console.log(res)
-					if (res.status === 1) {
-						resolve(res.data)
-					}
-				}).catch(err => {
-					console.log(err)
-					reject(err)
-				})
-			})
-		},
-		getProvinceCityCounty2(city) {
-			return new Promise((resolve, reject) => {
-				Request("main", "weapp/users/listQuery", "post", {
-					parentId: city,
-				}).then(res => {
-					console.log(res)
 					if (res.status === 1) {
 						resolve(res.data)
 					}
