@@ -7,6 +7,7 @@
 			<van-field v-model="contactName" label="联系人" placeholder="请输入联系人姓名"/>
 			<van-field v-model="tel" type="tel" maxlength="11" label="联系电话" placeholder="请输入联系电话"/>
 			<ProvinceCityCountry @func="getDataFormSon"></ProvinceCityCountry>
+			<van-divider/>
 			<van-field
 				v-model="address"
 				rows="2"
@@ -48,9 +49,9 @@
 
 <script>
 import Vue from "vue";
-import {Field, Cell, CellGroup, Uploader, Button} from "vant";
+import {Field, Cell, CellGroup, Uploader, Button, Divider,Toast} from "vant";
 
-Vue.use(Cell).use(Field).use(CellGroup).use(Uploader).use(Button);
+Vue.use(Cell).use(Field).use(CellGroup).use(Uploader).use(Button).use(Divider).use(Toast);
 import _ from 'lodash';
 import HandleToast from '@/utils/toast';
 import {Request} from "@/api/index";
@@ -80,19 +81,22 @@ export default {
 	methods: {
 		getDataFormSon(data) {
 			console.log(data)
+			if (data) {
+				this.areaIdPath = data;
+			}
 		},
 		submit() {
-			const {companyName, number, contactName, tel, address, companyDesc, businessScope, license, logo} = this;
+			const {companyName, number, contactName, tel, address, companyDesc, businessScope, license, logo, areaIdPath} = this;
 			const params = {
 				shopCompany: companyName,
 				shopAddress: address,
-				areaIdPath: 22,
+				areaIdPath: areaIdPath,
 				shopImg: logo,
 				businessLicence: number,
 				businessLicenceImg: license,
 				empiricalRange: businessScope,
 				applyLinkTel: tel,
-				applyLinkMan: companyName,
+				applyLinkMan: contactName,
 				companyProfile: companyDesc
 			}
 			if (_.every(params)) {
@@ -106,8 +110,22 @@ export default {
 					console.log(params)
 					Request('main', 'weapp/shopapplys/add', 'post', params).then(res => {
 						console.log(res);
+						if (res.status === 1) {
 
+						} else {
+							Toast({
+								message: '功能正在完善中,敬请期待...',
+								icon: 'smile-o',
+							});
+
+							setTimeout(()=>{
+								this.$router.push({
+									name:'My'
+								})
+							})
+						}
 					}).catch(err => {
+						console.log(err)
 					})
 				}
 			} else {
@@ -143,6 +161,18 @@ export default {
 		margin: px2rem(20) px2rem(15);
 		height: px2rem(40);
 		border-radius: px2rem(20);
+	}
+
+	.van-divider {
+		margin: 0 16px;
+	}
+
+	.provincecitycountry {
+		.van-cell {
+			&::after {
+				border-bottom-color: transparent;
+			}
+		}
 	}
 }
 </style>

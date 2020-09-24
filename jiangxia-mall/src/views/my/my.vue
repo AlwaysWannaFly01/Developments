@@ -1,8 +1,8 @@
 <template>
     <div class="page-my">
         <div class="personal">
-            <img src="@/assets/images/jx/default_avatar.png" />
-            <h2>项目</h2>
+            <img src="@/assets/images/bg/timg.jpg" />
+            <h2>立花泷</h2>
         </div>
         <div class="my-order">
             <h3>我的订单</h3>

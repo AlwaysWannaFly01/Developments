@@ -4,12 +4,12 @@ import { getToken } from "@/utils/auth";
 // console.log(process.env.API_HOST)
 const instance = axios.create({
 	baseURL: process.env.API_HOST, // url = base url + request url
-	timeout: 12000 // request timeout
+	timeout: 120000 // request timeout
 });
 
 const instanceJxyx = axios.create({
 	baseURL: process.env.JXYX_HOST,
-	timeout: 12000
+	timeout: 120000
 });
 
 function request(service) {
