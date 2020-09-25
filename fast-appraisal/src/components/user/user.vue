@@ -25,14 +25,10 @@ import {Request} from '@/api';
 import HandleToast from '@/utils/toast';
 import Vue from 'vue';
 import {Popup, Icon} from 'vant';
-import drawer from "../drawer";
 
 Vue.use(Popup).use(Icon);
 export default {
 	name: "user",
-	components: {
-		drawer
-	},
 	data() {
 		return {
 			trueName: '',
