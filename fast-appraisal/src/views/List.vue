@@ -1,6 +1,5 @@
 <template>
 	<div class="page-list" :style="{height: height + 'px'}">
-		<van-nav-bar title="历史报单" right-text="去评估" @click-right="onClickRight"/>
 		<div class="top" ref="topblock">
 			<div class="fixed-panel">
 				<User @checkLogin='loginStatus'></User>
@@ -41,9 +40,9 @@
 <script>
 import User from "@/components/user/user";
 import Vue from "vue";
-import {Search, List, Cell, NavBar} from "vant";
+import {Search, List, Cell} from "vant";
 
-Vue.use(Search).use(List).use(Cell).use(NavBar);
+Vue.use(Search).use(List).use(Cell);
 import {getListData, Request, postSearchData} from '@/api';
 
 export default {
@@ -54,7 +53,7 @@ export default {
 	beforeMount() {
 		this.height = window.innerHeight;
 		this.listHeight = {
-			"height": (window.innerHeight - 183 -46) + 'px',
+			"height": (window.innerHeight - 183) + 'px',
 		};
 	},
 
@@ -186,11 +185,6 @@ export default {
 		loginStatus(singer) {
 			this.isLogin = singer;
 		},
-		onClickRight(){
-			this.$router.push({
-				path: "/appraisal",
-			})
-		}
 	},
 };
 </script>
@@ -221,12 +215,13 @@ export default {
 
 	.fixed-search {
 		position: fixed;
-		//top: 118px;
-		top: 164px;
+		top: 118px;
+		//top: 164px;
 		width: px2rem(355);
 		left: 50%;
 		transform: translateX(-50%);
-		z-index: 9;
+		//z-index: 9;
+		z-index: 8;
 		height: 54px;
 		padding: 10px 10px 0px;
 		background-color: #ebeef5;
@@ -279,8 +274,8 @@ export default {
 		position: absolute;
 		left: 50%;
 		transform: translateX(-50%);
-		//top: 182px;
-		top: 228px;
+		top: 182px;
+		//top: 228px;
 		z-index: 1;
 		width: px2rem(355);
 

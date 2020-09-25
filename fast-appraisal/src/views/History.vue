@@ -1,6 +1,5 @@
 <template>
 	<div class="page-history" :style="{height: height + 'px'}">
-		<van-nav-bar title="历史报单" left-arrow @click-left="onClickLeft"/>
 		<div class="history-panel">
 			<User @checkLogin='loginStatus'/>
 		</div>
@@ -119,11 +118,6 @@ export default {
 				path: "/appraisal",
 			})
 		},
-		onClickLeft(){
-			this.$router.push({
-				path: "/list",
-			})
-		}
 	}
 }
 </script>

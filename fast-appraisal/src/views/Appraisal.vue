@@ -1,6 +1,5 @@
 <template>
 	<div class="page-appraisal" :style="{height: height + 'px'}">
-		<van-nav-bar title="在线报单"/>
 		<div class="appraisal-panel">
 			<User @checkLogin='loginStatus'/>
 		</div>
@@ -127,8 +126,7 @@ import {
 	Notify,
 	Divider,
 	Loading,
-	Empty,
-	NavBar
+	Empty
 } from "vant";
 
 Vue.use(Overlay)
@@ -141,8 +139,7 @@ Vue.use(Overlay)
 	.use(Notify)
 	.use(Divider)
 	.use(Loading)
-	.use(Empty)
-	.use(NavBar);
+	.use(Empty);
 import Vconsole from 'vconsole';
 
 // let vConsole = new Vconsole()
