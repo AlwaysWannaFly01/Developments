@@ -22,7 +22,7 @@
                 <div class="line"></div>
                 <div class="item" @click="handleClick(0)">
                     <img src="../../assets/images/jx_order.png" />
-                    <span>订单</span>
+                    <span>全部订单</span>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
             </div>
             <div class="item">
                 <img src="../../assets/images/jx/server_icon.png" />
-                <van-cell title="联系客服" />
+                <van-cell title="联系客服" @click="callPhone"/>
             </div>
         </div>
         <TabBar></TabBar>
@@ -77,6 +77,9 @@ export default {
 			this.$router.push({
 				name: "SellerJoin",
 			});
+		},
+		callPhone(){
+			window.location.href = 'tel:'
 		}
     },
 };
@@ -112,7 +115,7 @@ export default {
         padding: px2rem(10) px2rem(15);
         box-sizing: border-box;
         border-radius: px2rem(3);
-        box-shadow: 0pt 1.5pt 5pt 0pt rgba(169, 169, 169, 0.4);
+        box-shadow: 0pt px2rem(2) px2rem(5) 0 rgba(169, 169, 169, 0.4);
         h3 {
             font-size: 16px;
             margin-bottom: px2rem(15);

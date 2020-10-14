@@ -1,7 +1,7 @@
 <template>
 	<div class="page-shopFoot">
 		<van-goods-action>
-			<van-goods-action-icon icon="service-o" text="客服" @click="onClickIcon"/>
+			<van-goods-action-icon icon="service-o" text="客服" @click="callPhone"/>
 			<van-goods-action-icon icon="share-o" text="分享" @click="onClickIcon"/>
 			<van-goods-action-icon icon="cart-o" text="购物车" @click="onClickIcon"/>
 
@@ -53,6 +53,9 @@ export default {
 	methods: {
 		onClickIcon() {
 
+		},
+		callPhone(){
+			window.location.href = 'tel:';
 		},
 		addToShopCar() {
 			this.show = true

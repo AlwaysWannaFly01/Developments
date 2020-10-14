@@ -106,6 +106,7 @@ Vue.use(Col)
 import _ from "lodash";
 import { Request } from "@/api/index";
 import TabBar from "../../components/TabBar";
+import HandleToast from '@/utils/toast';
 export default {
     data() {
         return {
@@ -162,8 +163,7 @@ export default {
                         });
 
                         this.newGoodsList = res.data;
-						console.log(this.newGoodsList)
-
+						// console.log(this.newGoodsList)
                     }
                 })
                 .catch((err) => {
@@ -182,7 +182,7 @@ export default {
                                     "http://youyoujiang.com/" + item.goodsImg;
                             }
                         });
-                        console.log(res.data);
+                        // console.log(res.data);
                         this.switchListData = res.data;
                     }
                 })
@@ -199,6 +199,7 @@ export default {
 
         onClick(name, title) {
             // console.log(name, title);
+			HandleToast('加载中','loadType',300)
             this.getGoods(title)
                 .then((res) => {
                     if (res.status === 1) {
@@ -280,7 +281,7 @@ export default {
 }
 .page-index {
     position: relative;
-
+	bottom: 50px;
     img {
         &.banner {
             width: 100%;
@@ -487,7 +488,7 @@ export default {
         }
 
         .block {
-			margin-bottom: 50px;
+			//margin-bottom: 50px;
             ul {
                 display: flex;
                 flex-wrap: wrap;

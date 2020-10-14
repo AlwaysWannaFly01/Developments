@@ -114,7 +114,7 @@ import TabBar from "../../components/TabBar";
 
 import _ from "lodash";
 import {Request} from "@/api/index";
-
+import HandleToast from '@/utils/toast';
 export default {
 	data() {
 		return {
@@ -301,7 +301,7 @@ export default {
 			});
 		},
 		onSearch() {
-			console.log(this.value)
+			// console.log(this.value)
 			if (this.value) {
 				this.$router.push({
 					name: 'GoodsList',
@@ -309,6 +309,8 @@ export default {
 						searchValue: this.value
 					}
 				})
+			} else {
+				HandleToast('请填写要搜索的产品信息',null, 500)
 			}
 		}
 	},

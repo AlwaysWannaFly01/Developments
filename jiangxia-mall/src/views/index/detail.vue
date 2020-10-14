@@ -35,8 +35,6 @@
 			</section>
 			<div class="line bottom"></div>
 		</div>
-
-
 		<ShopFoot :detailData="data"></ShopFoot>
 	</div>
 </template>
@@ -48,20 +46,21 @@ Vue.use(Swipe).use(SwipeItem).use(Lazyload).use(Divider).use(GoodsAction).use(Go
 import _ from "lodash";
 import {Request} from "@/api/index";
 import ShopFoot from "../../components/ShopFoot";
+
 export default {
 	data() {
 		return {
 			data: {},
 		};
 	},
-	components:{
+	components: {
 		ShopFoot
 	},
 	beforeMount() {
 		this.id = this.$route.query.id;
 		this.deviceHeight = window.innerHeight;
 		this.mainHeight = {
-			height: window.innerHeight -50 + "px",
+			height: window.innerHeight - 50 + "px",
 		};
 	},
 	mounted() {
@@ -118,16 +117,17 @@ export default {
 }
 
 .page-detail {
-	.container{
+	.container {
 		overflow-y: auto;
 	}
+
 	.my-swipe {
 		.van-swipe-item {
-			height: px2rem(200);
+			height: px2rem(230);
 
 			img {
 				width: 100%;
-				height: px2rem(200);
+				height: px2rem(230);
 			}
 		}
 	}

@@ -7,7 +7,8 @@
 		</van-swipe>
 		<div class="block">
 			<van-divider>
-				<van-icon name="fire-o"/>
+				<van-icon name="fire-o" v-if="sellType==='new'"/>
+				<van-icon name="hot-o" v-if="sellType==='hot'"/>
 				<span v-if="sellType==='new'">最新上架</span>
 				<span v-else-if="sellType==='hot'">热销排行</span>
 			</van-divider>
@@ -18,10 +19,7 @@
 				<div class="right">
 					<div class="info">
 						<p>{{ item.goodsName }}</p>
-						<h4>
-							￥
-							<span>{{ item.shopPrice }}</span>
-						</h4>
+						<h4>￥<span>{{ item.shopPrice }}</span></h4>
 						<del>￥{{ item.marketPrice }}</del>
 					</div>
 
@@ -136,8 +134,22 @@ export default {
 	}
 
 	.van-list {
+		div:nth-last-child(3) {
+			.right {
+				border-bottom-color: transparent;
+			}
+		}
+
 		.list-item {
 			display: flex;
+
+			&:nth-last-child(1) {
+				padding: 10px;
+
+				.right {
+					border-bottom-color: transparent;
+				}
+			}
 
 			.left {
 				width: px2rem(100);

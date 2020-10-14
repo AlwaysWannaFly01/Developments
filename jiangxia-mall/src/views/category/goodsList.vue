@@ -6,9 +6,16 @@
 			background="#7abb56"
 			placeholder="请输入搜索关键词"
 			show-action
+			clearable
+			clear-trigger="focus"
+			class="searchInput"
+			@search="onSearch"
 		>
 			<template #action>
-				<div @click="onSearch">搜索</div>
+				<div @click="clickSearch">
+					<van-icon name="wap-nav" size="20" color="#fff" v-if="displayGrid"/>
+					<van-icon name="apps-o" size="20" color="#fff" v-else/>
+				</div>
 			</template>
 		</van-search>
 		<div class="sort-group">
@@ -38,10 +45,32 @@
 		</div>
 		<div class="container" :style="mainHeight">
 			<van-list
+				v-if="displayGrid"
+				class="grid"
+				:style="mainHeight"
+			>
+				<van-cell v-for="(item,index) in searchList" :key="index">
+					<img :src="item.goodsImg">
+					<div>
+						<h3>{{ item.goodsName }}</h3>
+						<strong>{{ `￥${item.costPrice}` }}</strong>
+						<p>
+							<del>{{ `￥${item.marketPrice}` }}</del>
+							<span>{{ `已售${item.saleNum}` }}</span>
+						</p>
+					</div>
+				</van-cell>
+			</van-list>
+
+			<van-list
 				v-model="loading"
 				:finished="finished"
 				finished-text="没有更多了"
+				:style="mainHeight"
 				class="w100"
+				@load="onLoad"
+				offset="30"
+				v-else
 			>
 				<van-cell v-for="(item,index) in searchList" :key="index">
 					<img :src="item.goodsImg">
@@ -61,9 +90,9 @@
 
 <script>
 import Vue from 'vue';
-import {Search, Button, List} from 'vant';
+import {Search, Button, List, Icon} from 'vant';
 
-Vue.use(Search).use(Button).use(List);
+Vue.use(Search).use(Button).use(List).use(Icon);
 import _ from "lodash";
 import {Request} from "@/api/index";
 
@@ -71,13 +100,17 @@ export default {
 	name: "goodsList",
 	data() {
 		return {
+			searchValue: '',
 			searchList: [],
 			loading: false,
-			finished: true
+			finished: true,
+			queryParams: {
+				page: 1
+			},
+			displayGrid: true
 		}
 	},
 	beforeMount() {
-		// console.log(this.$route.query)
 		this.searchValue = this.$route.query.searchValue;
 		this.init(this.searchValue);
 
@@ -90,14 +123,13 @@ export default {
 	methods: {
 		async init(param) {
 			const result = await this.search(param);
-			console.log(result)
+			// console.log(result)
 			if (result.status === 1) {
 				result.data.data.map(item => {
 					if (_.startsWith(item.goodsImg, "http")) {
 						return;
 					} else {
-						item.goodsImg =
-							"http://youyoujiang.com/" + item.goodsImg;
+						item.goodsImg = "http://youyoujiang.com/" + item.goodsImg;
 					}
 				})
 				this.searchList = result.data.data;
@@ -105,10 +137,10 @@ export default {
 		},
 		search(param) {
 			return new Promise((resolve, reject) => {
-				Request("jxyx", "weapp/goods/goodslistbycondition", "post", {
-					keyword: param
+				Request("main", "weapp/goods/goodslistbycondition", "post", {
+					keyword: param ? param : '',
+					page: this.queryParams.page
 				}).then(res => {
-					// console.log(res)
 					if (res.status === 1) {
 						resolve(res)
 					}
@@ -118,9 +150,80 @@ export default {
 				})
 			})
 		},
-		onSearch() {
-
-		}
+		async onSearch() {
+			const {searchValue} = this;
+			if (!searchValue) {
+				this.searchValue = '';
+				let isTrue = await this.refresh();
+				// console.log(isTrue);
+				if (isTrue) {
+					const result = await this.search();
+					console.log(result)
+					if (result.status === 1) {
+						result.data.data.map(item => {
+							if (_.startsWith(item.goodsImg, "http")) {
+								return;
+							} else {
+								item.goodsImg = "http://youyoujiang.com/" + item.goodsImg;
+							}
+						})
+						if (parseInt(result.data.current_page) === result.data.last_page) {
+							this.finished = true;
+							this.loading = false;
+						} else {
+							this.searchList = result.data.data;
+							this.finished = false;
+							this.loading = false;
+						}
+					}
+				}
+			} else {
+				console.log(searchValue)
+			}
+		},
+		async onLoad() {
+			this.queryParams.page++;
+			this.loading = true;
+			const result = await this.search();
+			console.log(result)
+			if (result.status === 1) {
+				result.data.data.map(item => {
+					if (_.startsWith(item.goodsImg, "http")) {
+						return;
+					} else {
+						item.goodsImg = "http://youyoujiang.com/" + item.goodsImg;
+					}
+				})
+				if (parseInt(result.data.current_page) === result.data.last_page) {
+					this.finished = true;
+					this.loading = false;
+				} else {
+					setTimeout(() => {
+						this.loading = false;
+						this.searchList = this.searchList.concat(result.data.data);
+						this.finished = false;
+					}, 600)
+				}
+			}
+		},
+		clickSearch() {
+			this.displayGrid = !this.displayGrid;
+		},
+		async refresh() {
+			return new Promise((resolve, reject) => {
+				this.queryParams = {
+					page: 1
+				}
+				this.searchList = [];
+				this.loading = true;
+				this.finished = false;
+				setTimeout(() => {
+					if (this.searchList.length === 0) {
+						resolve(true)
+					}
+				}, 500)
+			})
+		},
 	}
 }
 </script>
@@ -133,6 +236,19 @@ export default {
 }
 
 .page-goodslist {
+	.searchInput {
+		.van-search__action {
+			div {
+				display: flex;
+				align-items: center;
+			}
+
+			&:active {
+				background-color: #7abb56;
+			}
+		}
+	}
+
 	.sort-group {
 		display: flex;
 		border-bottom: 1px solid rgba(161, 161, 161, .3);
@@ -158,7 +274,6 @@ export default {
 	.container {
 		.w100 {
 			width: 100%;
-			height: 100%;
 			overflow-y: auto;
 			padding: 0 px2rem(15);
 			box-sizing: border-box;
@@ -168,14 +283,18 @@ export default {
 				box-sizing: border-box;
 				display: flex;
 				padding: px2rem(10) 0;
-				&::after{
-					right:0;
-					left:0;
+
+				&::after {
+					right: 0;
+					left: 0;
 				}
+
 				.van-cell__value {
-					display:flex;
+					display: flex;
+
 					img {
 						width: px2rem(80);
+						height: px2rem(80);
 					}
 
 					div {
@@ -208,11 +327,34 @@ export default {
 						}
 					}
 				}
-
-
 			}
+		}
 
+		.grid {
+			display: flex;
+			flex-wrap: wrap;
+			width: 100%;
+			padding: px2rem(10);
+			box-sizing: border-box;
+			background-color: #ebedf0;
+			overflow-y: auto;
+			.van-cell {
+				border-radius: px2rem(4);
+				&:nth-child(2n-1) {
+					margin-right: px2rem(11);
+				}
+				margin-bottom: px2rem(10);
+				width: px2rem(172);
 
+				.van-cell__value {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					img {
+						width: px2rem(80);
+					}
+				}
+			}
 		}
 	}
 }
