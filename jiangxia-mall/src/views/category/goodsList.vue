@@ -20,7 +20,7 @@
 		</van-search>
 		<div class="sort-group">
 			<div class="item">
-				<van-button type="default" size="mini">
+				<van-button type="default" size="mini" @click="back">
 					默认
 				</van-button>
 			</div>
@@ -28,20 +28,31 @@
 				<van-button type="default" size="mini" @click="priceOrderBy">
 					价格
 				</van-button>
-
-				<img src="../../assets/images/horn.png">
+				<img src="../../assets/images/horn.png" v-if="queryParams.priceOrder === -1">
+				<img src="../../assets/images/down.png"
+					 v-else-if="queryParams.condition===1&&queryParams.priceOrder === 0">
+				<img src="../../assets/images/up.png"
+					 v-else-if="queryParams.condition===1&&queryParams.priceOrder === 1">
 			</div>
 			<div class="item">
-				<van-button type="default" size="mini">
+				<van-button type="default" size="mini" @click="saleOrderBy">
 					销量
 				</van-button>
-				<img src="../../assets/images/horn.png">
+				<img src="../../assets/images/horn.png" v-if="queryParams.saleOrder === -1">
+				<img src="../../assets/images/down.png"
+					 v-else-if="queryParams.condition===0&&queryParams.saleOrder === 0">
+				<img src="../../assets/images/up.png"
+					 v-else-if="queryParams.condition===0&&queryParams.saleOrder === 1">
 			</div>
 			<div class="item">
-				<van-button type="default" size="mini">
+				<van-button type="default" size="mini" @click="popularOrderBy">
 					人气
 				</van-button>
-				<img src="../../assets/images/horn.png">
+				<img src="../../assets/images/horn.png" v-if="queryParams.popularOrder === -1">
+				<img src="../../assets/images/down.png"
+					 v-else-if="queryParams.condition===2&&queryParams.popularOrder === 0">
+				<img src="../../assets/images/up.png"
+					 v-else-if="queryParams.condition===2&&queryParams.popularOrder === 1">
 			</div>
 		</div>
 		<div class="container" :style="mainHeight">
@@ -55,11 +66,11 @@
 				@load="onLoad"
 				offset="30"
 			>
-				<van-cell v-for="(item,index) in searchList" :key="index">
+				<van-cell v-for="(item,index) in searchList" :key="index" @click="toDetail(item)">
 					<img :src="item.goodsImg">
 					<div>
 						<h3>{{ item.goodsName }}</h3>
-						<strong>{{ `￥${item.costPrice}` }}</strong>
+						<strong>{{ `￥${item.shopPrice}` }}</strong>
 						<p>
 							<del>{{ `￥${item.marketPrice}` }}</del>
 							<span>{{ `已售${item.saleNum}` }}</span>
@@ -78,7 +89,7 @@
 				@load="onLoad"
 				offset="30"
 			>
-				<van-cell v-for="(item,index) in searchList" :key="index">
+				<van-cell v-for="(item,index) in searchList" :key="index" @click="toDetail(item)">
 					<img :src="item.goodsImg">
 					<div>
 						<h3>{{ item.goodsName }}</h3>
@@ -112,7 +123,10 @@ export default {
 			finished: false,
 			queryParams: {
 				page: 0,
-				priceOrder: -1
+				condition: '',//默认
+				priceOrder: -1,
+				saleOrder: -1,
+				popularOrder: -1
 			},
 			displayGrid: true
 		}
@@ -126,12 +140,13 @@ export default {
 	},
 
 	methods: {
-		search(param) {
+		search(desc = -1) {
 			return new Promise((resolve, reject) => {
 				Request("main", "weapp/goods/goodslistbycondition", "post", {
-					keyword: param ? param : '',
+					keyword: this.searchValue,
 					page: this.queryParams.page,
-					desc: this.queryParams.priceOrder
+					desc: desc,
+					condition: this.queryParams.condition
 				}).then(res => {
 					if (res.status === 1) {
 						resolve(res)
@@ -143,34 +158,13 @@ export default {
 			})
 		},
 		async onSearch() {
-			let isTrue = await this.refresh();
-			if (isTrue) {
-				let result = await this.search(this.searchValue);
-				if (result.status === 1) {
-					result.data.data.map(item => {
-						if (_.startsWith(item.goodsImg, "http")) {
-							return;
-						} else {
-							item.goodsImg = "http://youyoujiang.com/" + item.goodsImg;
-						}
-					})
-					if (parseInt(result.data.current_page) < result.data.last_page) {
-						this.finished = false;
-						this.loading = false;
-						this.searchList = this.searchList.concat(result.data.data);
-					} else if (parseInt(result.data.current_page) === result.data.last_page) {
-						this.finished = true;
-						this.loading = false;
-						this.searchList = this.searchList.concat(result.data.data);
-					}
-				}
-			}
+			await this.convert();
 		},
 		async onLoad() {
 			this.queryParams.page++;
 			this.loading = true;
-			const result = await this.search(this.searchValue);
-			console.log(result)
+			const result = await this.search();
+			// console.log(result)
 			if (result.status === 1) {
 				result.data.data.map(item => {
 					if (_.startsWith(item.goodsImg, "http")) {
@@ -182,12 +176,12 @@ export default {
 				if (parseInt(result.data.current_page) < result.data.last_page) {
 					setTimeout(() => {
 						this.loading = false;
-						this.searchList = this.searchList.concat(result.data.data);
 						this.finished = false;
+						this.searchList = this.searchList.concat(result.data.data);
 					}, 600)
 				} else if (parseInt(result.data.current_page) === result.data.last_page) {
-					this.loading = false;
 					this.finished = true;
+					this.loading = false;
 					this.searchList = this.searchList.concat(result.data.data);
 				}
 			}
@@ -195,17 +189,52 @@ export default {
 		clickSearch() {
 			this.displayGrid = !this.displayGrid;
 		},
+		back() {
+			this.$router.push({
+				name:'Category'
+			})
+		},
 		async priceOrderBy() {
+			// console.log(this.searchValue)
+			this.queryParams.condition = 1;
+			this.queryParams.saleOrder = -1;
+			this.queryParams.popularOrder = -1;
 			if (this.queryParams.priceOrder < 1) {
 				this.queryParams.priceOrder++;
 			} else {
 				this.queryParams.priceOrder = -1;
+				this.queryParams.condition = '';
 			}
-			console.log(this.queryParams.priceOrder);
+			await this.convert(this.queryParams.priceOrder);
+		},
+		async saleOrderBy() {
+			this.queryParams.condition = 0;
+			this.queryParams.priceOrder = -1;
+			this.queryParams.popularOrder = -1;
+			if (this.queryParams.saleOrder < 1) {
+				this.queryParams.saleOrder++;
+			} else {
+				this.queryParams.saleOrder = -1;
+				this.queryParams.condition = '';
+			}
+			await this.convert(this.queryParams.saleOrder);
+		},
+		async popularOrderBy() {
+			this.queryParams.condition = 2;
+			this.queryParams.priceOrder = -1;
+			this.queryParams.saleOrder = -1;
+			if (this.queryParams.popularOrder < 1) {
+				this.queryParams.popularOrder++;
+			} else {
+				this.queryParams.popularOrder = -1;
+				this.queryParams.condition = '';
+			}
+			await this.convert(this.queryParams.popularOrder);
+		},
+		async convert(orderParam) {
 			let isTrue = await this.refresh();
 			if (isTrue) {
-				let result = await this.search();
-				console.log(result)
+				let result = await this.search(orderParam);
 				if (result.status === 1) {
 					result.data.data.map(item => {
 						if (_.startsWith(item.goodsImg, "http")) {
@@ -225,7 +254,6 @@ export default {
 					}
 				}
 			}
-
 		},
 		async refresh() {
 			return new Promise((resolve, reject) => {
@@ -237,8 +265,16 @@ export default {
 					if (this.searchList.length === 0) {
 						resolve(true)
 					}
-				}, 500)
+				}, 300)
 			})
+		},
+		toDetail(param) {
+			this.$router.push({
+				name: "Detail",
+				query: {
+					id: param.goodsId,
+				},
+			});
 		},
 	}
 }
@@ -391,6 +427,7 @@ export default {
 						display: flex;
 						flex-direction: column;
 						justify-content: space-between;
+
 						h3 {
 							font-size: 16px;
 							font-weight: 700;
