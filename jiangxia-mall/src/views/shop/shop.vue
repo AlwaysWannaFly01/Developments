@@ -87,7 +87,7 @@ export default {
 								"http://youyoujiang.com/" + item.goodsImg;
 						}
 					});
-					console.log(res.data);
+					// console.log(res.data);
 					this.recomList = res.data;
 				}
 			}).catch((err) => {

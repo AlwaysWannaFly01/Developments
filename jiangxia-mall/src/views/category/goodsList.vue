@@ -20,7 +20,7 @@
 		</van-search>
 		<div class="sort-group">
 			<div class="item">
-				<van-button type="default" size="mini" @click="back">
+				<van-button type="default" size="mini" @click="defaultQuery">
 					默认
 				</van-button>
 			</div>
@@ -60,11 +60,12 @@
 				v-if="displayGrid"
 				v-model="loading"
 				:finished="finished"
-				class="grid"
+				class="grid scrollContent"
 				:style="mainHeight"
 				finished-text="没有更多了"
 				@load="onLoad"
 				offset="30"
+				:immediate-check="false"
 			>
 				<van-cell v-for="(item,index) in searchList" :key="index" @click="toDetail(item)">
 					<img :src="item.goodsImg">
@@ -85,7 +86,7 @@
 				:finished="finished"
 				finished-text="没有更多了"
 				:style="mainHeight"
-				class="w100"
+				class="w100 scrollContent"
 				@load="onLoad"
 				offset="30"
 			>
@@ -123,22 +124,57 @@ export default {
 			finished: false,
 			queryParams: {
 				page: 0,
-				condition: '',//默认
+				condition: '',
 				priceOrder: -1,
 				saleOrder: -1,
 				popularOrder: -1
 			},
-			displayGrid: true
+			displayGrid: true,
+			scroll: 0,
 		}
 	},
 	beforeMount() {
+		// console.log(this.$route.query.searchValue);
 		this.searchValue = this.$route.query.searchValue;
 		this.deviceHeight = window.innerHeight;
 		this.mainHeight = {
 			height: window.innerHeight - 54 - 41 + "px",
 		};
 	},
-
+	async activated() {
+		console.log(this.$route.query.searchValue);
+		this.searchValue = this.$route.query.searchValue;
+		console.log(this.$route.meta.isBack);
+		if (!this.$route.meta.isBack) {
+			this.queryParams = {
+				condition: '',
+				priceOrder: -1,
+				saleOrder: -1,
+				popularOrder: -1
+			}
+			await this.convert()
+		} else {
+			//this.$route.meta.isBack为true,则表示从详情页返回的
+			const $content = document.querySelector('.scrollContent'); // 列表的外层容器
+			$content.scrollTop = this.scroll;
+		}
+	},
+	beforeRouteEnter(to, from, next) {
+		console.log('to ', to)
+		console.log('from ', from)
+		if (from.name == 'Detail') { // 这个name是下一级页面的路由name
+			to.meta.isBack = true; // 设置为true说明你是返回到这个页面，而不是通过跳转从其他页面进入到这个页面
+		} else {
+			to.meta.isBack = false;
+		}
+		next();
+	},
+	beforeRouteLeave(to, from, next) {
+		const $content = document.querySelector('.scrollContent');
+		const scrollTop = $content ? $content.scrollTop : 0;
+		this.scroll = scrollTop;
+		next();
+	},
 	methods: {
 		search(desc = -1) {
 			return new Promise((resolve, reject) => {
@@ -158,9 +194,26 @@ export default {
 			})
 		},
 		async onSearch() {
-			await this.convert();
+			if (this.queryParams.condition !== '') {
+				const {condition, priceOrder, saleOrder, popularOrder} = this.queryParams;
+				switch (condition) {
+					case 0:
+						await this.convert(saleOrder);
+						break;
+					case 1:
+						await this.convert(priceOrder);
+						break;
+					case 2:
+						await this.convert(popularOrder);
+						break;
+				}
+			} else {
+				await this.convert();
+			}
 		},
 		async onLoad() {
+			console.log('onLoad加载')
+			// console.log(this.queryParams)
 			this.queryParams.page++;
 			this.loading = true;
 			const result = await this.search();
@@ -189,10 +242,14 @@ export default {
 		clickSearch() {
 			this.displayGrid = !this.displayGrid;
 		},
-		back() {
-			this.$router.push({
-				name:'Category'
-			})
+		async defaultQuery() {
+			this.queryParams = {
+				condition: '',
+				priceOrder: -1,
+				saleOrder: -1,
+				popularOrder: -1
+			}
+			await this.convert();
 		},
 		async priceOrderBy() {
 			// console.log(this.searchValue)
@@ -347,6 +404,7 @@ export default {
 					img {
 						width: px2rem(80);
 						height: px2rem(80);
+						border-radius: px2rem(4);
 					}
 
 					div {
@@ -354,8 +412,14 @@ export default {
 						padding-left: px2rem(10);
 
 						h3 {
-							font-size: 16px;
+							font-size: 14px;
 							font-weight: 700;
+							overflow: hidden;
+							text-overflow: ellipsis;
+							display: -webkit-box;
+							-webkit-line-clamp: 2;
+							line-clamp: 2;
+							-webkit-box-orient: vertical;
 						}
 
 						strong {
@@ -394,6 +458,7 @@ export default {
 
 			.van-cell {
 				border-radius: px2rem(4);
+				height: px2rem(268);
 
 				&:nth-child(2n-1) {
 					margin-right: px2rem(11);
@@ -418,6 +483,7 @@ export default {
 					img {
 						width: px2rem(152);
 						height: px2rem(152);
+						border-radius: px2rem(4);
 					}
 
 					div {
@@ -429,8 +495,16 @@ export default {
 						justify-content: space-between;
 
 						h3 {
-							font-size: 16px;
+							font-size: 14px;
+							line-height: 15px;
 							font-weight: 700;
+							height: 30px;
+							overflow: hidden;
+							text-overflow: ellipsis;
+							display: -webkit-box;
+							-webkit-line-clamp: 2;
+							line-clamp: 2;
+							-webkit-box-orient: vertical;
 						}
 
 						strong {

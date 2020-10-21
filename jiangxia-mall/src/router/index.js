@@ -45,7 +45,8 @@ export default new Router({
 			name: "Category",
 			component: Category,
 			meta: {
-				title: "产品分类"
+				title: "产品分类",
+				keepAlive: true
 			}
 		},
 		{
@@ -157,7 +158,9 @@ export default new Router({
 			name: "GoodsList",
 			component: GoodsList,
 			meta: {
-				title: "商品列表"
+				title: "商品列表",
+				keepAlive: true,
+				isBack: false, //用于判断上一个页面是哪个
 			}
 		},
 		{

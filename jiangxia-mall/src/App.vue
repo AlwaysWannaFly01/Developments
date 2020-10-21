@@ -1,18 +1,15 @@
 <template>
 	<div id="app">
-		<router-view/>
-<!--		<TabBar></TabBar>-->
+		<keep-alive>
+			<router-view v-if='$route.meta.keepAlive'/>
+		</keep-alive>
+		<router-view v-if='!$route.meta.keepAlive'/>
 	</div>
 </template>
 
 <script>
-import TabBar from "./components/TabBar";
-
 export default {
-	name: "App",
-	components: {
-		TabBar
-	}
+	name: "App"
 };
 document.addEventListener("DOMContentLoaded", () => {
 	const html = document.querySelector("html");
@@ -23,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <style lang="scss">
-	#app{
-		padding-bottom: 50px;
-	}
+#app {
+	padding-bottom: 50px;
+}
 </style>

@@ -1,6 +1,6 @@
 <template>
     <div class="page-index">
-        <img src="../../assets/images/bg/banner.png" class="banner" />
+		<div class="banner"></div>
         <div class="content" @click="toHotPage">
             <img src="../../assets/images/bg/home-zhanwei.png" class="home-zhanwei" />
             <img src="../../assets/images/jx/play.png" class="play" />
@@ -212,8 +212,7 @@ export default {
                             }
                         });
                         this.switchListData = res.data;
-						console.log(this.switchListData)
-
+						// console.log(this.switchListData)
                     }
                 })
                 .catch((err) => {
@@ -282,15 +281,17 @@ export default {
 .page-index {
     position: relative;
 	bottom: 50px;
-    img {
-        &.banner {
-            width: 100%;
-        }
-    }
-
+	.banner{
+		width: 100%;
+		height: px2rem(260);
+		background-image: url("../../assets/images/bg/banner.png");
+		background-size: px2rem(375) auto;
+		background-repeat: no-repeat;
+		background-position-y: px2rem(50);
+	}
     .content {
         position: absolute;
-        top: px2rem(153);
+        top: px2rem(183);
         left: 50%;
         transform: translateX(-50%);
         width: px2rem(345);
@@ -318,7 +319,7 @@ export default {
         padding: 0 px2rem(15);
         box-sizing: border-box;
         height: px2rem(105);
-        margin-top: px2rem(148);
+        margin-top: px2rem(108);
 
         .van-row {
             height: px2rem(105);

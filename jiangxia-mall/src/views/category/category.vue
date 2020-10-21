@@ -16,7 +16,7 @@
 			<div v-if="active===0" class="main goods">
 				<!-- 分类列表 -->
 				<div class="menu-wrapper">
-					<van-sidebar v-model="activeKey" @change="onChange">
+					<van-sidebar v-model="activeKey" @change="onChange" class="menuWrapper">
 						<van-sidebar-item
 							:title="item.catName"
 							v-for="(item,index) in switchList[0].childList"
@@ -26,7 +26,7 @@
 				</div>
 				<!-- 商品列表 -->
 				<div class="goods-wrapper">
-					<ul ref="goodScroll" v-if="!loading">
+					<ul v-if="!loading" class="goodWrapper">
 						<li
 							v-for="(item,index) in goodsList.data"
 							:key="index"
@@ -64,7 +64,7 @@
 					class="oper-goods"
 					v-else-if="!mainLoading&&operGoods.data&&operGoods.data.length>0"
 				>
-					<ul>
+					<ul class="operaWrapper">
 						<li v-for="(item,index) in operGoods.data" :key="index">
 							<div @click="toDetail(item)">
 								<img :src="item.goodsImg"/>
@@ -85,7 +85,7 @@
 				</div>
 			</div>
 		</div>
-		<TabBar></TabBar>
+		<TabBar ref="mychild"></TabBar>
 	</div>
 </template>
 <script>
@@ -115,6 +115,7 @@ import TabBar from "../../components/TabBar";
 import _ from "lodash";
 import {Request} from "@/api/index";
 import HandleToast from '@/utils/toast';
+
 export default {
 	data() {
 		return {
@@ -133,6 +134,9 @@ export default {
 			activeKey: 0,
 			loading: true,
 			mainLoading: true,
+			menuScrollTop: 0,
+			goodScrollTop: 0,
+			operaScrollTop: 0
 		};
 	},
 	components: {
@@ -147,12 +151,47 @@ export default {
 		this.mainHeight = {
 			height: window.innerHeight - 32 - 59 - 170 - 50 + "px",
 		};
-
 		this.init();
 	},
-	mounted() {
+	async activated() {
+		const menuContent = document.querySelector('.menuWrapper'); // 列表的外层容器
+		if(menuContent){
+			menuContent.scrollTop = this.menuScrollTop;
+		}
+		const goodContent = document.querySelector('.goodWrapper');
+		// console.log(goodContent)
+		if (goodContent) {
+			goodContent.scrollTop = this.goodScrollTop;
+		}
+		const operaContent = document.querySelector('.operaWrapper');
+		// console.log(operaContent)
+		if (operaContent) {
+			operaContent.scrollTop = this.operaScrollTop;
+		}
 	},
-	created() {
+	beforeRouteEnter(to, from, next) {
+		// console.log('to ', to)
+		// console.log('from ', from)
+		next(vm => {
+			// console.log(vm)
+			vm.$refs.mychild.changeByParent(1);
+		})
+	},
+	beforeRouteLeave(to, from, next) {
+		const menuContent = document.querySelector('.menuWrapper');
+		const menuScrollTop = menuContent ? menuContent.scrollTop : 0;
+		this.menuScrollTop = menuScrollTop;
+
+		const goodContent = document.querySelector('.goodWrapper');
+		const goodScrollTop = goodContent ? goodContent.scrollTop : 0;
+		this.goodScrollTop = goodScrollTop;
+
+		const operaContent = document.querySelector('.operaWrapper');
+		const operaScrollTop = operaContent ? operaContent.scrollTop : 0;
+		this.operaScrollTop = operaScrollTop;
+		// console.log('to ', to)
+		// console.log('from ', from)
+		next();
 	},
 	computed: {},
 	methods: {
@@ -279,8 +318,8 @@ export default {
 		async onChange(index) {
 			// console.log(index);
 			this.loading = true;
-			this.$refs.goodScroll.scrollTop = 0;
-			// console.log(this.menuList);
+			const goodContent = document.querySelector('.goodWrapper');
+			goodContent.scrollTop = 0;
 			let menuData = await this.getGoodsList(this.menuList[index].catId);
 			menuData.data.map((item) => {
 				if (_.startsWith(item.goodsImg, "http")) {
@@ -310,7 +349,7 @@ export default {
 					}
 				})
 			} else {
-				HandleToast('请填写要搜索的产品信息',null, 500)
+				HandleToast('请填写要搜索的产品信息', null, 500)
 			}
 		}
 	},
@@ -428,7 +467,7 @@ export default {
 						li {
 							font-size: 14px;
 							width: px2rem(165);
-							margin-right: px2rem(15);
+							margin-right: px2rem(14);
 							margin-bottom: px2rem(10);
 
 							&:nth-child(2n) {

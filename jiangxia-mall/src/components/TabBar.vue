@@ -1,10 +1,10 @@
 <template>
 	<van-tabbar v-model="active" @change="onChange" class="awy-tabbar">
-		<van-tabbar-item icon="wap-home-o" to="/index" url="/index">首页</van-tabbar-item>
-		<van-tabbar-item icon="apps-o" to="/category" url="/category">分类</van-tabbar-item>
-		<van-tabbar-item icon="desktop-o" to="/live" url="/live">直播</van-tabbar-item>
-		<van-tabbar-item icon="shopping-cart-o" to="/shop" url="/shop">购物车</van-tabbar-item>
-		<van-tabbar-item icon="user-circle-o" to="/my" url="/my">我的</van-tabbar-item>
+		<van-tabbar-item icon="wap-home-o" to="/index">首页</van-tabbar-item>
+		<van-tabbar-item icon="apps-o" to="/category">分类</van-tabbar-item>
+		<van-tabbar-item icon="desktop-o" to="/live">直播</van-tabbar-item>
+		<van-tabbar-item icon="shopping-cart-o" to="/shop">购物车</van-tabbar-item>
+		<van-tabbar-item icon="user-circle-o" to="/my">我的</van-tabbar-item>
 	</van-tabbar>
 </template>
 
@@ -44,7 +44,7 @@ export default {
 	methods: {
 		onChange(index) {
 			// console.log(index)
-			// Notify({type: 'primary', message: index});
+			this.active = index;
 		},
 		changeByParent(param){
 			// console.log(param)
