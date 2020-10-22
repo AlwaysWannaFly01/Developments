@@ -26,13 +26,17 @@
 				</div>
 				<!-- 商品列表 -->
 				<div class="goods-wrapper">
-					<ul v-if="!loading" class="goodWrapper">
-						<li
-							v-for="(item,index) in goodsList.data"
-							:key="index"
-							class="goods-item"
-							@click="toDetail(item)"
-						>
+					<van-list
+						class="goodWrapper"
+						:finished="finished"
+						v-model="loading"
+						finished-text="没有更多了"
+						:immediate-check="false"
+						@load="loadMore"
+						offset="30"
+					>
+						<van-cell v-for="(item,index) in goodsList" :key="index" class="goods-item"
+								  @click="toDetail(item)">
 							<img :src="item.goodsImg"/>
 							<section>
 								<div>
@@ -48,9 +52,8 @@
 								</div>
 								<img src="../../assets/images/jx/add.png"/>
 							</section>
-						</li>
-					</ul>
-					<van-loading v-if="loading" type="spinner" size="20px"/>
+						</van-cell>
+					</van-list>
 				</div>
 			</div>
 			<div v-if="active===1" class="main oper">
@@ -59,10 +62,9 @@
 					<span>全部商品</span>
 					<img src="../../assets/images/jx/label_icon.png" />
 				</div>-->
-				<van-loading v-if="mainLoading" type="spinner" size="20px"/>
 				<div
 					class="oper-goods"
-					v-else-if="!mainLoading&&operGoods.data&&operGoods.data.length>0"
+					v-if="operGoods.data&&operGoods.data.length>0"
 				>
 					<ul class="operaWrapper">
 						<li v-for="(item,index) in operGoods.data" :key="index">
@@ -78,7 +80,7 @@
 				</div>
 				<div
 					class="empty-goods"
-					v-else-if="!mainLoading&&operGoods.data&&operGoods.data.length===0"
+					v-if="operGoods.data&&operGoods.data.length===0"
 				>
 					<img src="../../assets/images/jx/zanwushuju.png" class="empty"/>
 					<p>暂无数据</p>
@@ -98,6 +100,7 @@ import {
 	Sidebar,
 	SidebarItem,
 	Loading,
+	List
 } from "vant";
 
 Vue.use(Icon)
@@ -106,6 +109,7 @@ Vue.use(Icon)
 	.use(Search)
 	.use(Sidebar)
 	.use(SidebarItem)
+	.use(List)
 	.use(Loading);
 import TabBar from "../../components/TabBar";
 
@@ -129,14 +133,18 @@ export default {
 				},
 			],
 			value: "",
-			goodsList: {},
+			goodsList: [],
 			operGoods: {},
 			activeKey: 0,
-			loading: true,
-			mainLoading: true,
 			menuScrollTop: 0,
 			goodScrollTop: 0,
-			operaScrollTop: 0
+			operaScrollTop: 0,
+			finished: false,
+			loading: false,
+			queryParams: {
+				page: 1,
+				pagesize: 10
+			}
 		};
 	},
 	components: {
@@ -155,7 +163,7 @@ export default {
 	},
 	async activated() {
 		const menuContent = document.querySelector('.menuWrapper'); // 列表的外层容器
-		if(menuContent){
+		if (menuContent) {
 			menuContent.scrollTop = this.menuScrollTop;
 		}
 		const goodContent = document.querySelector('.goodWrapper');
@@ -198,42 +206,55 @@ export default {
 		async onClick(name) {
 			// console.log(name);
 			// console.log(this.active);
-			if (this.active === 1) {
-				let operGoodsRes = await this.getGoodsList(
-					this.switchList[1].catId
-				);
-				// console.log(operGoodsRes);
+			HandleToast('加载中', 'loadType', 300);
+			console.log(this.switchList);
+			this.activeKey =0;
+			let isTrue = await this.refresh();
+			if (isTrue) {
+				if (this.active === 1) {
+					let operGoodsRes = await this.getGoodsList(
+						this.switchList[1].catId
+					);
+					// console.log(operGoodsRes);
 
-				operGoodsRes.data.map((item) => {
-					if (_.startsWith(item.goodsImg, "http")) {
-						return;
-					} else {
-						item.goodsImg =
-							"http://youyoujiang.com/" + item.goodsImg;
-					}
-				});
-				this.operGoods = operGoodsRes;
-				this.mainLoading = false;
-			} else if (this.active === 0) {
-				let menuList = this.switchList[0].childList;
-				this.menuList = menuList;
-				let firstMenu = await this.getGoodsList(
-					menuList[this.activeKey].catId
-				);
-				firstMenu.data.map((item) => {
-					if (_.startsWith(item.goodsImg, "http")) {
-						return;
-					} else {
-						item.goodsImg =
-							"http://youyoujiang.com/" + item.goodsImg;
-					}
-				});
+					operGoodsRes.data.map((item) => {
+						if (_.startsWith(item.goodsImg, "http")) {
+							return;
+						} else {
+							item.goodsImg =
+								"http://youyoujiang.com/" + item.goodsImg;
+						}
+					});
+					this.operGoods = operGoodsRes;
+				} else if (this.active === 0) {
+					let menuList = this.switchList[0].childList;
+					this.menuList = menuList;
+					let firstMenu = await this.getGoodsList(
+						menuList[this.activeKey].catId
+					);
+					firstMenu.data.map((item) => {
+						if (_.startsWith(item.goodsImg, "http")) {
+							return;
+						} else {
+							item.goodsImg =
+								"http://youyoujiang.com/" + item.goodsImg;
+						}
+					});
 
-				this.goodsList = firstMenu;
-				this.loading = false;
+					if (parseInt(firstMenu.current_page) < firstMenu.last_page) {
+						this.finished = false;
+						this.loading = false;
+						this.goodsList = this.goodsList.concat(firstMenu.data);
+					} else if (parseInt(firstMenu.current_page) === firstMenu.last_page) {
+						this.finished = true;
+						this.loading = false;
+						this.goodsList = this.goodsList.concat(firstMenu.data);
+					}
+				}
 			}
 		},
 		async init() {
+			HandleToast('加载中', 'loadType', 300);
 			let menuList = await this.getMenuList();
 			// console.log(menuList);
 			let arr = [];
@@ -248,7 +269,6 @@ export default {
 
 			this.switchList = arr;
 			// console.log(this.switchList);
-
 			if (this.active === 0) {
 				let menuList = this.switchList[0].childList;
 				// console.log(menuList);
@@ -264,10 +284,16 @@ export default {
 							"http://youyoujiang.com/" + item.goodsImg;
 					}
 				});
-
-				// console.log(firstMenu);
-				this.goodsList = firstMenu;
-				this.loading = false;
+				console.log(firstMenu);
+				if (parseInt(firstMenu.current_page) < firstMenu.last_page) {
+					this.finished = false;
+					this.loading = false;
+					this.goodsList = this.goodsList.concat(firstMenu.data);
+				} else if (parseInt(firstMenu.current_page) === firstMenu.last_page) {
+					this.finished = true;
+					this.loading = false;
+					this.goodsList = this.goodsList.concat(firstMenu.data);
+				}
 			} else if (this.active === 1) {
 				let operGoodsRes = await this.getGoodsList(
 					this.switchList[1].catId
@@ -282,7 +308,6 @@ export default {
 					}
 				});
 				this.operGoods = operGoodsRes;
-				this.mainLoading = false;
 			}
 		},
 		getMenuList() {
@@ -303,6 +328,8 @@ export default {
 			return new Promise((resolve, reject) => {
 				Request("jxyx", "weapp/goods/goodslistbycondition", "post", {
 					catId: param,
+					page: this.queryParams.page,
+					pagesize: this.queryParams.pagesize,
 				})
 					.then((res) => {
 						// console.log(res);
@@ -316,20 +343,31 @@ export default {
 			});
 		},
 		async onChange(index) {
-			// console.log(index);
-			this.loading = true;
 			const goodContent = document.querySelector('.goodWrapper');
 			goodContent.scrollTop = 0;
-			let menuData = await this.getGoodsList(this.menuList[index].catId);
-			menuData.data.map((item) => {
-				if (_.startsWith(item.goodsImg, "http")) {
-					return;
-				} else {
-					item.goodsImg = "http://youyoujiang.com/" + item.goodsImg;
+			this.activeKey = index;
+			console.log(this.menuList)
+			let isTrue = await this.refresh();
+			if (isTrue) {
+				let menuData = await this.getGoodsList(this.menuList[index].catId);
+				menuData.data.map((item) => {
+					if (_.startsWith(item.goodsImg, "http")) {
+						return;
+					} else {
+						item.goodsImg = "http://youyoujiang.com/" + item.goodsImg;
+					}
+				});
+				// console.log(menuData)
+				if (parseInt(menuData.current_page) < menuData.last_page) {
+					this.finished = false;
+					this.loading = false;
+					this.goodsList = this.goodsList.concat(menuData.data);
+				} else if (parseInt(menuData.current_page) === menuData.last_page) {
+					this.finished = true;
+					this.loading = false;
+					this.goodsList = this.goodsList.concat(menuData.data);
 				}
-			});
-			this.goodsList = menuData;
-			this.loading = false;
+			}
 		},
 		toDetail(param) {
 			this.$router.push({
@@ -340,7 +378,6 @@ export default {
 			});
 		},
 		onSearch() {
-			// console.log(this.value)
 			if (this.value) {
 				this.$router.push({
 					name: 'GoodsList',
@@ -351,7 +388,45 @@ export default {
 			} else {
 				HandleToast('请填写要搜索的产品信息', null, 500)
 			}
-		}
+		},
+		async loadMore() {
+			this.queryParams.page++;
+			this.loading = true;
+			// console.log(this.queryParams.page)
+			// console.log(this.activeKey)
+			// console.log(this.menuList)
+			const result = await this.getGoodsList(this.menuList[this.activeKey].catId)
+			result.data.map((item) => {
+				if (_.startsWith(item.goodsImg, "http")) {
+					return;
+				} else {
+					item.goodsImg = "http://youyoujiang.com/" + item.goodsImg;
+				}
+			});
+			// console.log(result)
+			if (parseInt(result.current_page) < result.last_page) {
+				this.finished = false;
+				this.loading = false;
+				this.goodsList = this.goodsList.concat(result.data);
+			} else if (parseInt(result.current_page) === result.last_page) {
+				this.finished = true;
+				this.loading = false;
+				this.goodsList = this.goodsList.concat(result.data);
+			}
+		},
+		async refresh() {
+			return new Promise((resolve, reject) => {
+				this.queryParams.page = 1;
+				this.goodsList = []
+				this.loading = true;
+				this.finished = false;
+				setTimeout(() => {
+					if (this.goodsList.length === 0) {
+						resolve(true)
+					}
+				}, 300)
+			})
+		},
 	},
 };
 </script>
@@ -545,68 +620,81 @@ export default {
 				flex: 1;
 				height: 100%;
 
-				ul {
+				.van-list {
 					height: 100%;
 					overflow-y: auto;
 
-					li {
+					.van-cell {
 						font-size: 14px;
+						padding: 0;
 					}
 
 					.goods-item {
-						display: flex;
-						padding: px2rem(10);
-						box-sizing: border-box;
-
-						img {
-							width: px2rem(80);
-							height: px2rem(80);
-						}
-
-						section {
-							flex: 1;
+						.van-cell__value {
 							display: flex;
-							justify-content: space-between;
-							align-items: flex-end;
-
-							div {
-								flex: 1;
-								height: 100%;
-								padding-left: px2rem(10);
-								display: flex;
-								flex-direction: column;
-								align-items: flex-start;
-								justify-content: space-between;
-
-								h4 {
-									font-size: 14px;
-									text-align: left;
-								}
-
-								span {
-									color: #999;
-									margin-bottom: px2rem(16);
-								}
-
-								p {
-									strong {
-										color: #7abb56;
-										font-size: 14px;
-									}
-
-									del {
-										color: #a1a1a1;
-										font-size: 12px;
-									}
-								}
-							}
+							padding: px2rem(10);
+							box-sizing: border-box;
 
 							img {
-								width: px2rem(20);
-								height: px2rem(20);
-								vertical-align: bottom;
+								width: px2rem(80);
+								height: px2rem(80);
+							}
+
+							section {
+								flex: 1;
+								display: flex;
+								justify-content: space-between;
+								align-items: flex-end;
+
+								div {
+									flex: 1;
+									height: 100%;
+									padding-left: px2rem(10);
+									display: flex;
+									flex-direction: column;
+									align-items: flex-start;
+									justify-content: space-between;
+
+									h4 {
+										font-size: 14px;
+										text-align: left;
+									}
+
+									span {
+										color: #999;
+										margin-bottom: px2rem(16);
+									}
+
+									p {
+										strong {
+											color: #7abb56;
+											font-size: 14px;
+										}
+
+										del {
+											color: #a1a1a1;
+											font-size: 12px;
+										}
+									}
+								}
+
+								img {
+									width: px2rem(20);
+									height: px2rem(20);
+									vertical-align: bottom;
+								}
 							}
 						}
+					}
+
+					.van-list__loading {
+						.van-loading {
+							margin-top: 0;
+						}
+					}
+
+					.van-list__finished-text {
+						line-height: 40px;
 					}
 				}
 
