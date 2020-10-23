@@ -134,12 +134,12 @@ export default {
 		}
 	},
 	beforeMount() {
-		// console.log(this.$route.query.searchValue);
-		this.searchValue = this.$route.query.searchValue;
 		this.deviceHeight = window.innerHeight;
 		this.mainHeight = {
 			height: window.innerHeight - 54 - 41 + "px",
 		};
+		console.log(this.mainHeight)
+		this.searchValue = this.$route.query.searchValue;
 	},
 	async activated() {
 		console.log(this.$route.query.searchValue);

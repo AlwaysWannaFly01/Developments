@@ -225,6 +225,7 @@ export default {
                     // this.$refs.mychild.changeByParent(1);
                     this.$router.replace({
                         name: "Category",
+						params: { active: 0 },
                     });
                     break;
                 case "江夏制造":

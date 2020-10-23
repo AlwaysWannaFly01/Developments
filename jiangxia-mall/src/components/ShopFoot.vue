@@ -6,10 +6,10 @@
 			<van-goods-action-icon icon="cart-o" text="购物车" @click="onClickIcon"/>
 
 			<van-goods-action-button color="rgb(57, 148, 113)" type="warning" text="加入购物车" @click="addToShopCar"/>
-			<van-goods-action-button color="rgb(151, 202, 103)" type="danger" text="立即购买"/>
+			<van-goods-action-button color="rgb(151, 202, 103)" type="danger" text="立即购买" @click="showSku"/>
 		</van-goods-action>
 
-		<van-popup v-model="show" position="bottom" :style="{ height: '30%' }" closeable round class="my-popup">
+		<van-popup v-model="show" position="bottom" :style="{ height: '50%' }" closeable round class="my-popup">
 			<div class="top">
 				<img :src="detailData.newGoodsImg">
 				<div>
@@ -22,6 +22,10 @@
 			</div>
 			<van-stepper v-model="count"/>
 			<van-button block color="#7abb56" @click="sure">确定</van-button>
+			<van-goods-action>
+				<van-goods-action-button color="rgb(57, 148, 113)"  text="加入购物车" />
+				<van-goods-action-button color="rgb(151, 202, 103)"  text="立即购买" />
+			</van-goods-action>
 		</van-popup>
 	</div>
 
@@ -44,7 +48,8 @@ export default {
 	data() {
 		return {
 			show: false,
-			count: 1
+			count: 1,
+			show2: false,
 		}
 	},
 	mounted() {
@@ -54,11 +59,14 @@ export default {
 		onClickIcon() {
 
 		},
-		callPhone(){
+		callPhone() {
 			window.location.href = 'tel:';
 		},
 		addToShopCar() {
 			this.show = true
+		},
+		showSku() {
+			this.show2 = true
 		},
 		sure() {
 			const {detailData, count} = this
@@ -110,7 +118,7 @@ export default {
 				display: flex;
 				flex-direction: column;
 				justify-content: space-around;
-
+				margin-left: px2rem(20);
 				h3 {
 					font-size: 16px;
 				}

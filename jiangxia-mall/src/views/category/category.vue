@@ -151,17 +151,16 @@ export default {
 		TabBar,
 	},
 	beforeMount() {
-		// console.log(this.$route.params)
-		if (this.$route.params.active) {
-			this.active = this.$route.params.active;
-		}
 		this.deviceHeight = window.innerHeight;
 		this.mainHeight = {
 			height: window.innerHeight - 32 - 59 - 170 - 50 + "px",
 		};
-		this.init();
 	},
 	async activated() {
+		// console.log(this.$route.params)
+		this.active = this.$route.params.active ? this.$route.params.active : 0;
+		await this.init();
+
 		const menuContent = document.querySelector('.menuWrapper'); // 列表的外层容器
 		if (menuContent) {
 			menuContent.scrollTop = this.menuScrollTop;
@@ -208,7 +207,7 @@ export default {
 			// console.log(this.active);
 			HandleToast('加载中', 'loadType', 300);
 			console.log(this.switchList);
-			this.activeKey =0;
+			this.activeKey = 0;
 			let isTrue = await this.refresh();
 			if (isTrue) {
 				if (this.active === 1) {
