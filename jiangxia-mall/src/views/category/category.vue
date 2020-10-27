@@ -64,10 +64,18 @@
 				</div>-->
 				<div
 					class="oper-goods"
-					v-if="operGoods.data&&operGoods.data.length>0"
+					v-if="!operEmpty&&operGoods.length>0"
 				>
-					<ul class="operaWrapper">
-						<li v-for="(item,index) in operGoods.data" :key="index">
+					<van-list
+						class="operaWrapper"
+						:finished="operFinished"
+						v-model="operLoading"
+						finished-text="没有更多了"
+						:immediate-check="false"
+						@load="loadMoreOper"
+						offset="30"
+					>
+						<van-cell v-for="(item,index) in operGoods" :key="index">
 							<div @click="toDetail(item)">
 								<img :src="item.goodsImg"/>
 							</div>
@@ -75,12 +83,12 @@
 							<p>
 								<strong>{{ `￥${item.shopPrice}` }}</strong>
 							</p>
-						</li>
-					</ul>
+						</van-cell>
+					</van-list>
 				</div>
 				<div
 					class="empty-goods"
-					v-if="operGoods.data&&operGoods.data.length===0"
+					v-if="operEmpty&&operGoods.length===0"
 				>
 					<img src="../../assets/images/jx/zanwushuju.png" class="empty"/>
 					<p>暂无数据</p>
@@ -134,7 +142,7 @@ export default {
 			],
 			value: "",
 			goodsList: [],
-			operGoods: {},
+			operGoods: [],
 			activeKey: 0,
 			menuScrollTop: 0,
 			goodScrollTop: 0,
@@ -144,7 +152,10 @@ export default {
 			queryParams: {
 				page: 1,
 				pagesize: 10
-			}
+			},
+			operFinished: false,
+			operLoading: false,
+			operEmpty: false
 		};
 	},
 	components: {
@@ -155,33 +166,52 @@ export default {
 		this.mainHeight = {
 			height: window.innerHeight - 32 - 59 - 170 - 50 + "px",
 		};
+		this.active = this.$route.params.active ? this.$route.params.active : 0;
+		this.init();
 	},
 	async activated() {
 		// console.log(this.$route.params)
-		this.active = this.$route.params.active ? this.$route.params.active : 0;
-		await this.init();
+		// this.active = this.$route.params.active ? this.$route.params.active : 0;
+		// await this.init();
+
+		// console.log(this.menuScrollTop)
 
 		const menuContent = document.querySelector('.menuWrapper'); // 列表的外层容器
 		if (menuContent) {
 			menuContent.scrollTop = this.menuScrollTop;
 		}
+		// console.log(this.goodScrollTop)
+
 		const goodContent = document.querySelector('.goodWrapper');
 		// console.log(goodContent)
 		if (goodContent) {
 			goodContent.scrollTop = this.goodScrollTop;
 		}
-		const operaContent = document.querySelector('.operaWrapper');
-		// console.log(operaContent)
-		if (operaContent) {
-			operaContent.scrollTop = this.operaScrollTop;
+		if (this.active === 1) {
+			const operaContent = document.querySelector('.operaWrapper');
+			// console.log(operaContent)
+			if (operaContent) {
+				operaContent.scrollTop = this.operaScrollTop;
+			}
 		}
+
 	},
 	beforeRouteEnter(to, from, next) {
 		// console.log('to ', to)
 		// console.log('from ', from)
+		// console.log(this.active)
 		next(vm => {
 			// console.log(vm)
+			// console.log('to ', to)
+			// console.log('from ', from)
 			vm.$refs.mychild.changeByParent(1);
+			if (to.params.active === 1) {
+				vm.active =1;
+				vm.onClick(to.params.active);
+			}else if(to.params.active === 0){
+				vm.active =0;
+				vm.onClick(to.params.active);
+			}
 		})
 	},
 	beforeRouteLeave(to, from, next) {
@@ -191,6 +221,7 @@ export default {
 
 		const goodContent = document.querySelector('.goodWrapper');
 		const goodScrollTop = goodContent ? goodContent.scrollTop : 0;
+		console.log(goodScrollTop)
 		this.goodScrollTop = goodScrollTop;
 
 		const operaContent = document.querySelector('.operaWrapper');
@@ -204,9 +235,9 @@ export default {
 	methods: {
 		async onClick(name) {
 			// console.log(name);
-			// console.log(this.active);
+			console.log(this.active);
 			HandleToast('加载中', 'loadType', 300);
-			console.log(this.switchList);
+			// console.log(this.switchList);
 			this.activeKey = 0;
 			let isTrue = await this.refresh();
 			if (isTrue) {
@@ -215,7 +246,6 @@ export default {
 						this.switchList[1].catId
 					);
 					// console.log(operGoodsRes);
-
 					operGoodsRes.data.map((item) => {
 						if (_.startsWith(item.goodsImg, "http")) {
 							return;
@@ -224,7 +254,17 @@ export default {
 								"http://youyoujiang.com/" + item.goodsImg;
 						}
 					});
-					this.operGoods = operGoodsRes;
+
+					if (parseInt(operGoodsRes.current_page) < operGoodsRes.last_page) {
+						this.operFinished = false;
+						this.operLoading = false;
+						this.operGoods = this.operGoods.concat(operGoodsRes.data);
+					} else if (parseInt(operGoodsRes.current_page) === operGoodsRes.last_page) {
+						this.operFinished = true;
+						this.operLoading = false;
+						this.operGoods = this.operGoods.concat(operGoodsRes.data);
+						// console.log(this.operGoods)
+					}
 				} else if (this.active === 0) {
 					let menuList = this.switchList[0].childList;
 					this.menuList = menuList;
@@ -253,6 +293,7 @@ export default {
 			}
 		},
 		async init() {
+			console.log('init触发')
 			HandleToast('加载中', 'loadType', 300);
 			let menuList = await this.getMenuList();
 			// console.log(menuList);
@@ -283,7 +324,7 @@ export default {
 							"http://youyoujiang.com/" + item.goodsImg;
 					}
 				});
-				console.log(firstMenu);
+				// console.log(firstMenu);
 				if (parseInt(firstMenu.current_page) < firstMenu.last_page) {
 					this.finished = false;
 					this.loading = false;
@@ -297,7 +338,6 @@ export default {
 				let operGoodsRes = await this.getGoodsList(
 					this.switchList[1].catId
 				);
-
 				operGoodsRes.data.map((item) => {
 					if (_.startsWith(item.goodsImg, "http")) {
 						return;
@@ -306,7 +346,16 @@ export default {
 							"http://youyoujiang.com/" + item.goodsImg;
 					}
 				});
-				this.operGoods = operGoodsRes;
+				// this.operGoods = operGoodsRes;
+				if (parseInt(operGoodsRes.current_page) < operGoodsRes.last_page) {
+					this.operFinished = false;
+					this.operLoading = false;
+					this.operGoods = this.operGoods.concat(operGoodsRes.data);
+				} else if (parseInt(operGoodsRes.current_page) === operGoodsRes.last_page) {
+					this.operFinished = true;
+					this.operLoading = false;
+					this.operGoods = this.operGoods.concat(operGoodsRes.data);
+				}
 			}
 		},
 		getMenuList() {
@@ -343,7 +392,10 @@ export default {
 		},
 		async onChange(index) {
 			const goodContent = document.querySelector('.goodWrapper');
-			goodContent.scrollTop = 0;
+			console.log(goodContent)
+			if(goodContent){
+				goodContent.scrollTop = 0;
+			}
 			this.activeKey = index;
 			console.log(this.menuList)
 			let isTrue = await this.refresh();
@@ -365,6 +417,9 @@ export default {
 					this.finished = true;
 					this.loading = false;
 					this.goodsList = this.goodsList.concat(menuData.data);
+					if (this.goodsList.length === 0) {
+						this.operEmpty = true
+					}
 				}
 			}
 		},
@@ -413,10 +468,14 @@ export default {
 				this.goodsList = this.goodsList.concat(result.data);
 			}
 		},
+		async loadMoreOper() {
+
+		},
 		async refresh() {
 			return new Promise((resolve, reject) => {
 				this.queryParams.page = 1;
-				this.goodsList = []
+				this.goodsList = [];
+				this.operGoods = [];
 				this.loading = true;
 				this.finished = false;
 				setTimeout(() => {
@@ -531,58 +590,77 @@ export default {
 				.oper-goods {
 					flex: 1;
 					height: 100%;
-					// padding-bottom: 50px;
-					ul {
+
+					.van-list {
 						height: 100%;
 						overflow-y: auto;
 						display: flex;
 						flex-wrap: wrap;
 
-						li {
-							font-size: 14px;
-							width: px2rem(165);
-							margin-right: px2rem(14);
+						.van-cell {
+							width: 50%;
+							padding: 0;
 							margin-bottom: px2rem(10);
 
-							&:nth-child(2n) {
-								margin-right: 0;
+							&::after {
+								border-bottom: none;
 							}
 
-							div {
-								display: flex;
-								align-items: center;
-								justify-content: center;
+							.van-cell__value {
+								font-size: 14px;
 								width: px2rem(165);
-								height: px2rem(165);
-								box-sizing: border-box;
-								border: 1px solid rgba(169, 169, 169, 0.2);
 
-								img {
-									width: px2rem(160);
+								&:nth-child(2n) {
+									margin-right: 0;
+								}
+
+								div {
+									display: flex;
+									align-items: center;
+									justify-content: center;
+									box-sizing: border-box;
+									width: px2rem(165);
+									height: px2rem(165);
+									box-sizing: border-box;
+									border: 1px solid rgba(169, 169, 169, 0.2);
+
+									img {
+										width: px2rem(158);
+									}
+								}
+
+								h4 {
+									text-align: left;
+									overflow: hidden;
+									text-overflow: ellipsis;
+									display: -webkit-box;
+									-webkit-line-clamp: 1;
+									line-clamp: 1;
+									-webkit-box-orient: vertical;
+									margin-bottom: px2rem(8);
+									margin-top: px2rem(6);
+								}
+
+								p {
+									text-align: left;
+
+									strong {
+										color: #7abb56;
+									}
 								}
 							}
 
-							h4 {
-								text-align: left;
-								overflow: hidden;
-								text-overflow: ellipsis;
-								display: -webkit-box;
-								-webkit-line-clamp: 1;
-								line-clamp: 1;
-								-webkit-box-orient: vertical;
-								margin-bottom: px2rem(8);
-								margin-top: px2rem(6);
-							}
+						}
 
-							p {
-								text-align: left;
+						.van-list__loading {
+							width: 100%;
+						}
 
-								strong {
-									color: #7abb56;
-								}
-							}
+						.van-list__finished-text {
+							width: 100%;
 						}
 					}
+
 				}
 			}
 		}
