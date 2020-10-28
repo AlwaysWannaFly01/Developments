@@ -9,7 +9,8 @@ const instance = axios.create({
 
 const instanceJxyx = axios.create({
 	baseURL: process.env.JXYX_HOST,
-	timeout: 120000
+	timeout: 120000,
+	headers: {'Content-Type': ' application/json'}
 });
 
 function request(service) {
@@ -26,7 +27,7 @@ function request(service) {
 
 	service.interceptors.response.use(
 		response => {
-			// console.log('response: ', response);
+			console.log('response: ', response);
 			const { status, statusText, data } = response;
 			if (status !== 200 || statusText !== "OK") {
 				const errMsg = res.msg || "请求失败";

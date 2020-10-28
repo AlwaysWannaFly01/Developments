@@ -50,3 +50,11 @@ export function Request(type, reqMethod, reqType = "post", params = {}) {
 			});
 	});
 }
+
+export function getCode() {
+	return requestJxyx({
+		url: 'weapp/users/getVerify',
+		method: 'get',
+		responseType: "arraybuffer",
+	})
+}

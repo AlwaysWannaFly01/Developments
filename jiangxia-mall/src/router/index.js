@@ -17,7 +17,7 @@ import ManageAddress from "@/views/my/manageAddress";
 import AddAddress from "@/views/my/addAddress";
 import GoodsList from "@/views/category/goodsList";
 import SellerJoin from "@/views/my/sellerJoin";
-// import Login from "@/views/login/login";
+import Login from "@/views/login/login";
 
 Vue.use(Router);
 
@@ -27,11 +27,11 @@ export default new Router({
 			path: "*",
 			redirect: "/index"
 		},
-		// {
-		// 	path: "/login",
-		// 	name: "Login",
-		// 	component: Login,
-		// },
+		{
+			path: "/login",
+			name: "Login",
+			component: Login,
+		},
 		{
 			path: "/index",
 			name: "Index",
