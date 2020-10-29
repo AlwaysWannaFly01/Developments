@@ -1,19 +1,31 @@
 <template>
 	<div class="page-login">
-		<van-tabs @click="onClick" line-height="0" :style="deviceHeight" v-model="activeName">
+		<van-tabs line-height="0" :style="deviceHeight" v-model="activeName">
 			<van-tab title="账号登录" name="login">
 				<van-form @submit="onSubmit">
 					<van-field
 						v-model="loginUsername"
-						name="用户名"
+						name="loginUsername"
 						placeholder="用户名"
 					/>
 					<van-field
 						v-model="loginPassword"
 						type="password"
-						name="密码"
+						name="loginPassword"
 						placeholder="密码"
 					/>
+					<van-field
+						v-model="loginCode"
+						center
+						clearable
+						placeholder="请输入验证码"
+						class="code"
+						name="loginCode"
+					>
+						<template #button>
+							<img v-show="codeImg" :src="codeImg" @click="sendCode">
+						</template>
+					</van-field>
 					<div class="btn-block">
 						<van-button round block native-type="submit" color="#7abb56">
 							登录
@@ -23,26 +35,28 @@
 				<p class="new" @click="toRegister">新用户<span>注册</span></p>
 			</van-tab>
 			<van-tab title="账号注册" name="register">
-				<van-form @submit="onSubmit2">
+				<van-form @submit="onSubmitRegister">
 					<van-field
 						v-model="username"
-						name="账号"
-						placeholder="账号"
+						name="username"
+						placeholder="用户名"
 					/>
 					<van-field
 						v-model="password"
 						type="password"
-						name="密码"
+						name="password"
 						placeholder="密码"
 					/>
 					<van-field
-						v-model="sms"
+						v-model="code"
 						center
 						clearable
 						placeholder="请输入验证码"
+						class="code"
+						name="code"
 					>
 						<template #button>
-							<van-button size="small" type="primary" @click="sendCode">发送验证码</van-button>
+							<img v-show="codeImg" :src="codeImg" @click="sendCode">
 						</template>
 					</van-field>
 					<div class="btn-block">
@@ -64,6 +78,7 @@ import {Tab, Tabs, Toast, Form, Field} from 'vant';
 Vue.use(Tab).use(Tabs).use(Toast).use(Form).use(Field);
 import _ from "lodash";
 import {Request, getCode} from "@/api/index";
+import HandleToast from '@/utils/toast';
 
 export default {
 	name: "login",
@@ -71,10 +86,12 @@ export default {
 		return {
 			activeName: 'login',
 			loginUsername: '',
-			username: '',
 			loginPassword: '',
+			loginCode: '',
+			username: '',
 			password: '',
-			sms: ''
+			code: '',
+			codeImg: '',
 		};
 	},
 	beforeMount() {
@@ -83,17 +100,72 @@ export default {
 		};
 	},
 	mounted() {
+		this.sendCode();
 	},
 	methods: {
-		onClick(name, title) {
-			// console.log(name)
-			Toast(title);
-		},
 		onSubmit(values) {
-			console.log('submit', values);
-		},
-		onSubmit2(values) {
 			// console.log('submit', values);
+			const {loginUsername, loginPassword, loginCode} = values;
+			if (!loginUsername) {
+				HandleToast('用户名不能为空')
+			} else if (!loginPassword) {
+				HandleToast('密码不能为空')
+			} else if (!loginCode) {
+				HandleToast('验证码不能为空')
+			} else {
+				Request('main', 'weapp/users/login', 'post', {
+					loginName: loginUsername,
+					loginPwd: loginPassword,
+					verifyCode: loginCode,
+					loginType: 4
+				}).then(res => {
+					// console.log(res)
+					if (res.status == 1) {
+						HandleToast(res.msg, 'success', 300);
+						setTimeout(() => {
+							this.$router.replace({
+								path: "/index",
+							});
+						}, 500)
+					} else {
+						HandleToast(res.msg);
+					}
+				}).catch(err => {
+					console.log(err)
+				})
+			}
+		},
+		onSubmitRegister(values) {
+			// console.log('submit', values);
+			const {username, password, code} = values
+			if (!username) {
+				HandleToast('用户名不能为空')
+			} else if (!password) {
+				HandleToast('密码不能为空')
+			} else if (!code) {
+				HandleToast('验证码不能为空')
+			} else {
+				Request('main', 'weapp/users/registbyaccount', 'post', {
+					loginName: username,
+					loginPwd: password,
+					verifyCode: code
+				}).then(res => {
+					// console.log(res)
+					if (res.status === 1) {
+						HandleToast(res.msg, 'success');
+						setTimeout(() => {
+							this.$router.replace({
+								path: "/index",
+							});
+						}, 800)
+					} else {
+						HandleToast(res.msg)
+					}
+				}).catch(err => {
+					console.log(err)
+				})
+			}
+
 		},
 		toRegister() {
 			this.activeName = 'register';
@@ -103,12 +175,11 @@ export default {
 		},
 		sendCode() {
 			getCode().then(response => {
-				// console.log(response)
-				// return 'data:image/png;base64,' + btoa(
-				// 	new Uint8Array(response).reduce((data, byte) => data + String.fromCharCode(byte), '')
-				// )
+				return 'data:image/png;base64,' + btoa(
+					new Uint8Array(response).reduce((data, byte) => data + String.fromCharCode(byte), '')
+				)
 			}).then(data => {
-				console.log(data)
+				this.codeImg = data;
 			}).catch(err => {
 				console.log(err)
 			})
@@ -161,6 +232,23 @@ export default {
 					&::after {
 						right: px2rem(40);
 						left: px2rem(40);
+					}
+
+					.van-field__button {
+						padding-left: 0px;
+						box-sizing: border-box;
+						width: px2rem(100);
+						height: px2rem(31);
+
+						img {
+							width: px2rem(100);
+							height: px2rem(31);
+							vertical-align: middle;
+						}
+					}
+
+					&.code {
+						padding: px2rem(13) px2rem(40);
 					}
 				}
 

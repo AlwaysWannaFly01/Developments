@@ -52,7 +52,7 @@ export function Request(type, reqMethod, reqType = "post", params = {}) {
 }
 
 export function getCode() {
-	return requestJxyx({
+	return requestMain({
 		url: 'weapp/users/getVerify',
 		method: 'get',
 		responseType: "arraybuffer",
