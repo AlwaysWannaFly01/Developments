@@ -392,7 +392,7 @@ export default {
 		},
 		async onChange(index) {
 			const goodContent = document.querySelector('.goodWrapper');
-			console.log(goodContent)
+			// console.log(goodContent)
 			if(goodContent){
 				goodContent.scrollTop = 0;
 			}

@@ -122,6 +122,7 @@ export default {
 					// console.log(res)
 					if (res.status == 1) {
 						HandleToast(res.msg, 'success', 300);
+						localStorage.setItem('userId', res.data.userId);
 						setTimeout(() => {
 							this.$router.replace({
 								path: "/index",
@@ -153,6 +154,7 @@ export default {
 					// console.log(res)
 					if (res.status === 1) {
 						HandleToast(res.msg, 'success');
+						localStorage.setItem('userId', res.data.userId);
 						setTimeout(() => {
 							this.$router.replace({
 								path: "/index",

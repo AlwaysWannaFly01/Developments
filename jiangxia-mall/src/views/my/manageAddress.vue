@@ -13,12 +13,21 @@ import Vue from 'vue';
 import { Button ,Icon} from 'vant';
 
 Vue.use(Button).use(Icon);
+import {Request} from "@/api/index";
+import HandleToast from '@/utils/toast';
 export default {
 	name: "manageAddress",
 	data(){
 		return{
 
 		}
+	},
+	mounted(){
+		Request('main', 'weapp/users/myshippingaddress', 'post', {}).then(res => {
+			console.log(res)
+		}).catch(err => {
+			console.log(err)
+		})
 	},
 	methods:{
 		toAddAddress(){

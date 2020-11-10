@@ -3,7 +3,7 @@
 		<van-goods-action>
 			<van-goods-action-icon icon="service-o" text="客服" @click="callPhone"/>
 			<van-goods-action-icon icon="share-o" text="分享" @click="onClickIcon"/>
-			<van-goods-action-icon icon="cart-o" text="购物车" @click="onClickIcon"/>
+			<van-goods-action-icon icon="cart-o" text="购物车" @click="onClickShopBtn"/>
 
 			<van-goods-action-button color="rgb(57, 148, 113)" type="warning" text="加入购物车" @click="addToShopCar"/>
 			<van-goods-action-button color="rgb(151, 202, 103)" type="danger" text="立即购买" @click="showSku"/>
@@ -42,7 +42,6 @@
 				<h6>数量</h6>
 				<van-stepper v-model="count"/>
 			</div>
-			<!--			<van-button block color="#7abb56" @click="sure">确定</van-button>-->
 			<van-goods-action>
 				<van-goods-action-button color="rgb(57, 148, 113)" text="加入购物车" @click="sure"/>
 				<van-goods-action-button color="rgb(151, 202, 103)" text="立即购买"/>
@@ -56,10 +55,11 @@
 import Vue from "vue";
 import {GoodsAction, GoodsActionIcon, GoodsActionButton, Popup, Stepper, Button, RadioGroup, Radio} from "vant";
 
-Vue.use(GoodsAction).use(GoodsActionIcon).use(GoodsActionButton).use(Popup).use(Stepper).use(Stepper).use(RadioGroup).use(Radio);
+Vue.use(GoodsAction).use(GoodsActionIcon).use(GoodsActionButton).use(Popup).use(Stepper).use(RadioGroup).use(Radio);
 
 import _ from "lodash";
 import {Request} from "@/api/index";
+import HandleToast from '@/utils/toast';
 
 export default {
 	name: "ShopFoot",
@@ -105,24 +105,14 @@ export default {
 		showSku() {
 			this.show2 = true
 		},
-		sure() {
+		async sure() {
 			const {detailData, count} = this
 			console.log(detailData)
 			if (count > 0) {
-				console.log(count)
-				Request("main", "weapp/carts/addcart", "post", {
-					goodsId: detailData.goodsId,
-					goodsSpecId: detailData.goodsCatId,
-					buyNum: count,
-					type: 0
-				}).then(res => {
-					console.log(res)
-				}).catch(err => {
-
-				})
-
+				// console.log(count)
+				const res = await this.addCart(detailData, count, 0);
+				HandleToast('添加购物车成功', 'success')
 			}
-			// this.show = true
 		},
 		convert(arr, cate = 'band', sort = 'asc') {
 			let str = ''
@@ -139,6 +129,28 @@ export default {
 			// console.log(val)
 			// console.log(this.land)
 			await this.convert(this.land)
+		},
+		addCart(detailData, count, type) {
+			return new Promise((resolve, reject) => {
+				Request("main", "weapp/carts/addcart", "post", {
+					goodsId: detailData.goodsId,
+					goodsSpecId: detailData.goodsCatId,
+					buyNum: count,
+					type: type
+				}).then(res => {
+					if (res.status === 1) {
+						resolve(res)
+					}
+				}).catch(err => {
+					// console.log(err)
+					reject(err);
+				})
+			})
+		},
+		onClickShopBtn(){
+			this.$router.push({
+				name: "Shop",
+			});
 		}
 	}
 }

@@ -16,6 +16,7 @@ function request(service) {
 	service.interceptors.request.use(
 		config => {
 			config.headers["token"] = getToken();
+			// console.log(config)
 			return config;
 		},
 		error => {
