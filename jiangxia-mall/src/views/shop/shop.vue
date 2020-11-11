@@ -18,57 +18,69 @@
 				</van-col>
 			</van-row>
 			<div class="oper-block">
-				<p>
-					购物数量
-				</p>
-				<van-button type="default" size="small">管理</van-button>
+				<p>购物数量 <span>{{ account.goodsTotalNum }}</span></p>
+				<van-button type="default" size="small" @click="manage">{{ manageStatus ? '管理' : '取消' }}</van-button>
 			</div>
 		</div>
-		<div class="shop-container" :style="mainHeight">
-			<div class="shop-list" v-for="(item,index) in shopList" :key="index">
+		<div class="shop-container" v-if="!showHot" :style="mainHeight">
+			<div class="shop-list" v-for="(item,index) in account.carts" :key="index">
 				<div class="line"></div>
 				<div class="list-item">
 					<div class="item-top">{{ item.shopName }}</div>
 					<div class="item-bottom">
 						<div v-for="(subItem,subIndex) in item.list" :key="subIndex" class="item-bottom-list-item">
-							<van-checkbox v-model="subItem.isCheck" checked-color="#7abb56"></van-checkbox>
+							<van-checkbox v-model="subItem._isCheck" checked-color="#7abb56"
+										  @click="listItemCheckChange(subItem)"></van-checkbox>
 							<div class="detail">
 								<img :src="subItem.goodsImg">
 								<div class="detail-info">
-									<h4>{{subItem.goodsName}}</h4>
+									<h4>{{ subItem.goodsName }}</h4>
 									<span>属性:默认</span>
 									<strong>{{ `￥${subItem.shopPrice}` }}</strong>
 								</div>
-								<van-stepper v-model="subItem.cartNum"/>
+								<van-stepper v-model="subItem.cartNum" @change="cartNumOnChange(subItem)"/>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="empty" v-if="showHot">
-			<img src="../../assets/images/noShopper.png">
-		</div>
-		<div class="hot" v-if="showHot">
-			<div class="top">
-				<img src="../../assets/images/jx/label_icon.png">
-				<span>热门推荐</span>
-				<img src="../../assets/images/jx/label_icon.png">
+		<div class="account" v-if="!showHot">
+			<van-checkbox v-model="allChecked" checked-color="#7abb56" @click="allCheckFun">
+				全选({{ allNum ? allNum : 0 }})
+			</van-checkbox>
+			<div class="account-oper" v-if="manageStatus">
+				<strong>{{ account.goodsTotalMoney ? `￥${account.goodsTotalMoney.toFixed(2)}` : '' }}</strong>
+				<van-button round size="small" color="#7abb56">立即下单</van-button>
 			</div>
-			<div class="block">
-				<ul>
-					<li v-for="(item,index) in recomList" :key="index">
-						<img :src="item.goodsImg" @click="toDetail(item)"/>
-						<h4>{{ item.goodsName }}</h4>
-						<p>
-							<span class="price">￥{{ item.shopPrice }}</span>
-							<del
-								v-if="item.marketPrice > item.shopPrice"
-							>{{ item.marketPrice }}
-							</del>
-						</p>
-					</li>
-				</ul>
+			<van-button round size="small" v-if="!manageStatus" @click="deleteCarts">删除</van-button>
+		</div>
+		<div class="empty-container" v-if="showHot" :style="emptyHeight">
+			<div class="line"></div>
+			<div class="empty">
+				<img src="../../assets/images/noShopper.png">
+			</div>
+			<div class="hot">
+				<div class="top">
+					<img src="../../assets/images/jx/label_icon.png">
+					<span>热门推荐</span>
+					<img src="../../assets/images/jx/label_icon.png">
+				</div>
+				<div class="block">
+					<ul>
+						<li v-for="(item,index) in recomList" :key="index">
+							<img :src="item.goodsImg" @click="toDetail(item)"/>
+							<h4>{{ item.goodsName }}</h4>
+							<p>
+								<span class="price">￥{{ item.shopPrice }}</span>
+								<del
+									v-if="item.marketPrice > item.shopPrice"
+								>{{ item.marketPrice }}
+								</del>
+							</p>
+						</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 
@@ -83,21 +95,28 @@ Vue.use(Col).use(Row).use(Icon).use(Button).use(Checkbox).use(CheckboxGroup).use
 import TabBar from "../../components/TabBar";
 import _ from "lodash";
 import {Request} from "@/api/index";
+import HandleToast from '@/utils/toast';
 
 export default {
 	data() {
 		return {
 			recomList: [],
 			showHot: false,
-			shopList: []
+			account: {},
+			allChecked: false,
+			manageStatus: true,
+			allNum: 0
 		}
 	},
 	beforeMount() {
 		this.deviceHeight = window.innerHeight;
 		this.mainHeight = {
-			height: window.innerHeight - 50 - 50 -50 + "px",
+			height: window.innerHeight - 50 - 50 - 50 - 46 + "px",
 		};
-		console.log(this.mainHeight)
+		this.emptyHeight = {
+			height: window.innerHeight - 50 - 50 - 50 + "px",
+		}
+		// console.log(this.mainHeight)
 	},
 	mounted() {
 		this.init()
@@ -127,15 +146,12 @@ export default {
 			});
 
 			let res = await this.checkShopList();
-			console.log(res)
-			if (res.goodsTotalNum < 1) {
-				this.showHot = true;
+			this.account = res;
+			if (this.account.goodsTotalNum === 0) {
+				this.allChecked = false;
 			}
-
-			res.carts
-
-			this.shopList = res.carts
-
+			console.log(this.account)
+			await this.commonReload(this.account);
 		},
 		toDetail(param) {
 			this.$router.push({
@@ -154,19 +170,179 @@ export default {
 						// console.log(res.data)
 						res.data.carts.map((item, index) => {
 							item.list.map(subItem => {
-								console.log(subItem)
+								// console.log(subItem)
 								if (_.startsWith(subItem.goodsImg, "http")) {
 									return;
 								} else {
 									subItem.goodsImg =
 										"http://youyoujiang.com/" + subItem.goodsImg;
 								}
+								subItem._isCheck = subItem.isCheck === 1 ? true : false;
 							})
 						})
 						resolve(res.data)
 					}
 				}).catch(err => {
 					console.log(err)
+					reject(err)
+				})
+			})
+		},
+		manage() {
+			this.manageStatus = !this.manageStatus;
+		},
+		async listItemCheckChange(param) {
+			console.log(this.account)
+			let boolList = [];
+			this.account.carts.map(item => {
+				let result = item.list.every(subItem => {
+					return subItem._isCheck
+				})
+				boolList.push(result);
+			})
+			if (boolList.every(item => item)) {
+				this.allChecked = true;
+			} else {
+				this.allChecked = false;
+			}
+			console.log(param)
+
+			let res = await this.interChangeCartGood(param.cartId, param._isCheck, param.cartNum)
+			console.log(res)
+			let refresh = await this.checkShopList();
+			this.account = refresh;
+			console.log(this.account)
+			await this.commonReload(this.account)
+		},
+		async deleteCarts() {
+			console.log(this.account)
+			let resArray = [];
+			this.account.carts.map(item => {
+				item.list.map(subItem => {
+					if (subItem._isCheck) {
+						resArray.push(subItem.cartId)
+					}
+				})
+			})
+			console.log(resArray);
+			if (resArray.length > 0) {
+				let res = await this.interDelCart(resArray.join(','))
+				HandleToast(res.msg, 'success')
+				let refresh = await this.checkShopList();
+				this.account = refresh;
+				await this.commonReload(this.account)
+			} else {
+				HandleToast('请选择产品')
+			}
+		},
+		commonReload(param) {
+			let boolList = [];
+			param.carts.map(item => {
+				let result = item.list.every(subItem => {
+					return subItem._isCheck
+				})
+				boolList.push(result);
+			})
+			if (boolList.every(item => item)) {
+				this.allChecked = true;
+			} else {
+				this.allChecked = false;
+			}
+			if (param.goodsTotalNum < 1) {
+				this.allChecked = false;
+				if (param.carts.length < 1) {
+					this.showHot = true;
+				}
+			}
+			let num = 0;
+			param.carts.map(item => {
+				num += item.list.length;
+			})
+			this.allNum = num;
+		},
+		/*删除购物车离的商品*/
+		interDelCart(param) {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/carts/delcart', 'post', {id: param}).then(res => {
+					console.log(res)
+					if (res.status === 1) {
+						resolve(res)
+					}
+				}).catch(err => {
+					console.log(err);
+					reject(err)
+				})
+			})
+		},
+		async allCheckFun() {
+			console.log(this.allChecked)
+			if (this.allChecked) {
+				let resArray = [];
+				this.account.carts.map(item => {
+					item.list.map(subItem => {
+						subItem._isCheck = true;
+						resArray.push(subItem.cartId)
+					})
+				})
+				if (resArray.length > 0) {
+					let res = await this.interBatchChangeCartGood(resArray.join(','), 1)
+					let refresh = await this.checkShopList();
+					this.account = refresh;
+					await this.commonReload(this.account)
+				}
+			} else {
+				let resArray = [];
+				this.account.carts.map(item => {
+					item.list.map(subItem => {
+						subItem._isCheck = false;
+						resArray.push(subItem.cartId)
+					})
+				})
+				console.log(resArray)
+				if (resArray.length > 0) {
+					let res = await this.interBatchChangeCartGood(resArray.join(','), 0)
+					let refresh = await this.checkShopList();
+					this.account = refresh;
+					await this.commonReload(this.account)
+				}
+			}
+		},
+		async cartNumOnChange(param) {
+			console.log(this.account)
+			console.log(param)
+			let res = await this.interChangeCartGood(param.cartId, param._isCheck, param.cartNum)
+			console.log(res)
+			let refresh = await this.checkShopList();
+			this.account = refresh;
+			await this.commonReload(this.account)
+		},
+		/*修改购物车商品状态*/
+		interChangeCartGood(id, isCheck, buyNum) {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/carts/changecartgoods', 'post', {
+					id,
+					isCheck: isCheck ? 1 : 0,
+					buyNum
+				}).then(res => {
+					if (res.status === 1) {
+						resolve(res)
+					}
+				}).catch(err => {
+					reject(err)
+				})
+			})
+		},
+		/*批量修改购物车状态*/
+		interBatchChangeCartGood(ids, isCheck) {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/carts/batchchangecartgoods', 'post', {
+					ids,
+					isCheck,
+				}).then(res => {
+					if (res.status === 1) {
+						resolve(res)
+					}
+				}).catch(err => {
 					reject(err)
 				})
 			})
@@ -203,12 +379,23 @@ export default {
 
 			p {
 				font-size: 14px;
+
+				span {
+					color: #7abb56;
+				}
+			}
+
+			.van-button {
+				padding: 0 15px;
+				border: 1px solid rgba(50, 50, 51, .5);
+				height: 28px;
 			}
 		}
 	}
 
 	.shop-container {
 		overflow-y: auto;
+
 		.shop-list {
 			.line {
 				width: 100%;
@@ -225,6 +412,12 @@ export default {
 					line-height: px2rem(40);
 					padding: 0 px2rem(10);
 					border-bottom: 1px solid rgba(235, 237, 240, 0.5);
+					overflow: hidden;
+					text-overflow: ellipsis;
+					display: -webkit-box;
+					-webkit-line-clamp: 1;
+					line-clamp: 1;
+					-webkit-box-orient: vertical;
 				}
 
 				.item-bottom {
@@ -264,6 +457,12 @@ export default {
 								h4 {
 									font-size: 14px;
 									font-weight: 600;
+									overflow: hidden;
+									text-overflow: ellipsis;
+									display: -webkit-box;
+									-webkit-line-clamp: 2;
+									line-clamp: 2;
+									-webkit-box-orient: vertical;
 								}
 
 								span {
@@ -290,12 +489,66 @@ export default {
 		}
 	}
 
+	.empty-container {
+		overflow-y: auto;
+
+		.line {
+			width: 100%;
+			height: px2rem(6);
+			background-color: rgba(235, 237, 240, .5);
+		}
+	}
+
+	.account {
+		height: 46px;
+		box-sizing: border-box;
+		background-color: rgba(235, 237, 240, 0.3);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: px2rem(0) px2rem(10);
+		border-top: 1px solid rgba(235, 237, 240, 0.5);
+
+		.van-checkbox {
+			.van-checkbox__label {
+				font-size: 14px;
+			}
+		}
+
+		.account-oper {
+			height: 46px;
+			display: flex;
+			align-items: center;
+
+			strong {
+				font-size: 16px;
+				color: #7abb56;
+				margin-right: px2rem(10);
+				font-weight: 600;
+			}
+
+			.van-button {
+				padding: 0 25px;
+				font-size: 16px;
+			}
+		}
+
+		.van-button {
+			padding: 0 25px;
+			font-size: 16px;
+			color: rgba(50, 50, 51, .5);
+			border: 1px solid rgba(50, 50, 51, .5);
+		}
+	}
+
 	.empty {
 		text-align: center;
 		padding: px2rem(20);
+		min-height: px2rem(162);
 
 		img {
 			width: px2rem(200);
+			height: px2rem(162);
 		}
 	}
 
@@ -321,7 +574,7 @@ export default {
 		}
 
 		.block {
-			margin-bottom: 50px;
+			//margin-bottom: 50px;
 
 			ul {
 				display: flex;

@@ -512,6 +512,12 @@ export default {
                         font-size: 16px;
                         font-weight: 400;
                         margin-bottom: px2rem(6);
+						overflow: hidden;
+						text-overflow: ellipsis;
+						display: -webkit-box;
+						-webkit-line-clamp: 1;
+						line-clamp: 1;
+						-webkit-box-orient: vertical;
                     }
 
                     p {
