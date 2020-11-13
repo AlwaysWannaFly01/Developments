@@ -6,10 +6,18 @@
 
 <script>
 import Address from '@/components/Address';
+
 export default {
 	name: "addAddress",
-	components:{
+	components: {
 		Address
+	},
+	data() {
+		return {
+		}
+	},
+	mounted() {
+
 	}
 }
 </script>

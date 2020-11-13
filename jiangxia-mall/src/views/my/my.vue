@@ -60,9 +60,21 @@ import TabBar from "../../components/TabBar";
 
 export default {
 	data() {
-		return {};
+		return {
+			provinceCityCountry: [],
+			canClick: false
+		};
 	},
 	components: {TabBar},
+	async mounted() {
+		let res = await this.interMyIndex();
+		console.log(res)
+		this.serviceTel = res.serviceTel;
+		// console.log(JSON.parse(localStorage.getItem('localProvinceCityCountry')))
+		if (!localStorage.getItem('localProvinceCityCountry')) {
+			this.init()
+		}
+	},
 	methods: {
 		handleClick(param) {
 			this.$router.push({
@@ -73,17 +85,25 @@ export default {
 			});
 		},
 		toManageAddress() {
-			this.$router.push({
-				name: "ManageAddress",
-			});
+			if (localStorage.getItem('canClick')) {
+				this.$router.push({
+					name: "ManageAddress"
+				});
+			} else {
+				HandleToast('省市区正在加载中,请稍后')
+			}
 		},
 		toSellerJoin() {
-			this.$router.push({
-				name: "SellerJoin",
-			});
+			if (localStorage.getItem('canClick')) {
+				this.$router.push({
+					name: "SellerJoin"
+				});
+			} else {
+				HandleToast('省市区正在加载中,请稍后')
+			}
 		},
 		callPhone() {
-			window.location.href = 'tel:'
+			window.location.href = 'tel:' + this.serviceTel;
 		},
 		token() {
 			Request('main', 'weapp/upload/authToken', 'post', {}).then(res => {
@@ -91,7 +111,138 @@ export default {
 			}).catch(err => {
 				console.log(err)
 			})
-		}
+		},
+		interMyIndex() {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/users/myindex', 'get').then(res => {
+					if (res.status === 1) {
+						resolve(res.data)
+					}
+				}).catch(err => {
+					reject(err)
+				})
+			})
+		},
+
+		/*请求省市区*/
+		async init() {
+			let AllProvince = await this.getProvinceCityCounty();
+			this.AllProvince = AllProvince;
+			// console.log('所有省份:', AllProvince);
+			this.mapCityData()
+		},
+		async mapCityData() {
+			// console.log('Start');
+			const promise = this.AllProvince.map(async item => {
+				const cityRes = await this.getProvinceCityCounty(item.areaId);
+				return cityRes;
+			})
+			const AllCity = await Promise.all(promise);
+			this.AllCity = AllCity;
+
+			let ProvinceCity = []
+
+			if (this.AllCity && this.AllCity.length > 0) {
+				// console.log(this.AllCity)
+
+				this.AllProvince.map((el, index) => {
+					ProvinceCity.push({
+						text: this.AllProvince[index].areaName,
+						areaId: this.AllProvince[index].areaId,
+						children: this.AllCity[index]
+					})
+				})
+				// console.log(ProvinceCity)
+				this.ProvinceCity = ProvinceCity;
+				if (this.ProvinceCity && this.ProvinceCity.length > 0) {
+					// console.log(this.ProvinceCity);
+					let ProvinceCityCountry = [];
+					this.ProvinceCity.map(item => {
+						// console.log(item)
+						item.children.map(subItem => {
+							subItem['text'] = subItem.areaName;
+						})
+					})
+					// console.log(this.ProvinceCity);
+					let boolList = []
+					this.ProvinceCity.map(item => {
+						let result = item.children.every(subItem => {
+							return subItem.text;
+						})
+						boolList.push(result);
+					})
+					if (boolList.every(item => item)) {
+						this.checkCountryData(this.ProvinceCity);
+					}
+				}
+			}
+		},
+		async checkCountryData(param) {
+			console.log('开始')
+			// console.log(param)
+			const promise1 = param.map(async (item, index) => {
+				// console.log(item)
+				let countryRes = await this.mapCountryData(item);
+				return countryRes;
+			})
+
+			const allCityCountry = await Promise.all(promise1);
+			console.log('所有区县:', allCityCountry);
+			// console.log('所有省份城市:', this.ProvinceCity)
+
+			this.ProvinceCity.map((item, index) => {
+				item.children.map((subItem, subIndex) => {
+					subItem['children'] = allCityCountry[index][subIndex]
+				})
+			})
+			console.log('所有省份城市:', this.ProvinceCity)
+			let boolList = []
+			this.ProvinceCity.map((item, index) => {
+				let result = item.children.every(subItem => {
+					if (index === 24) {
+						return true;
+					}
+					return subItem.children.length > 0;
+				})
+				boolList.push(result);
+			})
+			console.log(boolList)
+			if (boolList.every(item => item)) {
+				this.canClick = true;
+				if (!localStorage.getItem('localProvinceCityCountry')) {
+					localStorage.setItem('localProvinceCityCountry', JSON.stringify(this.ProvinceCity));
+					localStorage.setItem('canClick', true)
+				}
+			}
+			console.log('结束')
+		},
+		async mapCountryData(param) {
+			const promise = param.children.map(async item => {
+				const res = await this.getProvinceCityCounty(item.areaId);
+				// console.log(res);
+				return res;
+			})
+			const thisCityCountry = await Promise.all(promise);
+			return thisCityCountry;
+		},
+		getProvinceCityCounty(param = 0) {
+			return new Promise((resolve, reject) => {
+				Request("main", "weapp/users/listQuery", "post", {
+					parentId: param,
+				}).then(res => {
+					if (res.status === 1) {
+						// console.log(res)
+						res.data.map(item => {
+							item['text'] = item.areaName
+						})
+						resolve(res.data)
+					}
+				}).catch(err => {
+					console.log(err)
+					reject(err)
+				})
+			})
+		},
 	},
 };
 </script>

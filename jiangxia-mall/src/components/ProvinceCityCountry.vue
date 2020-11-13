@@ -11,13 +11,13 @@
 				@change="onChange"
 			/>
 		</van-popup>
-<!--		<van-divider />-->
+		<!--		<van-divider />-->
 	</div>
 </template>
 
 <script>
 import Vue from "vue";
-import {Field, Cell, CellGroup, Popup, Picker,Divider } from "vant";
+import {Field, Cell, CellGroup, Popup, Picker, Divider} from "vant";
 
 Vue.use(Cell).use(Field).use(CellGroup).use(Popup).use(Picker).use(Divider);
 import _ from 'lodash';
@@ -123,9 +123,11 @@ export default {
 			console.log(boolList)
 			if (boolList.every(item => item)) {
 				this.canClick = true;
-				// console.log(this.canClick)
+				// this.$emit('provinceCityCountryData', this.ProvinceCity);
+				if (JSON.parse(localStorage.getItem('localProvinceCityCountry')).length === 0) {
+					localStorage.setItem('localProvinceCityCountry', JSON.stringify(this.ProvinceCity))
+				}
 			}
-
 			console.log('结束')
 		},
 		async mapCountryData(param) {
@@ -161,7 +163,7 @@ export default {
 			const {ProvinceCity} = this;
 			const areaId = ProvinceCity[index[0]].children[index[1]].children[index[2]].areaId
 			console.log(areaId);
-			this.$emit('func',areaId)
+			this.$emit('func', areaId)
 			this.value = value.join(',');
 			this.showPicker = false;
 		},
@@ -175,7 +177,7 @@ export default {
 			// console.log(this.canClick);
 			if (this.canClick) {
 				this.showPicker = true
-			}else{
+			} else {
 				HandleToast('省市区正在加载中,请稍后')
 			}
 		}

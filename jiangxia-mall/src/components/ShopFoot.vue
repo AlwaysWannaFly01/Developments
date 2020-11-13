@@ -3,7 +3,7 @@
 		<van-goods-action>
 			<van-goods-action-icon icon="service-o" text="客服" @click="callPhone"/>
 			<van-goods-action-icon icon="share-o" text="分享" @click="onClickIcon"/>
-			<van-goods-action-icon icon="cart-o" text="购物车" @click="onClickShopBtn"/>
+			<van-goods-action-icon icon="cart-o" text="购物车" :badge="shopCarNum" @click="onClickShopBtn"/>
 
 			<van-goods-action-button color="rgb(57, 148, 113)" type="warning" text="加入购物车" @click="addToShopCar"/>
 			<van-goods-action-button color="rgb(151, 202, 103)" type="danger" text="立即购买" @click="showSku"/>
@@ -70,7 +70,6 @@ export default {
 		return {
 			show: false,
 			count: 1,
-			show2: false,
 			radio: '',
 			land: [
 				{band: 0},
@@ -78,7 +77,8 @@ export default {
 				{band: 2},
 				{band: 3},
 			],
-			stockChoosed: {}
+			stockChoosed: {},
+			shopCarNum: null
 		}
 	},
 	async mounted() {
@@ -91,6 +91,9 @@ export default {
 			this.land = arr;
 		}
 		await this.convert(this.land);
+		let num = await this.interGetCartsNum();
+		console.log(num)
+		this.shopCarNum = num;
 	},
 	methods: {
 		onClickIcon() {
@@ -103,7 +106,6 @@ export default {
 			this.show = true
 		},
 		showSku() {
-			this.show2 = true
 		},
 		async sure() {
 			const {detailData, count} = this
@@ -112,6 +114,13 @@ export default {
 				// console.log(count)
 				const res = await this.addCart(detailData, count, 0);
 				HandleToast('添加购物车成功', 'success')
+				this.show = false;
+				setTimeout(() => {
+					this.count = 1;
+				}, 500)
+
+				let num = await this.interGetCartsNum();
+				this.shopCarNum = num;
 			}
 		},
 		convert(arr, cate = 'band', sort = 'asc') {
@@ -147,10 +156,38 @@ export default {
 				})
 			})
 		},
-		onClickShopBtn(){
+		onClickShopBtn() {
 			this.$router.push({
 				name: "Shop",
 			});
+		},
+		/*查看购物车列表*/
+		checkShopList() {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/carts/index', 'get').then(res => {
+					if (res.status === 1) {
+						resolve(res.data)
+					}
+				}).catch(err => {
+					console.log(err)
+					reject(err)
+				})
+			})
+		},
+
+		/*获取购物车数量*/
+		interGetCartsNum() {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/carts/getcartsnum', 'get').then(res => {
+					console.log(res)
+					if (res.status === 1) {
+						resolve(res.data)
+					}
+				}).catch(err => {
+					console.log(err)
+					reject(err)
+				})
+			})
 		}
 	}
 }
@@ -186,7 +223,7 @@ export default {
 				flex-direction: column;
 				justify-content: space-around;
 				margin-left: px2rem(20);
-				margin-right: px2rem(20);
+				margin-right: px2rem(30);
 
 				h3 {
 					font-size: 16px;
@@ -259,6 +296,10 @@ export default {
 				}
 			}
 		}
+	}
+
+	.van-info {
+		background-color: #7abb56;
 	}
 }
 </style>

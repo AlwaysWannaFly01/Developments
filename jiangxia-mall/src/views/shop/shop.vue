@@ -19,7 +19,7 @@
 			</van-row>
 			<div class="oper-block">
 				<p>购物数量 <span>{{ account.goodsTotalNum }}</span></p>
-				<van-button type="default" size="small" @click="manage">{{ manageStatus ? '管理' : '取消' }}</van-button>
+				<van-button type="default" size="small" v-if="!showHot" @click="manage">{{ manageStatus ? '管理' : '取消' }}</van-button>
 			</div>
 		</div>
 		<div class="shop-container" v-if="!showHot" :style="mainHeight">
@@ -50,7 +50,7 @@
 				全选({{ allNum ? allNum : 0 }})
 			</van-checkbox>
 			<div class="account-oper" v-if="manageStatus">
-				<strong>{{ account.goodsTotalMoney ? `￥${account.goodsTotalMoney.toFixed(2)}` : '' }}</strong>
+				<strong>{{ account.goodsTotalMoney ? `￥${account.goodsTotalMoney.toFixed(2)}` : '￥0' }}</strong>
 				<van-button round size="small" color="#7abb56">立即下单</van-button>
 			</div>
 			<van-button round size="small" v-if="!manageStatus" @click="deleteCarts">删除</van-button>
@@ -360,7 +360,7 @@ export default {
 .page-shop {
 	.top-banner {
 		.van-row {
-			background-color: rgba(201, 201, 201, .3);
+			background-color: rgba(201, 201, 201, .18);
 
 			.van-col {
 				height: 50px;
@@ -528,7 +528,7 @@ export default {
 			}
 
 			.van-button {
-				padding: 0 25px;
+				padding: 0 20px;
 				font-size: 16px;
 			}
 		}

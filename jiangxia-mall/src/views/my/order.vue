@@ -80,7 +80,7 @@ export default {
         background-color: #7abb56;
 
         h4 {
-            font-size: 18px;
+            font-size: 16px;
             color: #fff;
         }
 
@@ -100,6 +100,11 @@ export default {
                         font-size: 12px;
                     }
                 }
+				.van-tab--active{
+					.van-tab__text{
+						font-weight: 600;
+					}
+				}
             }
         }
     }

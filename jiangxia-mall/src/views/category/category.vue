@@ -221,7 +221,7 @@ export default {
 
 		const goodContent = document.querySelector('.goodWrapper');
 		const goodScrollTop = goodContent ? goodContent.scrollTop : 0;
-		console.log(goodScrollTop)
+		// console.log(goodScrollTop)
 		this.goodScrollTop = goodScrollTop;
 
 		const operaContent = document.querySelector('.operaWrapper');

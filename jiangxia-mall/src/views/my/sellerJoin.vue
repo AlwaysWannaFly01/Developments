@@ -6,8 +6,8 @@
 			<van-field v-model="number" label="执照编号" placeholder="请输入营业执照编号"/>
 			<van-field v-model="contactName" label="联系人" placeholder="请输入联系人姓名"/>
 			<van-field v-model="tel" type="tel" maxlength="11" label="联系电话" placeholder="请输入联系电话"/>
-			<ProvinceCityCountry @func="getDataFormSon"></ProvinceCityCountry>
-			<van-divider/>
+			<van-field label="所在地区" placeholder="省, 市, 区" :value="value" readonly
+					   right-icon="location-o" @click="showPickerPop"/>
 			<van-field
 				v-model="address"
 				rows="2"
@@ -44,25 +44,32 @@
 			</van-field>
 		</van-cell-group>
 		<van-button type="primary" size="large" color="#7abb56" @click="submit">提交申请</van-button>
+		<van-popup v-model="showPicker" position="bottom">
+			<van-picker
+				show-toolbar
+				:columns="provinceCityCountry"
+				@cancel="showPicker = false"
+				@confirm="onConfirm"
+				@change="onChange"
+			/>
+		</van-popup>
 	</div>
 </template>
 
 <script>
 import Vue from "vue";
-import {Field, Cell, CellGroup, Uploader, Button, Divider,Toast} from "vant";
+import {Field, Cell, CellGroup, Uploader, Button, Divider, Toast} from "vant";
 
 Vue.use(Cell).use(Field).use(CellGroup).use(Uploader).use(Button).use(Divider).use(Toast);
 import _ from 'lodash';
 import HandleToast from '@/utils/toast';
 import {Request} from "@/api/index";
-import ProvinceCityCountry from "../../components/ProvinceCityCountry";
 
 export default {
 	name: "sellerJoin",
 	mounted() {
-	},
-	components: {
-		ProvinceCityCountry
+		this.provinceCityCountry = JSON.parse(localStorage.getItem('localProvinceCityCountry'));
+		console.log(this.provinceCityCountry)
 	},
 	data() {
 		return {
@@ -75,7 +82,9 @@ export default {
 			businessScope: '',
 			license: [],
 			logo: [],
-
+			showPicker: false,
+			value: '',
+			provinceCityCountry: []
 		}
 	},
 	methods: {
@@ -118,9 +127,9 @@ export default {
 								icon: 'smile-o',
 							});
 
-							setTimeout(()=>{
+							setTimeout(() => {
 								this.$router.push({
-									name:'My'
+									name: 'My'
 								})
 							})
 						}
@@ -137,6 +146,24 @@ export default {
 				return false;
 			}
 			return true;
+		},
+		showPickerPop() {
+			this.showPicker = true;
+		},
+		onConfirm(value, index) {
+			console.log(value);
+			console.log(index);
+			const {provinceCityCountry} = this;
+			const areaId = provinceCityCountry[index[0]].children[index[1]].children[index[2]].areaId
+			// console.log(areaId);
+			this.value = value.join(', ');
+			this.showPicker = false;
+		},
+		onChange(picker, values) {
+			// console.log('picker:', picker)
+			// console.log('values:', values)
+			// 	picker.setColumnValues(1, cities[values[0]]);
+			// 	picker.setColumnValues(2, cities[values[0]]);
 		},
 	}
 }
