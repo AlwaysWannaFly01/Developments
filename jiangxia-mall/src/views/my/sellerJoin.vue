@@ -69,7 +69,6 @@ export default {
 	name: "sellerJoin",
 	mounted() {
 		this.provinceCityCountry = JSON.parse(localStorage.getItem('localProvinceCityCountry'));
-		console.log(this.provinceCityCountry)
 	},
 	data() {
 		return {

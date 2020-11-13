@@ -2,17 +2,15 @@
 	<div class="page-address">
 		<van-cell-group>
 			<van-field v-model="name" label="姓名" placeholder="请输入姓名"/>
-			<van-field v-model="tel" type="tel" label="联系电话" placeholder="请输入联系电话"/>
+			<van-field v-model="tel" type="tel" label="联系电话" placeholder="请输入联系电话" maxlength="11"/>
 			<van-field label="所在地区" placeholder="省, 市, 区" :value="value" readonly
 					   right-icon="location-o" @click="showPickerPop"/>
-
 			<van-field v-model="address" label="详细地址" placeholder="请输入详细地址"/>
 		</van-cell-group>
-		<!--		<div class="line"></div>-->
 		<section>
 			<van-checkbox v-model="checked" checked-color="#7abb56">设置为默认地址</van-checkbox>
 		</section>
-		<van-button type="primary" size="large" color="#7abb56">立即保存</van-button>
+		<van-button type="primary" size="large" color="#7abb56" @click="saveAddress">立即保存</van-button>
 		<van-popup v-model="showPicker" position="bottom">
 			<van-picker
 				show-toolbar
@@ -32,6 +30,7 @@ import {Form, Field, Popup, Checkbox, Picker} from 'vant';
 Vue.use(Form).use(Field).use(Popup).use(Checkbox).use(Picker);
 import _ from "lodash";
 import {Request} from "@/api/index";
+import HandleToast from '@/utils/toast';
 
 export default {
 	name: "Address",
@@ -46,18 +45,14 @@ export default {
 			value: '',
 			showPicker: false,
 			checked: true,
-			provinceCityCountry: []
+			provinceCityCountry: [],
+			areaId: ''
 		}
 	},
 	mounted() {
-		// this.init()
-		// console.log(this.childData)
 		this.provinceCityCountry = JSON.parse(localStorage.getItem('localProvinceCityCountry'));
 	},
 	methods: {
-		async init() {
-
-		},
 		showPickerPop() {
 			this.showPicker = true;
 		},
@@ -67,10 +62,58 @@ export default {
 			const {provinceCityCountry} = this;
 			const areaId = provinceCityCountry[index[0]].children[index[1]].children[index[2]].areaId
 			this.value = value.join(', ');
+			this.areaId = areaId;
 			this.showPicker = false;
 		},
 		onChange(picker, values) {
 		},
+		async saveAddress() {
+			const {name, tel, areaId, address, checked} = this;
+			let params = {
+				userName: name,
+				userPhone: tel,
+				userAddress: address,
+				areaId
+			}
+
+			console.log(params);
+			if (_.every(params)) {
+				if (!this.checkPhone(params.userPhone)) {
+					HandleToast('手机号码有误，请重新填写');
+				} else {
+					params['isDefault'] = checked;
+					let res = await this.interEdits(params);
+					console.log(res)
+					HandleToast(res.msg, 'success');
+					setTimeout(()=>{
+						this.$router.replace({
+							name: "ManageAddress",
+						})
+					},800)
+				}
+			} else {
+				HandleToast('请将内容填写完整')
+			}
+		},
+		checkPhone(phoneNumber) {
+			if (!(/^1[3456789]\d{9}$/.test(phoneNumber))) {
+				return false;
+			}
+			return true;
+		},
+
+		/*新增我的地址*/
+		interEdits(params) {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/users/edits', 'post', params).then(res => {
+					if (res.status === 1) {
+						resolve(res);
+					}
+				}).catch(err => {
+					reject(err)
+				})
+			})
+		}
 	}
 }
 </script>

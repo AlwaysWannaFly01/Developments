@@ -90,7 +90,7 @@ export default {
 					name: "ManageAddress"
 				});
 			} else {
-				HandleToast('省市区正在加载中,请稍后')
+				HandleToast('正在加载中,请稍后')
 			}
 		},
 		toSellerJoin() {
@@ -99,7 +99,7 @@ export default {
 					name: "SellerJoin"
 				});
 			} else {
-				HandleToast('省市区正在加载中,请稍后')
+				HandleToast('正在加载中,请稍后')
 			}
 		},
 		callPhone() {
