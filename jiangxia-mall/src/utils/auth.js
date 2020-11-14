@@ -2,15 +2,7 @@
 
 import {encryptByDES, decryptByDES} from './encryptDES.js';
 
-const userId = localStorage.getItem('userId')
-// console.log(userId);
-let TokenKey = ''
-if (userId) {
-	TokenKey = `JXYX_${userId}_`
-} else {
-	TokenKey = "JXYX_0_";
-}
-// console.log(TokenKey)
+const userId = localStorage.getItem('userId');
 const tmp = Date.parse(new Date()).toString();
 
 function rand(min, max) {
@@ -20,5 +12,10 @@ function rand(min, max) {
 const randnum = rand(1000, 9999);
 
 export function getToken() {
-	return encryptByDES(TokenKey + tmp + "_" + randnum);
+	if (userId) {
+		return encryptByDES(`JXYX_${userId}_` + tmp + "_" + randnum);
+	} else {
+		return encryptByDES("JXYX_0_" + tmp + "_" + randnum);
+	}
+
 }

@@ -12,13 +12,15 @@
 					</div>
 					<van-divider/>
 					<div class="list-item-bottom">
-						<van-checkbox v-model="checked" checked-color="#7abb56">设为默认</van-checkbox>
+						<van-checkbox v-model="item.isDefault" checked-color="#7abb56" @click="setDefault(item)"
+									  :disabled="item.isDefault?true:false">设为默认
+						</van-checkbox>
 						<div class="oper">
 							<div class="edit">
 								<van-icon name="edit"/>
 								<span>编辑</span>
 							</div>
-							<div class="delete">
+							<div class="delete" @click="deleteAddress(item)">
 								<van-icon name="delete"/>
 								<span>删除</span>
 							</div>
@@ -74,6 +76,59 @@ export default {
 					reject(err)
 				})
 			})
+		},
+		async deleteAddress(param) {
+			if (param) {
+				const res = await this.interDel(param.addressId);
+				HandleToast(res, 'success');
+				let result = await this.interMyShippingAddress();
+				setTimeout(() => {
+					this.myAddressList = result;
+				}, 800)
+			}
+		},
+		interDel(addressId) {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/users/del', 'post', {addressId}).then(res => {
+					console.log(res)
+					if (res.status === 1) {
+						resolve(res.msg)
+					}
+				}).catch(err => {
+					reject(err)
+				})
+			})
+		},
+		async setDefault(param) {
+			console.log(param)
+			console.log(this.myAddressList);
+			let newArr = [];
+			this.myAddressList.map(item => {
+				if (item.addressId === param.addressId) {
+					item.isDefault = 1;
+				} else {
+					item.isDefault = 0;
+				}
+				newArr.push(item)
+			})
+			// console.log(newArr)
+			this.myAddressList = newArr;
+			if (param) {
+				const res = await this.interSetDefault(param.addressId);
+				HandleToast(res, 'success', 500);
+			}
+		},
+		interSetDefault(addressId) {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/users/setdefault', 'post', {addressId}).then(res => {
+					console.log(res)
+					if (res.status === 1) {
+						resolve(res.msg)
+					}
+				}).catch(err => {
+					reject(err)
+				})
+			})
 		}
 	}
 }
@@ -81,11 +136,14 @@ export default {
 
 <style lang="scss">
 @import "@/assets/styles/global.scss";
-body{
+
+body {
 	background: rgba(201, 201, 201, 0.1);
 }
+
 .page-manageAddress {
 	background-color: #fff;
+
 	.empty {
 		text-align: center;
 		padding: px2rem(20);
@@ -145,6 +203,16 @@ body{
 					.van-checkbox {
 						.van-checkbox__label {
 							font-size: 16px;
+
+							&.van-checkbox__label--disabled {
+								color: #000;
+							}
+						}
+
+						.van-checkbox__icon--disabled .van-icon {
+							border-color: rgb(122, 187, 86);
+							background-color: rgb(122, 187, 86);
+							color: #fff;
 						}
 					}
 
@@ -153,6 +221,7 @@ body{
 						display: flex;
 						width: px2rem(140);
 						justify-content: space-between;
+
 						.edit {
 							display: flex;
 							align-items: center;
@@ -162,7 +231,8 @@ body{
 							display: flex;
 							align-items: center;
 						}
-						span{
+
+						span {
 							margin-left: px2rem(6);
 						}
 					}

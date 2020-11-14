@@ -119,17 +119,19 @@ export default {
 					verifyCode: loginCode,
 					loginType: 4
 				}).then(res => {
-					// console.log(res)
+					console.log(res)
 					if (res.status == 1) {
 						HandleToast(res.msg, 'success', 300);
 						localStorage.setItem('userId', res.data.userId);
 						setTimeout(() => {
 							this.$router.replace({
-								path: "/index",
+								name: "Index",
 							});
 						}, 500)
 					} else {
 						HandleToast(res.msg);
+						this.sendCode();
+						this.loginCode = '';
 					}
 				}).catch(err => {
 					console.log(err)
@@ -151,17 +153,21 @@ export default {
 					loginPwd: password,
 					verifyCode: code
 				}).then(res => {
-					// console.log(res)
+					console.log(res)
 					if (res.status === 1) {
-						HandleToast(res.msg, 'success');
-						localStorage.setItem('userId', res.data.userId);
-						setTimeout(() => {
-							this.$router.replace({
-								path: "/index",
-							});
-						}, 800)
+						// HandleToast(res.msg, 'success');
+						// localStorage.setItem('userId', res.data.userId);
+						// setTimeout(() => {
+						// 	this.$router.replace({
+						// 		name: "Index",
+						// 	});
+						// }, 800)
+						HandleToast('注册成功,请重新登录', 'success');
+						// this.activeName = 'login';
 					} else {
-						HandleToast(res.msg)
+						HandleToast(res.msg);
+						this.sendCode();
+						this.code = '';
 					}
 				}).catch(err => {
 					console.log(err)

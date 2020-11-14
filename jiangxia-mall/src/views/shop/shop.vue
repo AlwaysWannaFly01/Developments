@@ -165,7 +165,7 @@ export default {
 		checkShopList() {
 			return new Promise((resolve, reject) => {
 				Request('main', 'weapp/carts/index', 'get').then(res => {
-					// console.log(res)
+					console.log(res)
 					if (res.status === 1) {
 						// console.log(res.data)
 						res.data.carts.map((item, index) => {

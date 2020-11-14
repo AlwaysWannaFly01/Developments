@@ -91,9 +91,19 @@ export default {
 			this.land = arr;
 		}
 		await this.convert(this.land);
-		let num = await this.interGetCartsNum();
-		console.log(num)
-		this.shopCarNum = num;
+		let res = await this.interGetCartsNum();
+		console.log(res)
+		if (res.status === 1) {
+			this.shopCarNum = res.data;
+		} else {
+			HandleToast(res.msg, 'failure');
+			setTimeout(() => {
+				this.$router.replace({
+					name: 'Login'
+				})
+			}, 800)
+		}
+
 	},
 	methods: {
 		onClickIcon() {
@@ -119,8 +129,10 @@ export default {
 					this.count = 1;
 				}, 500)
 
-				let num = await this.interGetCartsNum();
-				this.shopCarNum = num;
+				let result = await this.interGetCartsNum();
+				if (res.status === 1) {
+					this.shopCarNum = result.data;
+				}
 			}
 		},
 		convert(arr, cate = 'band', sort = 'asc') {
@@ -181,7 +193,9 @@ export default {
 				Request('main', 'weapp/carts/getcartsnum', 'get').then(res => {
 					console.log(res)
 					if (res.status === 1) {
-						resolve(res.data)
+						resolve(res)
+					} else if (res.status === -1) {
+						resolve(res)
 					}
 				}).catch(err => {
 					console.log(err)
