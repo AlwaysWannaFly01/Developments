@@ -63,6 +63,7 @@
 							  :label="item.fullAddress"
 							  center
 							  v-for="(item,index) in allAddress" :key="index"
+							  :class="item.addressId===radio?'active':''"
 					>
 						<template #right-icon>
 							<van-radio :name="item.addressId" checked-color="#7abb56"/>
@@ -437,6 +438,20 @@ body {
 					.van-cell__title {
 						span {
 							font-weight: 600;
+						}
+					}
+
+					&.active {
+						.van-cell__left-icon {
+							color: #7abb56;
+						}
+
+						.van-cell__title {
+							color: #7abb56;
+
+							.van-cell__label {
+								color: #7abb56;
+							}
 						}
 					}
 				}

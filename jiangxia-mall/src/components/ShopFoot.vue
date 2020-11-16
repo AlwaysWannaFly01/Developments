@@ -44,7 +44,7 @@
 			</div>
 			<van-goods-action>
 				<van-goods-action-button color="rgb(57, 148, 113)" text="加入购物车" @click="sure"/>
-				<van-goods-action-button color="rgb(151, 202, 103)" text="立即购买"/>
+				<van-goods-action-button color="rgb(151, 202, 103)" text="立即购买" @click="buy"/>
 			</van-goods-action>
 		</van-popup>
 	</div>
@@ -113,9 +113,10 @@ export default {
 			window.location.href = 'tel:';
 		},
 		addToShopCar() {
-			this.show = true
+			this.show = true;
 		},
 		showSku() {
+			this.show = true;
 		},
 		async sure() {
 			const {detailData, count} = this
@@ -202,6 +203,16 @@ export default {
 					reject(err)
 				})
 			})
+		},
+		async buy() {
+			const {detailData, count} = this
+			console.log(detailData)
+			console.log(count)
+			const res = await this.addCart(detailData, count, 1);
+			this.$router.push({
+				name: 'Purchase'
+			})
+			this.show = false;
 		}
 	}
 }

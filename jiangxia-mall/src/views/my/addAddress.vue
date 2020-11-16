@@ -18,7 +18,7 @@ export default {
 		}
 	},
 	beforeMount() {
-		console.log(this.$route.query.data)
+		// console.log(this.$route.query.data)
 		this.data = this.$route.query.data
 	},
 	mounted() {
