@@ -18,6 +18,7 @@ import AddAddress from "@/views/my/addAddress";
 import GoodsList from "@/views/category/goodsList";
 import SellerJoin from "@/views/my/sellerJoin";
 import Login from "@/views/login/login";
+import Purchase from "@/views/shop/purchase";
 
 Vue.use(Router);
 
@@ -169,6 +170,13 @@ export default new Router({
 			component: SellerJoin,
 			meta: {
 				title: "商品入驻"
+			}
+		},{
+			path: "/purchase",
+			name: "Purchase",
+			component: Purchase,
+			meta: {
+				title: "提交订单"
 			}
 		},
 	]

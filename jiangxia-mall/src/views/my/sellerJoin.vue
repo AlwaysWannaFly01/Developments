@@ -34,7 +34,7 @@
 			/>
 			<van-field name="license" label="上传公司营业执照" class="flex-d-c">
 				<template #input>
-					<van-uploader v-model="license" :max-count="1"/>
+					<van-uploader v-model="license" :max-count="1" :after-read="afterRead"/>
 				</template>
 			</van-field>
 			<van-field name="logo" label="上传公司logo" class="flex-d-c">
@@ -67,9 +67,6 @@ import {Request} from "@/api/index";
 
 export default {
 	name: "sellerJoin",
-	mounted() {
-		this.provinceCityCountry = JSON.parse(localStorage.getItem('localProvinceCityCountry'));
-	},
 	data() {
 		return {
 			companyName: '',
@@ -86,14 +83,13 @@ export default {
 			provinceCityCountry: []
 		}
 	},
+	async mounted() {
+		this.provinceCityCountry = JSON.parse(localStorage.getItem('localProvinceCityCountry'));
+		let res = await this.interAuthToken();
+		console.log(res)
+	},
 	methods: {
-		getDataFormSon(data) {
-			console.log(data)
-			if (data) {
-				this.areaIdPath = data;
-			}
-		},
-		submit() {
+		async submit() {
 			const {companyName, number, contactName, tel, address, companyDesc, businessScope, license, logo, areaIdPath} = this;
 			const params = {
 				shopCompany: companyName,
@@ -107,6 +103,7 @@ export default {
 				applyLinkMan: contactName,
 				companyProfile: companyDesc
 			}
+			console.log(params)
 			if (_.every(params)) {
 				if (!this.checkPhone(params.applyLinkTel)) {
 					HandleToast('手机号码有误，请重新填写');
@@ -115,26 +112,8 @@ export default {
 				} else if (_.isEmpty(params.shopImg)) {
 					HandleToast('请上传公司logo');
 				} else {
-					console.log(params)
-					Request('main', 'weapp/shopapplys/add', 'post', params).then(res => {
-						console.log(res);
-						if (res.status === 1) {
-
-						} else {
-							Toast({
-								message: '功能正在完善中,敬请期待...',
-								icon: 'smile-o',
-							});
-
-							setTimeout(() => {
-								this.$router.push({
-									name: 'My'
-								})
-							})
-						}
-					}).catch(err => {
-						console.log(err)
-					})
+					let res = await this.interAdd(params);
+					console.log(res)
 				}
 			} else {
 				HandleToast('请将内容填写完整')
@@ -156,6 +135,7 @@ export default {
 			const areaId = provinceCityCountry[index[0]].children[index[1]].children[index[2]].areaId
 			// console.log(areaId);
 			this.value = value.join(', ');
+			this.areaIdPath = areaId;
 			this.showPicker = false;
 		},
 		onChange(picker, values) {
@@ -164,6 +144,38 @@ export default {
 			// 	picker.setColumnValues(1, cities[values[0]]);
 			// 	picker.setColumnValues(2, cities[values[0]]);
 		},
+		interAdd(params) {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/shopapplys/add', 'post', params).then(res => {
+					console.log(res);
+					if (res.status === 1) {
+						resolve(res)
+					}
+				}).catch(err => {
+					reject(err);
+				})
+			})
+		},
+		afterRead(file) {
+			// 此时可以自行将文件上传至服务器
+			console.log(file);
+			// this.file = file.file;//文件流
+			// this.fileSrc = file.content;
+			// console.log(this.fileList)
+		},
+		interAuthToken() {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/upload/authToken', 'post', {}).then(res => {
+					console.log(res)
+					if (res.status === 1) {
+						resolve(res.data)
+					}
+				}).catch(err => {
+					// console.log(err)
+					reject(err)
+				})
+			})
+		}
 	}
 }
 </script>

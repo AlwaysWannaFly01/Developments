@@ -19,7 +19,10 @@
 			</van-row>
 			<div class="oper-block">
 				<p>购物数量 <span>{{ account.goodsTotalNum }}</span></p>
-				<van-button type="default" size="small" v-if="!showHot" @click="manage">{{ manageStatus ? '管理' : '取消' }}</van-button>
+				<van-button type="default" size="small" v-if="!showHot" @click="manage">{{
+						manageStatus ? '管理' : '取消'
+					}}
+				</van-button>
 			</div>
 		</div>
 		<div class="shop-container" v-if="!showHot" :style="mainHeight">
@@ -51,7 +54,7 @@
 			</van-checkbox>
 			<div class="account-oper" v-if="manageStatus">
 				<strong>{{ account.goodsTotalMoney ? `￥${account.goodsTotalMoney.toFixed(2)}` : '￥0' }}</strong>
-				<van-button round size="small" color="#7abb56">立即下单</van-button>
+				<van-button round size="small" color="#7abb56" @click="pay">立即下单</van-button>
 			</div>
 			<van-button round size="small" v-if="!manageStatus" @click="deleteCarts">删除</van-button>
 		</div>
@@ -346,6 +349,11 @@ export default {
 					reject(err)
 				})
 			})
+		},
+		pay() {
+			this.$router.push({
+				name: 'Purchase'
+			})
 		}
 	}
 };
@@ -409,8 +417,8 @@ export default {
 
 				.item-top {
 					font-size: 16px;
-					line-height: px2rem(40);
-					padding: 0 px2rem(10);
+					line-height: px2rem(20);
+					padding: px2rem(12) px2rem(10);
 					border-bottom: 1px solid rgba(235, 237, 240, 0.5);
 					overflow: hidden;
 					text-overflow: ellipsis;
