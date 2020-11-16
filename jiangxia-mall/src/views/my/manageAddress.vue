@@ -1,10 +1,10 @@
 <template>
-	<div class="page-manageAddress">
-		<div class="empty" v-if="myAddressList.length === 0">
+	<div class="page-manageAddress" >
+		<div class="empty" v-if="myAddressList&&myAddressList.length === 0">
 			<img src="../../assets/images/noAddress.png">
 		</div>
-		<div class="address-list">
-			<div class="list-container">
+		<div class="address-list" :style="mainHeight">
+			<div class="list-container" v-if="myAddressList&&myAddressList.length > 0">
 				<div v-for="(item,index) in myAddressList" :key="index" class="list-item">
 					<div class="list-item-top">
 						<h3>{{ `收货人:${item.userName}  ${item.userPhone}` }}</h3>
@@ -16,7 +16,7 @@
 									  :disabled="item.isDefault?true:false">设为默认
 						</van-checkbox>
 						<div class="oper">
-							<div class="edit">
+							<div class="edit" @click="editAddress(item)">
 								<van-icon name="edit"/>
 								<span>编辑</span>
 							</div>
@@ -25,11 +25,10 @@
 								<span>删除</span>
 							</div>
 						</div>
-
 					</div>
 				</div>
+				<p>我也是有底线的</p>
 			</div>
-			<p>我也是有底线的</p>
 		</div>
 		<div class="btn-block">
 			<van-button icon="location-o" color="#7abb56" @click="toAddAddress">添加新地址</van-button>
@@ -50,9 +49,15 @@ export default {
 	name: "manageAddress",
 	data() {
 		return {
-			myAddressList: [],
+			myAddressList: null,
 			checked: false
 		}
+	},
+	beforeMount() {
+		this.deviceHeight = window.innerHeight;
+		this.mainHeight = {
+			height: window.innerHeight - 53 + "px",
+		};
 	},
 	async mounted() {
 		let res = await this.interMyShippingAddress();
@@ -129,6 +134,23 @@ export default {
 					reject(err)
 				})
 			})
+		},
+		editAddress(param) {
+			console.log(param);
+			this.$router.push({
+				name: 'AddAddress',
+				query: {
+					data: {
+						addressId: param.addressId,
+						userName: param.userName,
+						userPhone: param.userPhone,
+						areaName: param.areaName,
+						userAddress: param.userAddress,
+						isDefault: param.isDefault,
+						areaId: param.areaId
+					}
+				}
+			})
 		}
 	}
 }
@@ -143,7 +165,7 @@ body {
 
 .page-manageAddress {
 	background-color: #fff;
-
+	//padding-bottom: 53px;
 	.empty {
 		text-align: center;
 		padding: px2rem(20);
@@ -153,29 +175,22 @@ body {
 		}
 	}
 
+	&::before {
+		position: fixed;
+		right: 0;
+		top: 0;
+		left: 0;
+		height: 2px;
+		background: -webkit-repeating-linear-gradient(135deg, #ff6c6c 0, #ff6c6c 20%, transparent 0, transparent 25%, #1989fa 0, #1989fa 45%, transparent 0, transparent 50%);
+		background: repeating-linear-gradient(-45deg, #ff6c6c 0, #ff6c6c 20%, transparent 0, transparent 25%, #1989fa 0, #1989fa 45%, transparent 0, transparent 50%);
+		background-size: 80px;
+		content: '';
+	}
 
 	.address-list {
-		&::before {
-			position: absolute;
-			right: 0;
-			top: 0;
-			left: 0;
-			height: 2px;
-			background: -webkit-repeating-linear-gradient(135deg, #ff6c6c 0, #ff6c6c 20%, transparent 0, transparent 25%, #1989fa 0, #1989fa 45%, transparent 0, transparent 50%);
-			background: repeating-linear-gradient(-45deg, #ff6c6c 0, #ff6c6c 20%, transparent 0, transparent 25%, #1989fa 0, #1989fa 45%, transparent 0, transparent 50%);
-			background-size: 80px;
-			content: '';
-		}
-
-		> p {
-			height: px2rem(40);
-			line-height: px2rem(40);
-			text-align: center;
-			font-size: 14px;
-			background: rgba(201, 201, 201, 0.1);
-		}
-
+		overflow-y: auto;
 		.list-container {
+			//margin-bottom: 53px;
 			.list-item {
 				display: flex;
 				flex-direction: column;
@@ -242,13 +257,21 @@ body {
 					margin: px2rem(12) 0;
 				}
 			}
+
+			> p {
+				height: px2rem(40);
+				line-height: px2rem(40);
+				text-align: center;
+				font-size: 14px;
+				background: rgba(201, 201, 201, 0.1);
+			}
 		}
 	}
 
 	.btn-block {
 		position: fixed;
 		width: 100%;
-		padding: px2rem(6);
+		padding: 4px;
 		bottom: 0;
 		left: 50%;
 		background-color: #fff;

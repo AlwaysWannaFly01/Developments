@@ -46,7 +46,20 @@ export default {
 			showPicker: false,
 			checked: true,
 			provinceCityCountry: [],
-			areaId: ''
+			areaId: '',
+			addressId: ''
+		}
+	},
+	beforeMount() {
+		console.log(this.childData)
+		if (this.childData) {
+			this.name = this.childData.userName;
+			this.tel = this.childData.userPhone;
+			this.address = this.childData.userAddress;
+			this.checked = this.childData.isDefault;
+			this.value = this.childData.areaName;
+			this.areaId = this.childData.areaId;
+			this.addressId = this.childData.addressId;
 		}
 	},
 	mounted() {
@@ -64,11 +77,12 @@ export default {
 			this.value = value.join(', ');
 			this.areaId = areaId;
 			this.showPicker = false;
+			console.log(areaId)
 		},
 		onChange(picker, values) {
 		},
 		async saveAddress() {
-			const {name, tel, areaId, address, checked} = this;
+			const {name, tel, areaId, address, checked, addressId} = this;
 			let params = {
 				userName: name,
 				userPhone: tel,
@@ -82,14 +96,15 @@ export default {
 					HandleToast('手机号码有误，请重新填写');
 				} else {
 					params['isDefault'] = checked;
+					params['addressId'] = addressId;
 					let res = await this.interEdits(params);
 					console.log(res)
 					HandleToast(res.msg, 'success');
-					setTimeout(()=>{
+					setTimeout(() => {
 						this.$router.replace({
 							name: "ManageAddress",
 						})
-					},800)
+					}, 800)
 				}
 			} else {
 				HandleToast('请将内容填写完整')

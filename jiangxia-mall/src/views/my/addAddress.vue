@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<Address></Address>
+		<Address :childData="data"></Address>
 	</div>
 </template>
 
@@ -14,10 +14,15 @@ export default {
 	},
 	data() {
 		return {
+			data: null
 		}
 	},
+	beforeMount() {
+		console.log(this.$route.query.data)
+		this.data = this.$route.query.data
+	},
 	mounted() {
-
+		console.log(this.data)
 	}
 }
 </script>
