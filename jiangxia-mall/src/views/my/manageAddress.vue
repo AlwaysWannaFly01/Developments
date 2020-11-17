@@ -1,10 +1,10 @@
 <template>
-	<div class="page-manageAddress" >
+	<div class="page-manageAddress">
 		<div class="empty" v-if="myAddressList&&myAddressList.length === 0">
 			<img src="../../assets/images/noAddress.png">
 		</div>
-		<div class="address-list" :style="mainHeight">
-			<div class="list-container" v-if="myAddressList&&myAddressList.length > 0">
+		<div class="address-list" :style="mainHeight" v-if="myAddressList&&myAddressList.length > 0">
+			<div class="list-container">
 				<div v-for="(item,index) in myAddressList" :key="index" class="list-item">
 					<div class="list-item-top">
 						<h3>{{ `收货人:${item.userName}  ${item.userPhone}` }}</h3>
@@ -159,17 +159,12 @@ export default {
 <style lang="scss">
 @import "@/assets/styles/global.scss";
 
-body {
-	background: rgba(201, 201, 201, 0.1);
-}
-
 .page-manageAddress {
 	background-color: #fff;
 	//padding-bottom: 53px;
 	.empty {
 		text-align: center;
 		padding: px2rem(20);
-
 		img {
 			width: px2rem(200);
 		}
@@ -189,6 +184,8 @@ body {
 
 	.address-list {
 		overflow-y: auto;
+		background: rgba(201, 201, 201, 0.1);
+
 		.list-container {
 			//margin-bottom: 53px;
 			.list-item {

@@ -12,10 +12,12 @@ function rand(min, max) {
 const randnum = rand(1000, 9999);
 
 export function getToken() {
+	// console.log(userId)
 	if (userId) {
+		// console.log('有userId:' + encryptByDES(`JXYX_${userId}_` + tmp + "_" + randnum));
 		return encryptByDES(`JXYX_${userId}_` + tmp + "_" + randnum);
 	} else {
+		// console.log('没有userId:' +encryptByDES("JXYX_0_" + tmp + "_" + randnum));
 		return encryptByDES("JXYX_0_" + tmp + "_" + randnum);
 	}
-
 }

@@ -35,8 +35,8 @@
 							<van-checkbox v-model="subItem._isCheck" checked-color="#7abb56"
 										  @click="listItemCheckChange(subItem)"></van-checkbox>
 							<div class="detail">
-								<img :src="subItem.goodsImg">
-								<div class="detail-info">
+								<img :src="subItem.goodsImg" @click="toDetail(subItem)">
+								<div class="detail-info" @click="toDetail(subItem)">
 									<h4>{{ subItem.goodsName }}</h4>
 									<span>属性:默认</span>
 									<strong>{{ `￥${subItem.shopPrice}` }}</strong>

@@ -235,7 +235,7 @@ export default {
 	methods: {
 		async onClick(name) {
 			// console.log(name);
-			console.log(this.active);
+			// console.log(this.active);
 			HandleToast('加载中', 'loadType', 300);
 			// console.log(this.switchList);
 			this.activeKey = 0;

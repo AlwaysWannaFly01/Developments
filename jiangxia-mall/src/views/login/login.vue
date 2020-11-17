@@ -163,6 +163,7 @@ export default {
 						// 	});
 						// }, 800)
 						HandleToast('注册成功,请重新登录', 'success');
+						this.sendCode();
 						// this.activeName = 'login';
 					} else {
 						HandleToast(res.msg);
@@ -204,6 +205,7 @@ export default {
 }
 
 .page-login {
+	background-color: #fff;
 	.van-tabs {
 		.van-tabs__wrap {
 			height: px2rem(60);

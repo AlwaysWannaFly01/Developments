@@ -1,6 +1,6 @@
 import {Toast} from "vant";
 
-export default function (message, type = null, duration = 2000) {
+export default function (message, type = null, duration = 2000, callback) {
 	if (type === null) {
 		// Toast(message);
 		Toast({
@@ -19,5 +19,10 @@ export default function (message, type = null, duration = 2000) {
 			type,
 			duration
 		});
+	}
+	if (callback) {
+		setTimeout(() => {
+			callback();
+		}, duration)
 	}
 }

@@ -2,17 +2,19 @@
 	<div class="page-purchase">
 		<div class="container" :style="mainHeight">
 			<div class="user-address" @click="showPop">
-				<div class="content">
+				<div class="content" v-if="userAddress&&userAddress.addressId">
 					<div class="title">
 						<h3 class="name">{{ userAddress.userName ? userAddress.userName : '' }}</h3>
 						<h3>{{ userAddress.userPhone ? userAddress.userPhone : '' }}</h3>
 					</div>
 					<div class="addr">
-						<p><span v-show="userAddress.isDefault">[默认]&nbsp;</span>{{
-								userAddress.fullAddress ? userAddress.fullAddress : ''
-							}}</p>
+						<p>
+							<span v-show="userAddress.isDefault">[默认]&nbsp;</span>
+							{{ userAddress.fullAddress ? userAddress.fullAddress : '' }}
+						</p>
 					</div>
 				</div>
+				<div v-else class="empty-addr">设置收获地址</div>
 				<van-icon name="arrow" size="24" color="#999"/>
 			</div>
 			<div class="line-dashed"></div>
@@ -50,11 +52,11 @@
 		</div>
 		<div class="total">
 			<p>合计: <span>{{ `￥${account.goodsTotalMoney ? account.goodsTotalMoney : ''}` }}</span></p>
-			<van-button round size="small" color="#7abb56">立即结算</van-button>
+			<van-button round size="small" color="#7abb56" @click="settle">立即结算</van-button>
 		</div>
 		<van-popup v-model="show" position="bottom" :style="{ height: 'auto' }" closeable class="address-pop">
 			<h3>选择地址</h3>
-			<van-radio-group v-model="radio">
+			<van-radio-group v-model="radio" v-if="allAddress&&allAddress.length > 0">
 				<van-cell-group>
 					<van-cell icon="location-o"
 							  :title="item.userName + ' ' + item.userPhone"
@@ -72,6 +74,9 @@
 
 				</van-cell-group>
 			</van-radio-group>
+			<div v-else class="empty-div">
+				<img src="../../assets/images/noAddress.png">
+			</div>
 			<van-button type="primary" block color="#7abb56" @click="chooseOther">选择其它地址</van-button>
 		</van-popup>
 	</div>
@@ -110,7 +115,7 @@ export default {
 		this.userAddress = res.userAddress;
 		this.account = res.carts;
 		this.allAddress = await this.interMyShippingAddress()
-		console.log(this.allAddress)
+		// console.log(this.allAddress)
 		if (this.userAddress.isDefault) {
 			this.radio = this.userAddress.addressId;
 		}
@@ -166,6 +171,31 @@ export default {
 					reject(err)
 				})
 			})
+		},
+		async settle() {
+			console.log(this.userAddress)
+			const {addressId} = this.userAddress;
+			if (addressId) {
+				const res = await this.interSubmitOrder(addressId)
+				console.log(res)
+				HandleToast(res.msg, 'success', 2000, () => {
+					this.$router.replace({
+						name: 'My'
+					})
+				})
+			}
+		},
+		interSubmitOrder(addressId) {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/orders/submitorder', 'post', {addressId, payType: 1}).then(res => {
+					// console.log(res)
+					if (res.status === 1) {
+						resolve(res)
+					}
+				}).catch(err => {
+					reject(err)
+				})
+			})
 		}
 	}
 }
@@ -178,13 +208,10 @@ export default {
 	padding-bottom: 0;
 }
 
-body {
-	background-color: rgba(201, 201, 201, 0.1);
-}
-
 .page-purchase {
 	.container {
 		overflow-y: auto;
+		background-color: rgba(201, 201, 201, 0.1);
 
 		.user-address {
 			display: flex;
@@ -192,6 +219,7 @@ body {
 			padding: px2rem(12) px2rem(16);
 			background-color: #fff;
 			justify-content: space-between;
+			min-height: px2rem(60);
 
 			.content {
 				.title {
@@ -217,6 +245,10 @@ body {
 						color: #7abb56;
 					}
 				}
+			}
+
+			.empty-addr {
+				font-size: 16px;
 			}
 
 			.van-icon-arrow {
@@ -292,6 +324,7 @@ body {
 								display: flex;
 								flex: 1;
 								align-items: flex-end;
+								height: px2rem(80);
 
 								img {
 									width: px2rem(80);
@@ -459,6 +492,15 @@ body {
 
 			.van-hairline--top-bottom::after {
 				border-top: none;
+			}
+		}
+
+		.empty-div {
+			text-align: center;
+			padding-top: px2rem(20);
+
+			img {
+				width: px2rem(160);
 			}
 		}
 

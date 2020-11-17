@@ -10,14 +10,17 @@
 				<div class="item" @click="handleClick(1)">
 					<img src="../../assets/images/dfk.png"/>
 					<span>待付款</span>
+					<p v-if="order&&order.waitPay">{{ order.waitPay }}</p>
 				</div>
 				<div class="item" @click="handleClick(2)">
 					<img src="../../assets/images/dfh.png"/>
 					<span>待发货</span>
+					<p v-if="order&&order.waitSend">{{ order.waitSend }}</p>
 				</div>
 				<div class="item" @click="handleClick(3)">
 					<img src="../../assets/images/dsh.png"/>
 					<span>待收货</span>
+					<p v-if="order&&order.waitReceive">{{ order.waitReceive }}</p>
 				</div>
 				<div class="line"></div>
 				<div class="item" @click="handleClick(0)">
@@ -62,7 +65,8 @@ export default {
 	data() {
 		return {
 			provinceCityCountry: [],
-			canClick: false
+			canClick: false,
+			order: {}
 		};
 	},
 	components: {TabBar},
@@ -70,16 +74,13 @@ export default {
 		let res = await this.interMyIndex();
 		console.log(res)
 		this.serviceTel = res.serviceTel;
-		// console.log(JSON.parse(localStorage.getItem('localProvinceCityCountry')))
-		if (!localStorage.getItem('localProvinceCityCountry')) {
-			this.init()
-		}
+		this.order = res.order;
 	},
 	methods: {
 		handleClick(param) {
 			this.$router.push({
 				name: "Order",
-				params: {
+				query: {
 					active: param,
 				},
 			});
@@ -122,127 +123,7 @@ export default {
 					reject(err)
 				})
 			})
-		},
-
-		/*请求省市区*/
-		async init() {
-			let AllProvince = await this.getProvinceCityCounty();
-			this.AllProvince = AllProvince;
-			// console.log('所有省份:', AllProvince);
-			this.mapCityData()
-		},
-		async mapCityData() {
-			// console.log('Start');
-			const promise = this.AllProvince.map(async item => {
-				const cityRes = await this.getProvinceCityCounty(item.areaId);
-				return cityRes;
-			})
-			const AllCity = await Promise.all(promise);
-			this.AllCity = AllCity;
-
-			let ProvinceCity = []
-
-			if (this.AllCity && this.AllCity.length > 0) {
-				// console.log(this.AllCity)
-
-				this.AllProvince.map((el, index) => {
-					ProvinceCity.push({
-						text: this.AllProvince[index].areaName,
-						areaId: this.AllProvince[index].areaId,
-						children: this.AllCity[index]
-					})
-				})
-				// console.log(ProvinceCity)
-				this.ProvinceCity = ProvinceCity;
-				if (this.ProvinceCity && this.ProvinceCity.length > 0) {
-					// console.log(this.ProvinceCity);
-					let ProvinceCityCountry = [];
-					this.ProvinceCity.map(item => {
-						// console.log(item)
-						item.children.map(subItem => {
-							subItem['text'] = subItem.areaName;
-						})
-					})
-					// console.log(this.ProvinceCity);
-					let boolList = []
-					this.ProvinceCity.map(item => {
-						let result = item.children.every(subItem => {
-							return subItem.text;
-						})
-						boolList.push(result);
-					})
-					if (boolList.every(item => item)) {
-						this.checkCountryData(this.ProvinceCity);
-					}
-				}
-			}
-		},
-		async checkCountryData(param) {
-			console.log('开始')
-			// console.log(param)
-			const promise1 = param.map(async (item, index) => {
-				// console.log(item)
-				let countryRes = await this.mapCountryData(item);
-				return countryRes;
-			})
-
-			const allCityCountry = await Promise.all(promise1);
-			console.log('所有区县:', allCityCountry);
-			// console.log('所有省份城市:', this.ProvinceCity)
-
-			this.ProvinceCity.map((item, index) => {
-				item.children.map((subItem, subIndex) => {
-					subItem['children'] = allCityCountry[index][subIndex]
-				})
-			})
-			console.log('所有省份城市:', this.ProvinceCity)
-			let boolList = []
-			this.ProvinceCity.map((item, index) => {
-				let result = item.children.every(subItem => {
-					if (index === 24) {
-						return true;
-					}
-					return subItem.children.length > 0;
-				})
-				boolList.push(result);
-			})
-			console.log(boolList)
-			if (boolList.every(item => item)) {
-				this.canClick = true;
-				if (!localStorage.getItem('localProvinceCityCountry')) {
-					localStorage.setItem('localProvinceCityCountry', JSON.stringify(this.ProvinceCity));
-					localStorage.setItem('canClick', true)
-				}
-			}
-			console.log('结束')
-		},
-		async mapCountryData(param) {
-			const promise = param.children.map(async item => {
-				const res = await this.getProvinceCityCounty(item.areaId);
-				// console.log(res);
-				return res;
-			})
-			const thisCityCountry = await Promise.all(promise);
-			return thisCityCountry;
-		},
-		getProvinceCityCounty(param = 0) {
-			return new Promise((resolve, reject) => {
-				Request("main", "weapp/users/listQuery", "post", {
-					parentId: param,
-				}).then(res => {
-					if (res.status === 1) {
-						// console.log(res)
-						res.data.map(item => {
-							item['text'] = item.areaName
-						})
-						resolve(res.data)
-					}
-				}).catch(err => {
-					console.log(err)
-					reject(err)
-				})
-			})
-		},
+		}
 	},
 };
 </script>
@@ -296,6 +177,7 @@ export default {
 				display: flex;
 				flex-direction: column;
 				align-items: center;
+				position: relative;
 
 				img {
 					width: px2rem(25);
@@ -303,6 +185,21 @@ export default {
 				}
 
 				span {
+					font-size: 14px;
+				}
+
+				p {
+					position: absolute;
+					top: px2rem(-5);
+					right: 36%;
+					transform: translateX(50%);
+					border: 1px solid #7abb56;
+					border-radius: 50%;
+					width: px2rem(14);
+					height: px2rem(14);
+					color: #7abb56;
+					text-align: center;
+					line-height: px2rem(14);
 					font-size: 14px;
 				}
 			}
