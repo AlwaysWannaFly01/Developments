@@ -71,7 +71,6 @@
 							<van-radio :name="item.addressId" checked-color="#7abb56"/>
 						</template>
 					</van-cell>
-
 				</van-cell-group>
 			</van-radio-group>
 			<div v-else class="empty-div">
@@ -506,7 +505,7 @@ export default {
 
 		.van-button {
 			border-radius: 22px;
-			margin-top: px2rem(30);
+			margin-top: px2rem(20);
 		}
 	}
 }

@@ -40,21 +40,33 @@
 						</p>
 					</div>
 					<div class="bottom">
-						<van-button round color="#bbb" plain size="small">取消订单</van-button>
+						<van-button round color="#bbb" plain size="small" @click="cancel(item)">取消订单</van-button>
 						<van-button round color="#7abb56" size="small">立即付款</van-button>
 					</div>
 				</div>
 			</van-list>
-
 		</div>
+		<van-popup v-model="show" position="bottom" :style="{ height: 'auto' }" closeable class="choose-pop">
+			<h3>取消订单</h3>
+			<van-radio-group v-model="radio">
+				<van-cell-group>
+					<van-cell>
+						<template #right-icon>
+							<van-radio checked-color="#7abb56"/>
+						</template>
+					</van-cell>
+				</van-cell-group>
+			</van-radio-group>
+			<van-button type="primary" block color="#7abb56">提交</van-button>
+		</van-popup>
 	</div>
 </template>
 
 <script>
 import Vue from "vue";
-import {NavBar, Tab, Tabs, List, Button, Loading} from "vant";
+import {NavBar, Tab, Tabs, List, Button, Loading, Popup} from "vant";
 
-Vue.use(NavBar).use(Tab).use(Tabs).use(List).use(Button).use(Loading);
+Vue.use(NavBar).use(Tab).use(Tabs).use(List).use(Button).use(Loading).use(Popup);
 import {Request} from "@/api/index";
 import HandleToast from '@/utils/toast';
 
@@ -96,7 +108,9 @@ export default {
 			loading: false,
 			finished: false,
 			orderList: [],
-			isEmpty: true
+			isEmpty: true,
+			show: false,
+			radio: ''
 		};
 	},
 	async beforeMount() {
@@ -107,10 +121,11 @@ export default {
 		this.deviceHeight = {
 			height: window.innerHeight + "px",
 		};
-
 		this.mainHeight = {
 			height: window.innerHeight - 100 - 44 + "px",
 		};
+	},
+	mounted(){
 
 	},
 	methods: {
@@ -204,7 +219,11 @@ export default {
 					orderId: param.orderId
 				}
 			})
-		}
+		},
+		cancel(param) {
+			console.log(param);
+			this.show = true;
+		},
 	},
 };
 </script>
@@ -370,6 +389,77 @@ export default {
 		.van-loading {
 			height: 50px;
 			line-height: 50px;
+		}
+	}
+
+	.choose-pop {
+		padding: px2rem(20) px2rem(16);
+		box-sizing: border-box;
+
+		h3 {
+			font-size: 16px;
+			font-weight: 600;
+			text-align: center;
+		}
+
+		.van-radio-group {
+			margin-top: px2rem(20);
+			max-height: px2rem(340);
+			overflow-y: auto;
+
+			.van-cell-group {
+				.van-cell {
+					padding: 10px 0;
+
+					&::after {
+						left: 0;
+						right: 0;
+					}
+
+					.van-cell__left-icon {
+						margin-right: px2rem(10);
+						font-size: 20px;
+					}
+
+					.van-cell__title {
+						span {
+							font-weight: 600;
+						}
+					}
+
+					&.active {
+						.van-cell__left-icon {
+							color: #7abb56;
+						}
+
+						.van-cell__title {
+							color: #7abb56;
+
+							.van-cell__label {
+								color: #7abb56;
+							}
+						}
+					}
+				}
+			}
+
+			.van-hairline--top-bottom::after {
+				border-top: none;
+			}
+		}
+
+		.empty-div {
+			text-align: center;
+			padding-top: px2rem(20);
+
+			img {
+				width: px2rem(160);
+			}
+		}
+
+		.van-button {
+			border-radius: 22px;
+			margin-top: px2rem(20);
 		}
 	}
 }
