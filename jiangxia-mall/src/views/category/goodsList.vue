@@ -134,15 +134,14 @@ export default {
 		}
 	},
 	beforeMount() {
-		this.deviceHeight = window.innerHeight;
 		this.mainHeight = {
 			height: window.innerHeight - 54 - 41 + "px",
 		};
-		console.log(this.mainHeight)
+		// console.log(this.mainHeight)
 		this.searchValue = this.$route.query.searchValue;
 	},
 	async activated() {
-		console.log(this.$route.query.searchValue);
+		// console.log(this.$route.query.searchValue);
 		this.searchValue = this.$route.query.searchValue;
 		console.log(this.$route.meta.isBack);
 		if (!this.$route.meta.isBack) {
@@ -160,8 +159,8 @@ export default {
 		}
 	},
 	beforeRouteEnter(to, from, next) {
-		console.log('to ', to)
-		console.log('from ', from)
+		// console.log('to ', to)
+		// console.log('from ', from)
 		if (from.name == 'Detail') { // 这个name是下一级页面的路由name
 			to.meta.isBack = true; // 设置为true说明你是返回到这个页面，而不是通过跳转从其他页面进入到这个页面
 		} else {
@@ -217,7 +216,7 @@ export default {
 			this.queryParams.page++;
 			this.loading = true;
 			const result = await this.search();
-			// console.log(result)
+			console.log(result)
 			if (result.status === 1) {
 				result.data.data.map(item => {
 					if (_.startsWith(item.goodsImg, "http")) {
@@ -226,15 +225,12 @@ export default {
 						item.goodsImg = "http://youyoujiang.com/" + item.goodsImg;
 					}
 				})
+				this.loading = false;
 				if (parseInt(result.data.current_page) < result.data.last_page) {
-					setTimeout(() => {
-						this.loading = false;
-						this.finished = false;
-						this.searchList = this.searchList.concat(result.data.data);
-					}, 600)
+					this.finished = false;
+					this.searchList = this.searchList.concat(result.data.data);
 				} else if (parseInt(result.data.current_page) === result.data.last_page) {
 					this.finished = true;
-					this.loading = false;
 					this.searchList = this.searchList.concat(result.data.data);
 				}
 			}
@@ -292,6 +288,7 @@ export default {
 			let isTrue = await this.refresh();
 			if (isTrue) {
 				let result = await this.search(orderParam);
+				console.log(result)
 				if (result.status === 1) {
 					result.data.data.map(item => {
 						if (_.startsWith(item.goodsImg, "http")) {
@@ -300,14 +297,16 @@ export default {
 							item.goodsImg = "http://youyoujiang.com/" + item.goodsImg;
 						}
 					})
+					this.loading = false;
 					if (parseInt(result.data.current_page) < result.data.last_page) {
 						this.finished = false;
-						this.loading = false;
 						this.searchList = this.searchList.concat(result.data.data);
 					} else if (parseInt(result.data.current_page) === result.data.last_page) {
 						this.finished = true;
-						this.loading = false;
 						this.searchList = this.searchList.concat(result.data.data);
+					} else if (parseInt(result.data.current_page) > result.data.last_page) {
+						this.searchList = [];
+						this.finished = true;
 					}
 				}
 			}
@@ -537,7 +536,8 @@ export default {
 
 			.van-list__loading {
 				width: 100%;
-				margin-top: px2rem(-10);
+				//margin-top: px2rem(-10);
+
 			}
 		}
 	}
