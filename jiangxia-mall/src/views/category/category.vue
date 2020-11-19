@@ -120,10 +120,6 @@ Vue.use(Icon)
 	.use(List)
 	.use(Loading);
 import TabBar from "../../components/TabBar";
-
-// import BScroll from "better-scroll";
-// import Data from "../../assets/data/goods.json";
-
 import _ from "lodash";
 import {Request} from "@/api/index";
 import HandleToast from '@/utils/toast';
@@ -206,10 +202,10 @@ export default {
 			// console.log('from ', from)
 			vm.$refs.mychild.changeByParent(1);
 			if (to.params.active === 1) {
-				vm.active =1;
+				vm.active = 1;
 				vm.onClick(to.params.active);
-			}else if(to.params.active === 0){
-				vm.active =0;
+			} else if (to.params.active === 0) {
+				vm.active = 0;
 				vm.onClick(to.params.active);
 			}
 		})
@@ -393,7 +389,7 @@ export default {
 		async onChange(index) {
 			const goodContent = document.querySelector('.goodWrapper');
 			// console.log(goodContent)
-			if(goodContent){
+			if (goodContent) {
 				goodContent.scrollTop = 0;
 			}
 			this.activeKey = index;

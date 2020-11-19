@@ -169,7 +169,7 @@ export default {
 			let isTrue = await this.refresh();
 			if (isTrue) {
 				const result = await this.interGetOrderList(this.list[param].value);
-				// console.log(result)
+				console.log(result)
 				await this.convert(result);
 			}
 		},
@@ -183,6 +183,8 @@ export default {
 					// console.log(res)
 					if (res.status === 1) {
 						resolve(res.data)
+					} else {
+
 					}
 				}).catch(err => {
 					console.log(err);
@@ -191,12 +193,12 @@ export default {
 			})
 		},
 		async onLoad() {
-			// console.log('onLoad加载')
+			console.log('onLoad加载')
 			// console.log(this.query)
 			this.query.page++;
 			this.loading = true;
 			const result = await this.interGetOrderList(this.list[this.active].value);
-			// console.log(result)
+			console.log(result)
 
 			result.data.map(item => {
 				item.list.map((subItem) => {
