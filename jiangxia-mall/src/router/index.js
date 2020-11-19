@@ -80,7 +80,8 @@ export default new Router({
 			name: "Order",
 			component: Order,
 			meta: {
-				title: "我的订单"
+				title: "我的订单",
+				keepAlive: true
 			}
 		},
 		{

@@ -80,7 +80,7 @@ export default {
 		handleClick(param) {
 			this.$router.push({
 				name: "Order",
-				query: {
+				params: {
 					active: param,
 				},
 			});

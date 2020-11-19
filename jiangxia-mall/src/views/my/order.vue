@@ -73,6 +73,7 @@ Vue.use(NavBar).use(Tab).use(Tabs).use(List).use(Button).use(Loading).use(Popup)
 import {Request} from "@/api/index";
 import HandleToast from '@/utils/toast';
 
+let activeKey;
 export default {
 	name: "order",
 	data() {
@@ -118,17 +119,45 @@ export default {
 		};
 	},
 	async beforeMount() {
-		const {active} = this.$route.query;
-		console.log(active)
-		this.active = +active;
-		this.onLoad();
-
+		// const {active} = this.$route.params;
+		// console.log(active)
+		// this.active = +active;
+		// this.onLoad();
 		this.deviceHeight = {
 			height: window.innerHeight + "px",
 		};
 		this.mainHeight = {
 			height: window.innerHeight - 100 - 44 + "px",
 		};
+	},
+	async activated() {
+		// console.log(this.$route.params)
+		if (!this.$route.meta.isBack) {
+			// console.log(this.active)
+			activeKey = this.$route.params.active
+		} else {
+			// console.log(this.active)
+			activeKey = this.active;
+		}
+	},
+	beforeRouteEnter(to, from, next) {
+		// console.log('to ', to)
+		// console.log('from ', from)
+		if (from.name == 'OrderDetail') { // 这个name是下一级页面的路由name
+			to.meta.isBack = true; // 设置为true说明你是返回到这个页面，而不是通过跳转从其他页面进入到这个页面
+		} else {
+			to.meta.isBack = false;
+		}
+		next(vm => {
+			console.log(vm);
+			if (activeKey) {
+				vm.active = activeKey;
+				vm.tabChange(activeKey);
+			} else {
+				vm.active = 0;
+				vm.tabChange(0);
+			}
+		})
 	},
 	async mounted() {
 		this.reason = await this.interCancellationReason();
@@ -140,7 +169,7 @@ export default {
 			let isTrue = await this.refresh();
 			if (isTrue) {
 				const result = await this.interGetOrderList(this.list[param].value);
-				console.log(result)
+				// console.log(result)
 				await this.convert(result);
 			}
 		},
@@ -167,7 +196,7 @@ export default {
 			this.query.page++;
 			this.loading = true;
 			const result = await this.interGetOrderList(this.list[this.active].value);
-			console.log(result)
+			// console.log(result)
 
 			result.data.map(item => {
 				item.list.map((subItem) => {
@@ -203,7 +232,7 @@ export default {
 			} else if (parseInt(obj.current_page) === obj.last_page) {
 				this.finished = true;
 				this.orderList = this.orderList.concat(obj.data);
-				console.log(this.orderList)
+				// console.log(this.orderList)
 			} else if (parseInt(obj.current_page) > obj.last_page) {
 				this.finished = true;
 				this.orderList = [];
@@ -226,7 +255,7 @@ export default {
 		interCancellationReason() {
 			return new Promise((resolve, reject) => {
 				Request('main', 'weapp/orders/cancellationreason', 'get').then(res => {
-					console.log(res)
+					// console.log(res)
 					if (res.status === 1) {
 						resolve(res.data)
 					}
