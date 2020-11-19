@@ -39,34 +39,37 @@
 							<span>{{ `￥${item.totalMoney}` }}</span>
 						</p>
 					</div>
-					<div class="bottom">
+					<div class="bottom" v-show="item.orderStatus !== -1">
 						<van-button round color="#bbb" plain size="small" @click="cancel(item)">取消订单</van-button>
 						<van-button round color="#7abb56" size="small">立即付款</van-button>
 					</div>
 				</div>
 			</van-list>
 		</div>
-		<van-popup v-model="show" position="bottom" :style="{ height: 'auto' }" closeable class="choose-pop">
+		<van-popup v-model="show" position="bottom" :style="{ height: 'auto' }" closeable class="choose-pop"
+				   @close="closePop">
 			<h3>取消订单</h3>
-			<van-radio-group v-model="radio">
+			<p>请选择取消订单原因(必选)</p>
+			<van-radio-group v-model="radio" v-if="reason&&reason.length>0">
 				<van-cell-group>
-					<van-cell>
+					<van-cell v-for="(item,index) in reason" :key="index" :title="item.dataName" clickable
+							  @click="chooseReason(item.dataVal)" :class="item.dataVal===radio?'active':''">
 						<template #right-icon>
-							<van-radio checked-color="#7abb56"/>
+							<van-radio checked-color="#7abb56" :name="item.dataVal"/>
 						</template>
 					</van-cell>
 				</van-cell-group>
 			</van-radio-group>
-			<van-button type="primary" block color="#7abb56">提交</van-button>
+			<van-button type="primary" block color="#7abb56" @click="submitReason">提交</van-button>
 		</van-popup>
 	</div>
 </template>
 
 <script>
 import Vue from "vue";
-import {NavBar, Tab, Tabs, List, Button, Loading, Popup} from "vant";
+import {NavBar, Tab, Tabs, List, Button, Loading, Popup, CellGroup, Cell} from "vant";
 
-Vue.use(NavBar).use(Tab).use(Tabs).use(List).use(Button).use(Loading).use(Popup);
+Vue.use(NavBar).use(Tab).use(Tabs).use(List).use(Button).use(Loading).use(Popup).use(CellGroup).use(Cell);
 import {Request} from "@/api/index";
 import HandleToast from '@/utils/toast';
 
@@ -110,11 +113,13 @@ export default {
 			orderList: [],
 			isEmpty: true,
 			show: false,
-			radio: ''
+			radio: '',
+			reason: []
 		};
 	},
 	async beforeMount() {
 		const {active} = this.$route.query;
+		console.log(active)
 		this.active = +active;
 		this.onLoad();
 
@@ -125,28 +130,18 @@ export default {
 			height: window.innerHeight - 100 - 44 + "px",
 		};
 	},
-	mounted(){
-
+	async mounted() {
+		this.reason = await this.interCancellationReason();
 	},
 	methods: {
 		async tabChange(param) {
-			// console.log(param)
+			console.log(param)
+			this.active = param;
 			let isTrue = await this.refresh();
 			if (isTrue) {
 				const result = await this.interGetOrderList(this.list[param].value);
 				console.log(result)
-				this.loading = false;
-				this.isEmpty = false;
-				if (parseInt(result.current_page) < result.last_page) {
-					this.finished = false;
-					this.orderList = this.orderList.concat(result.data);
-				} else if (parseInt(result.current_page) === result.last_page) {
-					this.finished = true;
-					this.orderList = this.orderList.concat(result.data);
-				} else if (parseInt(result.current_page) > result.last_page) {
-					this.finished = true;
-					this.orderList = [];
-				}
+				await this.convert(result);
 			}
 		},
 		interGetOrderList(type) {
@@ -183,19 +178,7 @@ export default {
 					}
 				})
 			})
-			this.loading = false;
-			this.isEmpty = false;
-			if (parseInt(result.current_page) < result.last_page) {
-				this.finished = false;
-				this.orderList = this.orderList.concat(result.data);
-			} else if (parseInt(result.current_page) === result.last_page) {
-				this.finished = true;
-				this.orderList = this.orderList.concat(result.data);
-				console.log(this.orderList)
-			} else if (parseInt(result.current_page) > result.last_page) {
-				this.finished = true;
-				this.orderList = [];
-			}
+			await this.convert(result);
 		},
 		async refresh() {
 			return new Promise((resolve, reject) => {
@@ -211,6 +194,21 @@ export default {
 				}, 500)
 			})
 		},
+		async convert(obj) {
+			this.loading = false;
+			this.isEmpty = false;
+			if (parseInt(obj.current_page) < obj.last_page) {
+				this.finished = false;
+				this.orderList = this.orderList.concat(obj.data);
+			} else if (parseInt(obj.current_page) === obj.last_page) {
+				this.finished = true;
+				this.orderList = this.orderList.concat(obj.data);
+				console.log(this.orderList)
+			} else if (parseInt(obj.current_page) > obj.last_page) {
+				this.finished = true;
+				this.orderList = [];
+			}
+		},
 		toOrderDetail(param) {
 			console.log(param)
 			this.$router.push({
@@ -223,7 +221,60 @@ export default {
 		cancel(param) {
 			console.log(param);
 			this.show = true;
+			this.cancelOrderId = param.orderId;
 		},
+		interCancellationReason() {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/orders/cancellationreason', 'get').then(res => {
+					console.log(res)
+					if (res.status === 1) {
+						resolve(res.data)
+					}
+				}).catch(err => {
+					console.log(err);
+					reject(err);
+				})
+			})
+		},
+		async chooseReason(param) {
+			this.radio = param;
+		},
+		closePop() {
+			this.radio = '';
+		},
+		async submitReason() {
+			console.log(this.cancelOrderId);
+			if (!this.radio) {
+				HandleToast('请选择取消订单原因', 'fail')
+			} else {
+				const res = await this.interCancellation(this.radio);
+				HandleToast(res.msg, 'success', 800, async () => {
+					this.show = false;
+					let isTrue = await this.refresh();
+					if (isTrue) {
+						const result = await this.interGetOrderList(this.list[this.active].value);
+						console.log(result)
+						this.convert(result);
+					}
+				});
+			}
+		},
+		interCancellation(Id) {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/orders/cancellation', 'post', {
+					id: this.cancelOrderId,
+					reasonId: Id
+				}).then(res => {
+					console.log(res)
+					if (res.status === 1) {
+						resolve(res)
+					}
+				}).catch(err => {
+					console.log(err);
+					reject(err);
+				})
+			})
+		}
 	},
 };
 </script>
@@ -402,6 +453,13 @@ export default {
 			text-align: center;
 		}
 
+		p {
+			font-size: 16px;
+			font-weight: 600;
+			text-align: left;
+			margin-top: px2rem(30);
+		}
+
 		.van-radio-group {
 			margin-top: px2rem(20);
 			max-height: px2rem(340);
@@ -423,7 +481,7 @@ export default {
 
 					.van-cell__title {
 						span {
-							font-weight: 600;
+							font-weight: 400;
 						}
 					}
 

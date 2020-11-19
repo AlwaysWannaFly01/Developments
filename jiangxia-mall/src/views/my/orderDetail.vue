@@ -1,8 +1,8 @@
 <template>
 	<div class="page-orderDetail" :style="deviceHeight">
 		<div class="head">
-			<h4 v-if="detail.log&&detail.log.length>0">{{ detail.log[0].logContent }}</h4>
-			<p v-if="detail.log&&detail.log.length>0">{{ detail.log[0].logTime }}</p>
+			<h4 v-if="detail.log&&detail.log.length>0">{{ detail.log[detail.log.length - 1].logContent }}</h4>
+			<p v-if="detail.log&&detail.log.length>0">{{ detail.log[detail.log.length - 1].logTime }}</p>
 		</div>
 		<div class="container" :style="mainHeight">
 			<van-steps :active="active">
@@ -190,6 +190,7 @@ export default {
 				flex-direction: column;
 				justify-content: center;
 				min-height: px2rem(40);
+
 				h4 {
 					margin-bottom: px2rem(10);
 				}
@@ -225,6 +226,7 @@ export default {
 			border-radius: px2rem(3);
 			background-color: #fff;
 			min-height: px2rem(172);
+
 			.top {
 				display: flex;
 				align-items: center;
@@ -245,6 +247,7 @@ export default {
 					justify-content: space-between;
 					padding: px2rem(10) px2rem(10);
 					min-height: px2rem(60);
+
 					.left {
 						display: flex;
 
