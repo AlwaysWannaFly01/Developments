@@ -76,6 +76,12 @@ export default {
 					console.log(res)
 					if (res.status === 1) {
 						resolve(res.data)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					reject(err)
@@ -98,6 +104,12 @@ export default {
 					console.log(res)
 					if (res.status === 1) {
 						resolve(res.msg)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					reject(err)
@@ -129,6 +141,12 @@ export default {
 					console.log(res)
 					if (res.status === 1) {
 						resolve(res.msg)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					reject(err)
@@ -165,6 +183,7 @@ export default {
 	.empty {
 		text-align: center;
 		padding: px2rem(20);
+
 		img {
 			width: px2rem(200);
 		}

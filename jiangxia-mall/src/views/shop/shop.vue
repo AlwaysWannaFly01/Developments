@@ -184,6 +184,12 @@ export default {
 							})
 						})
 						resolve(res.data)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					console.log(err)
@@ -270,6 +276,12 @@ export default {
 					console.log(res)
 					if (res.status === 1) {
 						resolve(res)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					console.log(err);
@@ -329,6 +341,12 @@ export default {
 				}).then(res => {
 					if (res.status === 1) {
 						resolve(res)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					reject(err)
@@ -344,6 +362,12 @@ export default {
 				}).then(res => {
 					if (res.status === 1) {
 						resolve(res)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					reject(err)

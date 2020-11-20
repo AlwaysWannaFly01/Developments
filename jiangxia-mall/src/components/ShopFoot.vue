@@ -95,15 +95,7 @@ export default {
 		console.log(res)
 		if (res.status === 1) {
 			this.shopCarNum = res.data;
-		} else {
-			HandleToast(res.msg, 'failure');
-			setTimeout(() => {
-				this.$router.replace({
-					name: 'Login'
-				})
-			}, 800)
 		}
-
 	},
 	methods: {
 		onClickIcon() {
@@ -162,6 +154,12 @@ export default {
 				}).then(res => {
 					if (res.status === 1) {
 						resolve(res)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					// console.log(err)
@@ -180,6 +178,12 @@ export default {
 				Request('main', 'weapp/carts/index', 'get').then(res => {
 					if (res.status === 1) {
 						resolve(res.data)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					console.log(err)
@@ -195,8 +199,12 @@ export default {
 					console.log(res)
 					if (res.status === 1) {
 						resolve(res)
-					} else if (res.status === -1) {
-						resolve(res)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					console.log(err)

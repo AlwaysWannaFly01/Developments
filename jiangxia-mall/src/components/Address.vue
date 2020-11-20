@@ -123,6 +123,12 @@ export default {
 				Request('main', 'weapp/users/edits', 'post', params).then(res => {
 					if (res.status === 1) {
 						resolve(res);
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					reject(err)
