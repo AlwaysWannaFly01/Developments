@@ -45,35 +45,35 @@
 				<div>
 					<h4>订单编号:</h4>
 					<p>
-						<span>{{ detail.orderNo }}</span>
+						<span>{{ detail.orderNo ? detail.orderNo : '' }}</span>
 						<van-button plain size="mini">复制</van-button>
 					</p>
 				</div>
 				<div>
 					<h4>下单时间:</h4>
-					<p>{{ detail.createTime }}</p>
+					<p>{{ detail.createTime ? detail.createTime : '' }}</p>
 				</div>
 				<div>
 					<h4>支付状态:</h4>
-					<p>{{ detail.status }}</p>
+					<p>{{ detail.status ? detail.status : '' }}</p>
 				</div>
 				<div>
 					<h4>支付方式:</h4>
-					<p>{{ detail.payInfo }}</p>
+					<p>{{ detail.payInfo ? detail.payInfo : '' }}</p>
 				</div>
 			</div>
 			<div class="payInfo">
 				<div class="price">
 					<h4>支付金额:</h4>
-					<p>{{ `￥${detail.totalMoney}` }}</p>
+					<p>{{ `￥${detail.totalMoney ? detail.totalMoney : ''}` }}</p>
 				</div>
 				<div class="mount">
-					<p>实付款: <strong>{{ `￥${detail.realTotalMoney}` }}</strong></p>
+					<p>实付款: <strong>{{ `￥${detail.realTotalMoney ? detail.realTotalMoney : ''}` }}</strong></p>
 				</div>
 			</div>
 		</div>
 		<div class="pay">
-			<van-button round size="small" color="#7abb56">立即付款</van-button>
+			<van-button round size="small" color="#7abb56" :disabled="isDisable">立即付款</van-button>
 		</div>
 	</div>
 </template>
@@ -92,7 +92,8 @@ export default {
 		return {
 			orderId: '',
 			detail: {},
-			active: 0,
+			active: -99,
+			isDisable: false
 		}
 	},
 	async beforeMount() {
@@ -107,6 +108,25 @@ export default {
 		}
 		this.detail = await this.interGetDetail(this.orderId);
 		console.log(this.detail)
+		switch (this.detail.orderStatus) {
+			case -2:
+				this.active = 0;
+				break;
+			case 0:
+				this.active = 1;
+				break;
+			case 1:
+				this.active = 2;
+				break;
+			case 2:
+				this.active = 3;
+				break;
+			case -1:
+				/*已取消*/
+				this.active = -99;
+				this.isDisable = true;
+				break;
+		}
 	},
 	async mounted() {
 
@@ -117,9 +137,22 @@ export default {
 				Request('main', 'weapp/orders/getdetail', 'post', {
 					id
 				}).then(res => {
-					// console.log(res)
+					console.log(res)
 					if (res.status === 1) {
+						res.data.goods.map((item) => {
+							if (_.startsWith(item.goodsImg, "http")) {
+								return;
+							} else {
+								item.goodsImg = "http://youyoujiang.com/" + item.goodsImg;
+							}
+						});
 						resolve(res.data)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
 					}
 				}).catch(err => {
 					reject(err);

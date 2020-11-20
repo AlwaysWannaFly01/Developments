@@ -124,8 +124,17 @@ export default {
 		interSettlement() {
 			return new Promise((resolve, reject) => {
 				Request("main", "weapp/carts/settlement", "get").then((res) => {
-					// console.log(res);
+					console.log(res);
 					if (res.status === 1) {
+						res.data.carts.carts.map((item) => {
+							item.list.map((subItem) => {
+								if (_.startsWith(subItem.goodsImg, "http")) {
+									return;
+								} else {
+									subItem.goodsImg = "http://youyoujiang.com/" + subItem.goodsImg;
+								}
+							})
+						});
 						resolve(res.data)
 					} else {
 						HandleToast(res.msg, 'fail', 1000, () => {

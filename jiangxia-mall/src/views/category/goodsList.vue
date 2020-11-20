@@ -134,6 +134,8 @@ export default {
 		}
 	},
 	beforeMount() {
+		console.log(window.innerHeight);
+		console.log(document.body.clientHeight)
 		this.mainHeight = {
 			height: window.innerHeight - 54 - 41 + "px",
 		};
@@ -143,7 +145,7 @@ export default {
 	async activated() {
 		// console.log(this.$route.query.searchValue);
 		this.searchValue = this.$route.query.searchValue;
-		console.log(this.$route.meta.isBack);
+		// console.log(this.$route.meta.isBack);
 		if (!this.$route.meta.isBack) {
 			this.queryParams = {
 				condition: '',

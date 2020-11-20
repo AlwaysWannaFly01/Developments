@@ -289,7 +289,7 @@ export default {
 			}
 		},
 		async init() {
-			console.log('init触发')
+			// console.log('init触发')
 			HandleToast('加载中', 'loadType', 300);
 			let menuList = await this.getMenuList();
 			// console.log(menuList);

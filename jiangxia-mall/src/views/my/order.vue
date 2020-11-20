@@ -41,7 +41,7 @@
 					</div>
 					<div class="bottom" v-show="item.orderStatus !== -1">
 						<van-button round color="#bbb" plain size="small" @click="cancel(item)">取消订单</van-button>
-						<van-button round color="#7abb56" size="small">立即付款</van-button>
+						<van-button round color="#7abb56" size="small" @click="pay(item)">立即付款</van-button>
 					</div>
 				</div>
 			</van-list>
@@ -119,10 +119,6 @@ export default {
 		};
 	},
 	async beforeMount() {
-		// const {active} = this.$route.params;
-		// console.log(active)
-		// this.active = +active;
-		// this.onLoad();
 		this.deviceHeight = {
 			height: window.innerHeight + "px",
 		};
@@ -149,7 +145,7 @@ export default {
 			to.meta.isBack = false;
 		}
 		next(vm => {
-			console.log(vm);
+			// console.log(vm);
 			if (activeKey) {
 				vm.active = activeKey;
 				vm.tabChange(activeKey);
@@ -164,12 +160,12 @@ export default {
 	},
 	methods: {
 		async tabChange(param) {
-			console.log(param)
+			// console.log(param)
 			this.active = param;
 			let isTrue = await this.refresh();
 			if (isTrue) {
 				const result = await this.interGetOrderList(this.list[param].value);
-				console.log(result)
+				// console.log(result)
 				await this.convert(result);
 			}
 		},
@@ -180,8 +176,17 @@ export default {
 					pagesize: this.query.pageSize,
 					page: this.query.page
 				}).then(res => {
-					// console.log(res)
+					console.log(res)
 					if (res.status === 1) {
+						res.data.data.map((item) => {
+							item.list.map((subItem) => {
+								if (_.startsWith(subItem.goodsImg, "http")) {
+									return;
+								} else {
+									subItem.goodsImg = "http://youyoujiang.com/" + subItem.goodsImg;
+								}
+							})
+						});
 						resolve(res.data)
 					} else {
 						HandleToast(res.msg, 'fail', 800, () => {
@@ -245,7 +250,7 @@ export default {
 			}
 		},
 		toOrderDetail(param) {
-			console.log(param)
+			// console.log(param)
 			this.$router.push({
 				name: 'OrderDetail',
 				query: {
@@ -318,6 +323,32 @@ export default {
 					}
 				}).catch(err => {
 					console.log(err);
+					reject(err);
+				})
+			})
+		},
+		async pay(item) {
+			console.log(item);
+			const res = await this.interWxpays(item.pkey);
+			console.log(res)
+		},
+		interWxpays(pkey) {
+			return new Promise((resolve, reject) => {
+				Request('main', 'weapp/orders/wxpays', 'post', {
+					pkey
+				}).then(res => {
+					console.log(res)
+					if (res.status === 1) {
+						resolve(res)
+					} else {
+						HandleToast(res.msg, 'fail', 800, () => {
+							this.$router.replace({
+								name: 'Login'
+							})
+						});
+					}
+				}).catch(err => {
+					// console.log(err);
 					reject(err);
 				})
 			})
