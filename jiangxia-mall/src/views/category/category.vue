@@ -5,7 +5,7 @@
 				<template #title>{{ item.catName }}</template>
 			</van-tab>
 		</van-tabs>
-		<van-search v-model="value" placeholder="点击搜索商品名称" @search="onSearch"/>
+		<van-search v-model="value" placeholder="点击搜索商品名称" @search="onSearch" ref="inputText"/>
 		<div class="img-block">
 			<img src="../../assets/images/bg/live_farm.png" v-if="active===0"/>
 			<img src="../../assets/images/bg/live_oper.png" v-if="active===1"/>
@@ -429,12 +429,16 @@ export default {
 		},
 		onSearch() {
 			if (this.value) {
-				this.$router.push({
-					name: 'GoodsList',
-					query: {
-						searchValue: this.value
-					}
-				})
+				this.$refs.inputText.blur();//软键盘隐藏
+				/*解决输入框弹起软键盘,跳转到下一页,获取window.innerHeight计算错误的问题*/
+				setTimeout(() => {
+					this.$router.push({
+						name: 'GoodsList',
+						query: {
+							searchValue: this.value
+						}
+					})
+				}, 400)
 			} else {
 				HandleToast('请填写要搜索的产品信息', null, 500)
 			}

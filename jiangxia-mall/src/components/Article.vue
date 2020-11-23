@@ -87,6 +87,7 @@ export default {
 .page-article {
 	.banner {
 		width: 100%;
+		height: px2rem(140);
 	}
 
 	.content {

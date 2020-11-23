@@ -153,7 +153,8 @@ export default {
 				saleOrder: -1,
 				popularOrder: -1
 			}
-			await this.convert()
+			// console.log('初始化')
+			await this.convert();
 		} else {
 			//this.$route.meta.isBack为true,则表示从详情页返回的
 			const $content = document.querySelector('.scrollContent'); // 列表的外层容器

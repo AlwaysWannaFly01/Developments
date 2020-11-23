@@ -94,6 +94,7 @@ export default {
 		p {
 			font-size: 14px;
 			margin-top: px2rem(10);
+			line-height: 18px;
 		}
 	}
 
@@ -117,10 +118,12 @@ export default {
 
 		.desc {
 			font-size: 14px;
+			line-height: 18px;
 		}
 
 		.detail {
 			font-size: 14px;
+			line-height: 18px;
 		}
 	}
 

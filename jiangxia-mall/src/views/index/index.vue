@@ -415,7 +415,7 @@ export default {
 		background-image: url("../../assets/images/bg/banner.png");
 		background-size: px2rem(375) auto;
 		background-repeat: no-repeat;
-		background-position-y: px2rem(50);
+		background-position-y: px2rem(45);
 	}
 
 	.content {
