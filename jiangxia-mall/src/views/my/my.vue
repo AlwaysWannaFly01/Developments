@@ -65,7 +65,7 @@ export default {
 	data() {
 		return {
 			provinceCityCountry: [],
-			canClick: false,
+			// canClick: false,
 			order: {}
 		};
 	},
@@ -86,22 +86,22 @@ export default {
 			});
 		},
 		toManageAddress() {
-			if (localStorage.getItem('canClick')) {
+			// if (localStorage.getItem('canClick')) {
 				this.$router.push({
 					name: "ManageAddress"
 				});
-			} else {
-				HandleToast('正在加载中,请稍后')
-			}
+			// } else {
+			// 	HandleToast('正在加载中,请稍后')
+			// }
 		},
 		toSellerJoin() {
-			if (localStorage.getItem('canClick')) {
+			// if (localStorage.getItem('canClick')) {
 				this.$router.push({
 					name: "SellerJoin"
 				});
-			} else {
-				HandleToast('正在加载中,请稍后')
-			}
+			// } else {
+			// 	HandleToast('正在加载中,请稍后')
+			// }
 		},
 		callPhone() {
 			window.location.href = 'tel:' + this.serviceTel;

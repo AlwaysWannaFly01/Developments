@@ -9,7 +9,6 @@
 		<div class="img-block">
 			<img src="../../assets/images/bg/live_farm.png" v-if="active===0"/>
 			<img src="../../assets/images/bg/live_oper.png" v-if="active===1"/>
-			<!--			<img src="../../assets/images/jx/play.png" class="play"/>-->
 		</div>
 
 		<div class="main-container" :style="mainHeight">
@@ -57,11 +56,6 @@
 				</div>
 			</div>
 			<div v-if="active===1" class="main oper">
-				<!-- <div class="top">
-					<img src="../../assets/images/jx/label_icon.png" />
-					<span>全部商品</span>
-					<img src="../../assets/images/jx/label_icon.png" />
-				</div>-->
 				<div
 					class="oper-goods"
 					v-if="!operEmpty&&operGoods.length>0"

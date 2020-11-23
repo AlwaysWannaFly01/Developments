@@ -77,33 +77,9 @@
 </template>
 <script>
 import Vue from "vue";
-import {
-	Col,
-	Row,
-	Cell,
-	CellGroup,
-	Tag,
-	Icon,
-	Swipe,
-	SwipeItem,
-	Button,
-	Tab,
-	Tabs,
-	Loading,
-} from "vant";
+import {Col, Row, Cell, CellGroup, Tag, Icon, Swipe, SwipeItem, Button, Tab, Tabs, Loading,} from "vant";
 
-Vue.use(Col)
-	.use(Row)
-	.use(Cell)
-	.use(CellGroup)
-	.use(Tag)
-	.use(Icon)
-	.use(Swipe)
-	.use(SwipeItem)
-	.use(Button)
-	.use(Tab)
-	.use(Tabs)
-	.use(Loading);
+Vue.use(Col).use(Row).use(Cell).use(CellGroup).use(Tag).use(Icon).use(Swipe).use(SwipeItem).use(Button).use(Tab).use(Tabs).use(Loading);
 
 import _ from "lodash";
 import {Request} from "@/api/index";
@@ -135,7 +111,8 @@ export default {
 	mounted() {
 		this.init();
 		if (!localStorage.getItem('localProvinceCityCountry')) {
-			this.addressInit();
+			/*将省市区数据存到本地*/
+			// this.addressInit();
 		}
 	},
 	methods: {
@@ -295,8 +272,6 @@ export default {
 			let ProvinceCity = []
 
 			if (this.AllCity && this.AllCity.length > 0) {
-				// console.log(this.AllCity)
-
 				this.AllProvince.map((el, index) => {
 					ProvinceCity.push({
 						text: this.AllProvince[index].areaName,

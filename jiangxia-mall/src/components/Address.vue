@@ -31,7 +31,7 @@ Vue.use(Form).use(Field).use(Popup).use(Checkbox).use(Picker);
 import _ from "lodash";
 import {Request} from "@/api/index";
 import HandleToast from '@/utils/toast';
-
+import ProvinceCityCountryData from '@/assets/data/ProvinceCityCountry';
 export default {
 	name: "Address",
 	props: [
@@ -63,7 +63,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.provinceCityCountry = JSON.parse(localStorage.getItem('localProvinceCityCountry'));
+		this.provinceCityCountry = ProvinceCityCountryData;
 	},
 	methods: {
 		showPickerPop() {

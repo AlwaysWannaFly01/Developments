@@ -64,6 +64,7 @@ Vue.use(Cell).use(Field).use(CellGroup).use(Uploader).use(Button).use(Divider).u
 import _ from 'lodash';
 import HandleToast from '@/utils/toast';
 import {Request} from "@/api/index";
+import ProvinceCityCountryData from '@/assets/data/ProvinceCityCountry';
 
 export default {
 	name: "sellerJoin",
@@ -84,7 +85,8 @@ export default {
 		}
 	},
 	async mounted() {
-		this.provinceCityCountry = JSON.parse(localStorage.getItem('localProvinceCityCountry'));
+		this.provinceCityCountry = ProvinceCityCountryData;
+
 		let res = await this.interAuthToken();
 		console.log(res)
 	},
