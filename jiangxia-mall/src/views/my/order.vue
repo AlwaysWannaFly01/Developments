@@ -331,22 +331,54 @@ export default {
 			console.log(item);
 			const res = await this.interWxpays(item.pkey);
 			console.log(res)
+			if (res.status === 1) {
+				callpay();
+				/*前端js发起支付*/
+				function jsApiCall() {
+					WeixinJSBridge.invoke("getBrandWCPayRequest", {
+						"appId": "{$jsapi_parameters.appId}", //公众号名称，由商户传入
+						"timeStamp": "{$jsapi_parameters.timeStamp}", //时间戳，自1970年以来的秒数
+						"nonceStr": "{$jsapi_parameters.nonceStr}", //随机串
+						"package": "{$jsapi_parameters.package}",
+						"signType": "{$jsapi_parameters.signType}", //微信签名方式：
+						"paySign": "{$jsapi_parameters.paySign}" //微信签名
+					}, function (res) {
+						if (res.err_msg == "get_brand_wcpay_request:ok") {
+							//微信支付成功,前端不做处理,微信异步调用后台接口
+						} else {
+						}
+						alert(JSON.stringify(res));
+					})
+				};
+
+				function callpay() {
+					if (typeof WeixinJSBridge == "undefined") {
+						if (document.addEventListener) {
+							document.addEventListener("WeixinJSBridgeReady", jsApiCall, false);
+						} else if (document.attachEvent) {
+							document.attachEvent("WeixinJSBridgeReady", jsApiCall);
+							document.attachEvent("onWeixinJSBridgeReady", jsApiCall);
+						}
+					} else {
+						jsApiCall();
+					}
+				}
+
+			} else {
+				HandleToast(res.msg, 'fail', 800, () => {
+					this.$router.replace({
+						name: 'Login'
+					})
+				});
+			}
+
 		},
 		interWxpays(pkey) {
 			return new Promise((resolve, reject) => {
 				Request('main', 'weapp/orders/wxpays', 'post', {
 					pkey
 				}).then(res => {
-					console.log(res)
-					if (res.status === 1) {
-						resolve(res)
-					} else {
-						HandleToast(res.msg, 'fail', 800, () => {
-							this.$router.replace({
-								name: 'Login'
-							})
-						});
-					}
+					resolve(res)
 				}).catch(err => {
 					// console.log(err);
 					reject(err);
