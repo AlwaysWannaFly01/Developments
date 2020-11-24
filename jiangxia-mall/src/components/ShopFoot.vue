@@ -102,7 +102,7 @@ export default {
 
 		},
 		callPhone() {
-			window.location.href = 'tel:';
+			window.location.href = 'tel:' + this.detailData.shop.shopTel;
 		},
 		addToShopCar() {
 			this.show = true;
@@ -325,7 +325,6 @@ export default {
 							}
 						}
 					}
-
 				}
 			}
 		}

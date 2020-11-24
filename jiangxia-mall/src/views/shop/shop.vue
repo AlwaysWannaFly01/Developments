@@ -19,9 +19,8 @@
 			</van-row>
 			<div class="oper-block">
 				<p>购物数量 <span v-show="!isEmpty&&!showHot">{{ account.goodsTotalNum }}</span></p>
-				<van-button type="default" size="small" v-if="!isEmpty&&!showHot" @click="manage">{{
-						manageStatus ? '管理' : '取消'
-					}}
+				<van-button type="default" size="small" v-if="!isEmpty&&!showHot" @click="manage">
+					{{ manageStatus ? '管理' : '取消' }}
 				</van-button>
 			</div>
 		</div>
@@ -42,7 +41,11 @@
 										<img :src="subItem.goodsImg" @click="toDetail(subItem)">
 										<div class="detail-info" @click="toDetail(subItem)">
 											<h4>{{ subItem.goodsName }}</h4>
-											<span>属性:默认</span>
+											<span>
+												{{
+													subItem.specNames.length > 0 ? `属性:${subItem.specNames.map(tag => tag.itemName).join(',')}` : '属性:默认'
+												}}
+											</span>
 											<strong>{{ `￥${subItem.shopPrice}` }}</strong>
 										</div>
 										<van-stepper v-model="subItem.cartNum" @change="cartNumOnChange(subItem)"/>

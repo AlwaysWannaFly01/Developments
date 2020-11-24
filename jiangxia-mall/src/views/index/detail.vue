@@ -58,7 +58,6 @@ export default {
 	},
 	beforeMount() {
 		this.id = this.$route.query.id;
-		this.deviceHeight = window.innerHeight;
 		this.mainHeight = {
 			height: window.innerHeight - 50 + "px",
 		};

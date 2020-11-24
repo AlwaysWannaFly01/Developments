@@ -249,7 +249,7 @@ export default {
 						box-sizing: border-box;
 						width: px2rem(100);
 						height: px2rem(31);
-
+						margin-left: px2rem(8);
 						img {
 							width: px2rem(100);
 							height: px2rem(31);
