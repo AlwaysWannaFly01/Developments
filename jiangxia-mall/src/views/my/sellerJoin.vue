@@ -32,12 +32,12 @@
 				type="textarea"
 				placeholder="请输入经营范围"
 			/>
-			<van-field name="license" label="上传公司营业执照" class="flex-d-c">
+			<van-field name="license2" label="上传公司营业执照" class="flex-d-c">
 				<template #input>
 					<van-uploader v-model="license" :max-count="1" :after-read="afterRead"/>
 				</template>
 			</van-field>
-			<van-field name="logo" label="上传公司logo" class="flex-d-c">
+			<van-field name="logo2" label="上传公司logo" class="flex-d-c">
 				<template #input>
 					<van-uploader v-model="logo" :max-count="1"/>
 				</template>
@@ -65,6 +65,7 @@ import _ from 'lodash';
 import HandleToast from '@/utils/toast';
 import {Request} from "@/api/index";
 import ProvinceCityCountryData from '@/assets/data/ProvinceCityCountry';
+// import {uploadToken} from '@/utils/qiniuUploadToken';
 
 export default {
 	name: "sellerJoin",
@@ -81,14 +82,17 @@ export default {
 			logo: [],
 			showPicker: false,
 			value: '',
-			provinceCityCountry: []
+			provinceCityCountry: [],
+			// 实名认证后创建的存储空间对应的上传地址(华东，华南等等不一样：https://developer.qiniu.com/kodo/manual/1671/region-endpoint)
+			qiniuDomain: "https://upload-z2.qiniup.com",
+			// qiniuDomain: "http://youyoujiang.com",
+			// 创建成功后官方随机分配的公开图片地址前缀，即上传成功后对应的公用图片地址前缀
+			qiniuViewHost: "http://qkbzu8sr4.hn-bkt.clouddn.com",
+			// qiniuViewHost: "http://youyoujiang.com",
 		}
 	},
 	async mounted() {
 		this.provinceCityCountry = ProvinceCityCountryData;
-
-		let res = await this.interAuthToken();
-		console.log(res)
 	},
 	methods: {
 		async submit() {
@@ -170,19 +174,50 @@ export default {
 			// this.file = file.file;//文件流
 			// this.fileSrc = file.content;
 			// console.log(this.fileList)
+			this.upLoadQiniu(file);
 		},
 		interAuthToken() {
 			return new Promise((resolve, reject) => {
 				Request('main', 'weapp/upload/authToken', 'post', {}).then(res => {
-					console.log(res)
+					// console.log(res)
 					if (res.status === 1) {
-						resolve(res.data)
+						resolve(res)
 					}
 				}).catch(err => {
 					// console.log(err)
 					reject(err)
 				})
 			})
+		},
+		async upLoadQiniu(req) {
+			const config = {
+				headers: {
+					"Content-Type": "multipart/form-data"
+				}
+			}
+			let fileType = '';
+			if (req.file.type === 'image/png') {
+				fileType = 'png'
+			} else {
+				fileType = 'jpg'
+			}
+			// 重命名要上传的文件
+			const keyname = `${new Date().getTime()}${Math.random().toString(36).slice(2)}.${fileType}`;
+			const res = await this.interAuthToken();
+			const token = res.data;
+			const formdata = new FormData();
+			formdata.append('file', req.file);
+			formdata.append('token', token);
+			formdata.append('key', keyname)
+			// const result = await this.$axios.post(this.qiniuDomain, formdata, config);
+
+			const result = await Request('main', this.qiniuDomain, 'post', formdata);
+			console.log(result)
+
+			console.log(`${this.qiniuViewHost}/${result.key}`)
+			this.license = [
+				{url: `${this.qiniuViewHost}/${result.key}`}
+			]
 		}
 	}
 }
