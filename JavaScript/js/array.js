@@ -101,3 +101,33 @@ arr3.forEach(function (el, index, arr) {
     console.log(this === obj) // true
     console.log(arr)
 }, obj)
+
+
+//2.map()
+const arr = [{id: 1},{id: 2},{id: 3}]
+const newArr = arr.map((el,index,arr) => {
+    el.age = 20
+    return el
+});
+//[{id: 1,age: 20},{id: 2,age: 20},{id: 3,age: 20}]
+console.log(newArr);
+
+
+//3.filter()
+const arr4 = [{id: 1},{id: 2},{id: 3}]
+const newArr2 = arr4.filter((el,index,arr) => {
+    el.age = 20
+    return el
+});
+// [{id: 1,age: 20},{id: 2,age: 20},{id: 3,age: 20}]
+console.log(newArr2);
+
+//4.some()
+const arr5 = [{id: 1},{id: 2},{id: 3}]
+const someResult = arr5.some((el,index,arr) => {
+    return el.id === 1
+});
+// true
+console.log(someResult)
+
+
