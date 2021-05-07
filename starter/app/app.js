@@ -6,18 +6,7 @@ import serve from 'koa-static';
 import { config, json, logging, success, jwt, Loader } from 'lin-mizar';
 import { PermissionModel } from './model/permission';
 import WebSocket from './extension/socket/socket'
-
-/**
- * 首页
- */
-function indexPage (app) {
-  app.context.loader.mainRouter.get('/', async ctx => {
-    ctx.type = 'html';
-    ctx.body = '123'
-  });
-
-
-}
+import path from 'path'
 
 /**
  * 跨域支持
@@ -96,6 +85,7 @@ async function createApp () {
   applyCors(app);
   applyStatic(app);
   const { log, error, Lin, multipart } = require('lin-mizar');
+  app.use(serve(path.join( __dirname,  '../public')))
   app.use(log);
   app.on('error', error);
 
@@ -105,7 +95,6 @@ async function createApp () {
   const lin = new Lin();
   await lin.initApp(app, true); // 是否挂载插件路由，默认为true
   await PermissionModel.initPermission();
-  indexPage(app);
   multipart(app);
   return applyWebSocket(app);
 }
