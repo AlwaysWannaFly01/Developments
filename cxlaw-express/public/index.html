@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<h2>
+    打的
+</h2>
+<input id="get" type="button" value="get"/>
+<input id="post" type="button" value="post"/>
+<input id="put" type="button" value="put"/>
+<input id="delete" type="button" value="delete"/>
+<script>
+    $("#get").click(function () {
+        axios.get('/guide')
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    })
+
+
+    $("#post").click(function () {
+        axios.post('/guide', {
+            title: 'Fred',
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    })
+
+    $("#put").click(function(){
+        axios.put('/guide/3', {
+            addr: '武汉市',
+            sddf:'safdff'
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    })
+
+    $("#delete").click(function(){
+        axios.delete('/guide',{
+            params: {	// 请求参数拼接在url上
+                id: 12
+            }
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    })
+
+</script>
+</body>
+</html>
