@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="javascripts/jQuery.js"></script>
+    <script src="javascripts/axios.js"></script>
+</head>
+<body>
+<h2>cms线上接口测试</h2>
+<input id="get" type="button" value="get"/>
+<input id="post" type="button" value="post"/>
+<input id="put" type="button" value="put"/>
+<input id="delete" type="button" value="delete"/>
+<script>
+    $("#get").click(function () {
+        axios.get('/v1/book')
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    })
+</script>
+</body>
+</html>
